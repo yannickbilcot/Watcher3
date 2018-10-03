@@ -452,6 +452,7 @@ function _results_table(results){
 
         result["translated_status"] = _(result["status"]);
         result['status_color'] = status_colors[result['status']]
+        result['guid'] = result['guid'].replace(/'/g, "\\'");
         rows += format_template(templates.release, result).outerHTML;
     });
 
