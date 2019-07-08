@@ -153,7 +153,7 @@ class NewzNabProvider(object):
                 result = {
                     "download_client": None,
                     "downloadid": None,
-                    "freeleech": 1 if item['attr'].get('downloadvolumefactor', 1) == 0 else 0,
+                    "freeleech": float(item['attr'].get('downloadvolumefactor', 1)) == 0.0,
                     "guid": guid,
                     "indexer": indexer,
                     "info_link": item.get('comments', '').split('#')[0],
