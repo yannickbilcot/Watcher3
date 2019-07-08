@@ -20,10 +20,6 @@ ul#movies li{
     text-align: center;
 }
 
-.card{
-    cursor: pointer;
-}
-
 .card-body{
     padding: 0.5em 0.25em;
 }
