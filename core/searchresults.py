@@ -84,7 +84,7 @@ def score(releases, imdbid=None, imported=False):
     if any(i['type'] in ('torrent', 'magnet') for i in releases):
         if core.CONFIG['Search']['mintorrentseeds'] > 0:
             releases = seed_check(releases)
-        if core.CONFIG['Search']['freeleechpoints'] > 0:
+        if core.CONFIG['Search']['freeleechpoints'] > 0 or core.CONFIG['Search']['requirefreeleech']:
             releases = freeleech(releases)
 
     releases = score_sources(releases, sources, check_size=check_size)
@@ -244,12 +244,21 @@ def freeleech(releases):
 
     Returns list[dict]
     '''
+    logging.info('Checking torrent Freeleech info.')
     points = core.CONFIG['Search']['freeleechpoints']
-    logging.info('Adding Freeleech points.')
-    for res in releases:
-        if res['type'] in ('magnet', 'torrent') and res['freeleech'] == 1:
-            logging.debug('Adding {} Freeleech points to {}.'.format(points, res['title']))
-            res['score'] += points
+    for release in releases[:]:
+        if not release['type'] in ('magnet', 'torrent'):
+            continue
+	    if release['freeleech'] == 1:
+	        if core.CONFIG['Search']['requirefreeleech']:
+	            continue
+            logging.debug('Adding {} Freeleech points to {}.'.format(points, release['title']))
+	        release['score'] += points
+	    elif core.CONFIG['Search']['requirefreeleech']:
+	        logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
+	        releases.remove(release)
+	
+	    logging.info('Keeping {} releases.'.format(len(releases)))
 
     return releases
 
