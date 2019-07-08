@@ -299,6 +299,7 @@ class ImportCPLibrary(object):
             if m['info']['imdb'] in library:
                 logging.debug('{} in library, skipping.'.format(m['info']['original_title']))
                 continue
+                
             logging.debug('Parsing CouchPotato movie {}'.format(m['info']['original_title']))
             movie = {}
             if m['status'] == 'done':
@@ -306,7 +307,11 @@ class ImportCPLibrary(object):
                 for i in m['releases']:
                     if i['status'] == 'done':
                         if i.get('info'):
-                            name = i['info']['name'].lower()
+                            # handle missing keys - not all CP entries have all fields populated
+	                        try:
+	                            name = i['info']['name']
+	                        except Exception as e:
+	                            name = m['info']['original_title'] 
                         elif i.get('identifier'):
                             name = i['identifier'].lower()
                         else:
@@ -316,7 +321,10 @@ class ImportCPLibrary(object):
                         movie['audiocodec'] = title_data.get('audio')
                         movie['videocodec'] = title_data.get('codec')
 
-                        movie['size'] = i.get('info', {}).get('size', 0) * 1024 * 1024
+                        try:
+                            movie['size'] = i.get('info', {}).get('size', 0) * 1024 * 1024
+                        except Exception as e:
+                             movie['size'] = 0
                         if any(i in name for i in ['4K', 'UHD', '2160P']):
                             movie['resolution'] = 'BluRay-4K'
                         elif any(i in name for i in ['1080', 'brrip', 'bdrip', 'bluray']):
