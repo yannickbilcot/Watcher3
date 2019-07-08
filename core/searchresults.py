@@ -254,9 +254,9 @@ def freeleech(releases):
                     continue
             logging.debug('Adding {} Freeleech points to {}.'.format(points, release['title']))
             release['score'] += points
-            elif core.CONFIG['Search']['requirefreeleech']:
-                logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
-                releases.remove(release)
+        elif core.CONFIG['Search']['requirefreeleech']:
+            logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
+            releases.remove(release)
 
             logging.info('Keeping {} releases.'.format(len(releases)))
 
