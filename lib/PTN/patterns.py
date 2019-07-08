@@ -21,7 +21,7 @@ patterns = [
     ('repack', 'REPACK'),
     ('container', '(MKV|AVI|MP4)'),
     ('widescreen', 'WS'),
-    ('website', '^(\[ ?([^\]]+?) ?\])'),
+    ('website', '^(\[ ?([^\]]+?) ?\]|[^-]+? ?--->)'),
     ('language', '(rus\.eng|ita\.eng)'),
     ('sbs', '(?:Half-)?SBS'),
     ('unrated', 'UNRATED'),
