@@ -249,16 +249,16 @@ def freeleech(releases):
     for release in releases[:]:
         if not release['type'] in ('magnet', 'torrent'):
             continue
-	    if release['freeleech'] == 1:
-	        if core.CONFIG['Search']['requirefreeleech']:
-	            continue
+            if release['freeleech'] == 1:
+                if core.CONFIG['Search']['requirefreeleech']:
+                    continue
             logging.debug('Adding {} Freeleech points to {}.'.format(points, release['title']))
-	        release['score'] += points
-	    elif core.CONFIG['Search']['requirefreeleech']:
-	        logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
-	        releases.remove(release)
-	
-	    logging.info('Keeping {} releases.'.format(len(releases)))
+                release['score'] += points
+            elif core.CONFIG['Search']['requirefreeleech']:
+                logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
+                releases.remove(release)
+
+            logging.info('Keeping {} releases.'.format(len(releases)))
 
     return releases
 
