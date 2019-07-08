@@ -216,8 +216,11 @@ function show_details(event, elem){
                                             "year": movie["title"]
                                             })
     .done(function(r){
+        document.querySelector('#trailer + preload-icon').classList.remove('loading');
         if(r){
             $modal.find("iframe#trailer").attr("src", `https://www.youtube.com/embed/${r}?&showinfo=0`);
+        } else {
+            document.getElementById('trailer').classList.add('unavailable');
         }
     });
 }

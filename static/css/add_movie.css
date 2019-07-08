@@ -68,7 +68,27 @@ img.poster{
     max-height: 18em;
 }
 
-iframe#trailer {
+preload-icon {
+    display: none;
+}
+	
+preload-icon.loading {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+	
+preload-icon > .mdi {
+    font-size: 3em;
+    width: initial;
+}
+	
+iframe#trailer.unavailable {
     background: url("../images/trailer_unavailable.png") no-repeat 50% 50%;
 }
 

@@ -145,8 +145,11 @@
                                     <img src="{poster_url}" class="img-responsive">
                                 </div>
                                 <div class="col-md-7">
-                                    <div class="embed-responsive embed-responsive-16by9">
-                                        <iframe src="" id="trailer"></iframe>
+                                    <div class="embed-responsive embed-responsive-16by9 loading">
+                                        <iframe src id="trailer"></iframe>
+                                        <preload-icon class="loading">
+                                            <i class="mdi mdi-circle animated"/></i>
+                                        </preload-icon>
                                     </div>
                                     <p class="plot">{overview}</p>
                                 </div>
