@@ -84,7 +84,7 @@ def score(releases, imdbid=None, imported=False):
     if any(i['type'] in ('torrent', 'magnet') for i in releases):
         if core.CONFIG['Search']['mintorrentseeds'] > 0:
             releases = seed_check(releases)
-        if core.CONFIG['Search']['freeleechpoints'] > 0:
+        if core.CONFIG['Search']['freeleechpoints'] > 0 or core.CONFIG['Search']['requirefreeleech']:
             releases = freeleech(releases)
 
     releases = score_sources(releases, sources, check_size=check_size)
