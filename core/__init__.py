@@ -17,9 +17,9 @@ PLUGIN_DIR = 'plugins'
 MAKO_CACHE = 'templates/cache'
 
 # Paths to internet things
-GIT_URL = 'https://github.com/nosmokingbandit/watcher3'
-GIT_REPO = 'https://github.com/nosmokingbandit/watcher3.git'
-GIT_API = 'https://api.github.com/repos/nosmokingbandit/watcher3'
+GIT_URL = 'https://github.com/barbequesauce/watcher3'
+GIT_REPO = 'https://github.com/barbequesauce/watcher3.git'
+GIT_API = 'https://api.github.com/repos/barbequesauce/watcher3'
 
 # Server settings
 SERVER_ADDRESS = None
