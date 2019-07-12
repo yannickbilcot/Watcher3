@@ -166,7 +166,11 @@ class TheMovieDatabase(object):
                 return []
             else:
                 results = json.loads(response.text)
-                results['imdbid'] = results.pop('imdb_id')
+                if results.pop('imdb_id') == 'N/A':
+                    logging.warning('Incomplete data received from TMDB, IMDBid = {}'.format(results.pop('imdb_id')))
+                    return []
+                else:
+                    results['imdbid'] = results.pop('imdb_id')
                 return [results]
         except (SystemExit, KeyboardInterrupt):
             raise

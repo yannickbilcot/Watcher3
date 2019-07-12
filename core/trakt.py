@@ -45,7 +45,7 @@ def sync():
 
     library = [i['imdbid'] for i in core.sql.get_user_movies()]
 
-    movies = [i for i in movies if i['ids']['imdb'] not in library]
+    movies = [i for i in movies if ((i['ids']['imdb'] not in library) and (i['ids']['imdb'] != 'N/A'))]
 
     logging.info('Found {} new movies from Trakt lists.'.format(len(movies)))
 
