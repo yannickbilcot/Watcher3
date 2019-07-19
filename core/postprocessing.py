@@ -849,7 +849,8 @@ class Postprocessing(object):
         else:
             logging.info('Moving {} to {}'.format(current_file_path, target_folder))
             try:
-                shutil.move(current_file_path, target_folder)
+                shutil.copyfile(current_file_path, target_folder)
+                os.unlink(current_file_path)
             except Exception as e:
                 logging.error('Mover failed: Could not move file.', exc_info=True)
                 return ''
