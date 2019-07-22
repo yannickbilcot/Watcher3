@@ -167,7 +167,8 @@ class TheMovieDatabase(object):
             else:
                 results = json.loads(response.text)
                 results['imdbid'] = results.pop('imdb_id')
-                if results['imdbid'] == 'N/A':
+                logging.warning('TMDB returned imdbid as {}'.format(results['imdbid']))
+                if results['imdbid'] == 'N/A' or results['imdbid'] == '':
                     logging.warning('TMDB did not have an IMDBid for this movie')
                     return []
                 else:
