@@ -57,9 +57,11 @@ def sync():
                                   'imdbid': i['ids']['imdb'],
                                   'title': i['title'],
                                   'origin': 'Trakt'})
-        if added['response'] and core.CONFIG['Search']['searchafteradd'] and i['year'] != 'N/A':
-            searcher.search(imdbid, i['title'], i['year'], core.config.default_profile())
-
+        try:
+            if added['response'] and core.CONFIG['Search']['searchafteradd'] and i['year'] != 'N/A':
+                searcher.search(imdbid, i['title'], i['year'], core.config.default_profile())
+        except Exception as e:
+            logging.error('Movie {} did not get added.'.format(i['title']), exc_info=False)
     return success
 
 
