@@ -847,9 +847,9 @@ class Postprocessing(object):
                 logging.error('Mover failed: Unable to copy movie.', exc_info=True)
                 return ''
         else:
-            logging.info('Moving {} to {}'.format(current_file_path, target_folder))
+            logging.info('Moving {} to {}'.format(current_file_path, new_file_location))
             try:
-                shutil.copyfile(current_file_path, target_folder)
+                shutil.copyfile(current_file_path, new_file_location)
                 os.unlink(current_file_path)
             except Exception as e:
                 logging.error('Mover failed: Could not move file.', exc_info=True)
