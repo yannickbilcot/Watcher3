@@ -182,6 +182,10 @@ class Postprocessing(object):
         data['original_file'] = self.get_movie_file(data['path'], check_size=False if data['mode'] == 'failed' else True)
         data['parent_dir'] = os.path.basename(os.path.dirname(data['original_file'])) if data.get('original_file') else ''
 
+        if not data['original_file']:
+            logging.warning('Movie file not found')
+            data['mode'] = 'failed'
+
         # Get possible local data or get TMDB data to merge with self.params.
         logging.info('Gathering release information.')
         data.update(self.get_movie_info(data))
