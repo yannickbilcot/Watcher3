@@ -2,7 +2,7 @@
 
 Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB or Torrent to your download client. Watcher also has basic post-processing capabilities such as renaming and moving.
 
-Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features. **Note that as the owner of the original project seems to be inactive, this repository has been established in an attempt to move the project forward, taking in both pending PRs from the original project and PRs applied to other forks. **  
+Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features. **Note that as the owner of the original project seems to be inactive, this repository has been established in an attempt to move the project forward, taking in both pending PRs from the original project and PRs applied to other forks.**  
 
 Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any announcements, feature discussion, or events that require user interaction.
 
