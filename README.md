@@ -6,6 +6,8 @@ Watcher is a work in progress and plans to add more features in the future, but 
 
 Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any announcements, feature discussion, or events that require user interaction.
 
+<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a>
+
 Refer to the [wiki](https://github.com/barbequesauce/Watcher3/wiki) for more information about post-processing, start scripts, and other features.
 
 ## Installation
