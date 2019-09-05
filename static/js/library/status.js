@@ -157,6 +157,8 @@ window.addEventListener("DOMContentLoaded", function(){
         if(event.target.getAttribute('value') == 'False'){
             set_cookie('hide_finished_movies', 'True')
             cached_movies = Array(movie_count - finished_count)
+            pages = Math.ceil((movie_count - finished_count) / per_page);
+            document.querySelector("button#page_count").innerText = "/ "+pages;
             hf = 'True'
         } else {
             set_cookie('hide_finished_movies', 'False')
