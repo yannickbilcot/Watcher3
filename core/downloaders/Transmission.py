@@ -70,13 +70,14 @@ def add_torrent(data):
 
     bandwidthPriority = priority_keys[conf['priority']]
 
-    download_dir = None
+    d = client.get_session().__dict__['_fields']['download_dir'][0]
+    d_components = d.split('/')
+
     if category:
-        d = client.get_session().__dict__['_fields']['download_dir'][0]
-        d_components = d.split('/')
         d_components.append(category)
 
-        download_dir = '/'.join(d_components)
+    download_dir = None
+    download_dir = '/'.join(d_components)
 
     try:
         download = client.add_torrent(url, paused=paused, bandwidthPriority=bandwidthPriority, download_dir=download_dir, timeout=30)
