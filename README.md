@@ -6,7 +6,7 @@ Watcher is a work in progress and plans to add more features in the future, but 
 
 Watcher may change frequently, so we strongly suggest you subscribe to the subreddit [/r/watcher](https://www.reddit.com/r/watcher/) to stay informed of any announcements, feature discussion, or events that require user interaction.
 
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a>
+<center><a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a><a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/automated/barbequesauce/watcher3.svg"/></a><a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/build/barbequesauce/watcher3.svg"/></a></center>
 
 Refer to the [wiki](https://github.com/barbequesauce/Watcher3/wiki) for more information about post-processing, start scripts, and other features.
 
@@ -36,6 +36,15 @@ If you do not wish to use Git, follow these steps.
 * Start Watcher using `python3 watcher/watcher.py`
 * Open a browser and navigate to `localhost:9090`
 
+**Docker:**
+
+* docker run -d \ --name=watcher3
+*   -v /path/to/config/:/config
+*   -v /path/to/downloads/:/downloads
+*   -v /path/to/movies/:/movies
+*   -e PGID=1000 -e PUID=1000
+*   -p 9090:9090
+*   barbequesauce/watcher3
 
 ## Usage
 
