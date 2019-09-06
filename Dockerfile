@@ -1,13 +1,15 @@
-FROM python:3.6-alpine
+FROM alpine:3.8
 
-# install git
-RUN apk add --no-cache git
-# copy app to dockerfile
-COPY . /app/watcher3
+ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3"
 
-# ports and volumes
+RUN apk add --no-cache bash curl git nano vim ca-certificates python3
+RUN rm -rf /tmp/* /var/tmp/*
+
+COPY . /opt/$APP_NAME
+
+WORKDIR /opt/watcher3
+
+VOLUME [ "/config" "/opt/$APP_NAME/userdata"]
 EXPOSE 9090
-WORKDIR /app/watcher3
-VOLUME /config /downloads /movies /app/watcher3/userdata
 
-CMD python /app/watcher3/watcher.py -c /config/config.cfg -l /config/logs/ --db /config/database.sqlite --plugins /config/plugins/
+CMD python3 /opt/$APP_NAME/watcher.py -c /config/watcher.cfg -l /config/logs/ --db /config/db/database.sqlite --plugins /config/plugins/
