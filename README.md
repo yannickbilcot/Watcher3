@@ -1,5 +1,7 @@
 ## Watcher
 
+<p align="center"><a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Watcher3" src="https://github.com/ellnic/Watcher3/blob/master/static/images/readme-logo.png"/></a>
+
 Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB or Torrent to your download client. Watcher also has basic post-processing capabilities such as renaming and moving.
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features. **Note that as the owner of the original project seems to be inactive, this repository has been established in an attempt to move the project forward, taking in both pending PRs from the original project and PRs applied to other forks. **  
