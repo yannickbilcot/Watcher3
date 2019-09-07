@@ -18,7 +18,7 @@ Refer to the [wiki](https://github.com/barbequesauce/Watcher3/wiki) for more inf
 
 **Docker:**
 
-<p align="center"><a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/ellnic/watcher3.svg"/></a>
+<p align="center"><a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/ellnic/watcher3.svg"/></a>
 <a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/ellnic/watcher3.svg"/></a>
 <a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/ellnic/watcher3.svg"/></a>
 
