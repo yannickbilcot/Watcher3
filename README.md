@@ -8,10 +8,16 @@ Watcher is a work in progress and plans to add more features in the future, but 
 
 Watcher may change frequently, so we strongly suggest you subscribe to the subreddit /r/watcher to stay informed of any announcements, feature discussion, or events that require user interaction.
 
-Docker Pull Count Docker Build Docker Build Gitter IRC
+<p align="center"><a href="https://gitter.im/barbequesauce-Watcher3/development"><img alt="Gitter" src="https://img.shields.io/gitter/room/barbequesauce/watcher3.svg"/></a>
+<a href="https://kiwiirc.com/client/freenode.net/#watcher3"><img alt="IRC" src="https://img.shields.io/badge/Freenode-Online-Success.svg"/></a>
+</p>
+<p align="center"><a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/ellnic/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/barbequesauce/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/barbequesauce/watcher3.svg"/></a>
 
 Refer to the wiki for more information about post-processing, start scripts, and other features.
-Installation
+
+## Installation
 
 Watcher requires Python 3.
 
@@ -19,25 +25,30 @@ It is also strongly recommended that you install GIT. This will allow you to upd
 
 Download the required files using GIT:
 
-If you choose to use Git follow these steps.
+If you choose to use Git follow these steps:
 
-    Open a terminal and cd to the directory you in which you want to install Watcher.
-    Run git clone https://github.com/barbequesauce/Watcher3.git
-    Start Watcher using python3 watcher/watcher.py
-    Open a browser and navigate to localhost:9090
+Open a terminal and cd to the directory you in which you want to install Watcher:
 
-Download ZIP:
+    git clone https://github.com/barbequesauce/Watcher3.git
+
+Start Watcher using python3 watcher/watcher.py
+
+    python3 /watcher/watcher.py
+
+Open a browser and navigate to localhost:9090
+
+## Download ZIP:
 
 If you do not wish to use Git, follow these steps.
 
-    Open your browser and go to https://github.com/barbequesauce/Watcher3
-    Click on the green Clone or download button and click Download ZIP
-    Once done downloading, extract the ZIP to the location in which you want Watcher installed
-    Open a terminal and cd to the Watcher directory.
-    Start Watcher using python3 watcher/watcher.py
-    Open a browser and navigate to localhost:9090
+1. Open your browser and go to https://github.com/barbequesauce/Watcher3
+2. Click on the green Clone or download button and click Download ZIP
+3. Once done downloading, extract the ZIP to the location in which you want Watcher installed
+4. Open a terminal and cd to the Watcher directory.
+5. Start Watcher using python3 watcher/watcher.py
+6. Open a browser and navigate to localhost:9090
 
-Docker:
+## Docker:
 
     docker run -d \ --name=watcher3
     -v /path/to/config/:/config
@@ -47,50 +58,52 @@ Docker:
     -p 9090:9090
     barbequesauce/watcher3
 
-Usage
+## Usage
 
 You can add the following arguments to Watcher when running the Python script. Always use the absolute path when supplying a directory or file argument.
 
 Run the server as a daemon (*nix only)
 
-$ watcher.py --daemon
+    $ watcher.py --daemon
 
 Run the server as a background process (Windows only)
 
-$ pythonw watcher.py --daemon
+    $ python watcher.py --daemon
 
 Change address to bind to.
 
-$ watcher.py --address 0.0.0.0
+    $ watcher.py --address 0.0.0.0
 
 Change port to host on.
 
-$ watcher.py --port 9090
+    $ watcher.py --port 9090
 
 Open browser on launch.
 
-$ watcher.py --browser
+    $ watcher.py --browser
 
 Change path to config file. If not present, one will be created.
 
-$ watcher.py --conf /path/to/config.cfg
+     watcher.py --conf /path/to/config.cfg
 
 Change path of log directory.
 
-$ watcher.py --log /path/to/logs/
+    $ watcher.py --log /path/to/logs/
 
 Change path to database. If not present, a new, empty database will be created.
 
-$ watcher.py --db /path/to/database.sqlite
+    $ watcher.py --db /path/to/database.sqlite
 
 Change path to plugins directory.
 
-$ watcher.py --plugins /path/to/plugins/
+    $ watcher.py --plugins /path/to/plugins/
 
 Create PID file.
 
-$ watcher.py --pid /path/to/pid/file.pid
-Backup / Restore
+    $ watcher.py --pid /path/to/pid/file.pid
+
+
+# Backup / Restore
 
 Watcher includes a simple script for backing up and restoring your database and config.
 
@@ -101,8 +114,8 @@ Usage
 
 Back up Watcher.
 
-$ backup.py -b
+    $ backup.py -b
 
 Restore Watcher.
 
-$ backup.py -r
+    $ backup.py -r
