@@ -17,9 +17,11 @@ Watcher is a work in progress and plans to add more features in the future, but 
 
 Watcher may change frequently, so we strongly suggest that you come by and say hello on Freenode (#watcher3) or via Gitter.
 
-You may also wish to subscribe to the subreddit /r/watcher, but at this time, there is little activity there. It was for the original project, and most the current developement talk is happening via IRC and Gitter.
+You may also wish to subscribe to the subreddit /r/watcher, but at this time there is little activity there. It was for the original project, and most the current developement talk is happening via IRC and Gitter.
 
-Refer to the wiki for more information about post-processing, start scripts, and other features. You may also wish to checkout ellnic's repo, which may (or may not) have certain downstream changes before they are pulled. https://github.com/ellnic/Watcher3 Please do not submit PR's there, submit them to barbequesauce.
+Refer to the wiki for more information about post-processing, start scripts, and other features. https://github.com/barbequesauce/Watcher3/wiki
+
+You may also wish to checkout ellnic's repo, which may (or may not) have certain downstream changes before they are pulled. https://github.com/ellnic/Watcher3 Please do not submit PR's there, submit them to barbequesauce.
 
 ## Recent Highlights
 
@@ -37,7 +39,7 @@ Obtaining the files:
 
     git clone https://github.com/barbequesauce/Watcher3.git
 
-Start Watcher using python3 watcher/watcher.py
+Start Watcher using:
 
     python3 /watcher/watcher.py
 
@@ -122,7 +124,7 @@ Restore Watcher.
 
 ## Docker:
 
-We how have an updated Docker container using an alpine 3.8 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
+We now have an updated Docker container using an alpine 3.8 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
 
 1. Pull the container:
 
@@ -145,4 +147,4 @@ If you wish to exec into the container to have a look around, use:
 
 ``` docker exec -it watcher3 /bin/bash```
 
-You may also wish to checkout ellnic's docker: https://hub.docker.com/r/ellnic/watcher3 (which depending on what I am doing may either be broken or have interesting changes!)
+You may also wish to checkout ellnic's docker: https://hub.docker.com/r/ellnic/watcher3
