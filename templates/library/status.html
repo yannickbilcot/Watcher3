@@ -42,6 +42,15 @@
                         <option value="release_date">${_('Year')}</option>
                         <option value="status">${_('Status')}</option>
                     </select>
+                    <select id="per_page" class="btn btn-light border">
+                        <option value="10">${_('10')}</option>
+                        <option value="25">${_('25')}</option>
+                        <option value="50">${_('50')}</option>
+                        <option value="100">${_('100')}</option>
+                        <option value="250">${_('250')}</option>
+                        <option value="500">${_('500')}</option>
+                        <option value="10000">${_('1000')}</option>
+                    </select>
                     <button class="btn btn-light border" id="sort_direction" onclick="switch_sort_direction(event, this)">
                         <i class="mdi"></i>
                     </button>
