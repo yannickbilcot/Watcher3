@@ -38,13 +38,13 @@ window.addEventListener("DOMContentLoaded", function(){
                  delete: document.querySelector("template#template_delete").innerHTML,
                  release: document.querySelector("template#template_release").innerHTML
                 }
-    status_colors = {Finished: 'success', // Library colour
-                     Snatched: 'primary', // Library colour
-                     Found: 'warning', // Library colour
-                     Bad: 'danger', // Library colour
-                     Wanted: 'info', // Library colour
-                     Available: 'success',  // Info modal colour
-                     Waiting: 'info',  // Info modal colour
+    status_colors = {Finished: 'success',
+                     Snatched: 'primary',
+                     Found: 'warning',
+                     Bad: 'danger',
+                     Wanted: 'info',
+                     Available: 'available',
+                     Waiting: 'waiting',
 
                      }
 

@@ -4115,7 +4115,7 @@ tbody.collapse.show {
 
 .badge-warning {
 	color: #FFFFFF;
-	background-color: #edb500
+	background-color: #EDB500
 }
 
 .badge-warning[href]:hover, .badge-warning[href]:focus {
@@ -4133,6 +4133,28 @@ tbody.collapse.show {
 	color: #fff;
 	text-decoration: none;
 	background-color: #CF3806
+}
+
+.badge-available {
+	color: #4CAF50;
+	background-color: #41455B
+}
+
+.badge-available[href]:hover, .badge-available[href]:focus {
+	color: #4CAF50;
+	text-decoration: none;
+	background-color: #383B52
+}
+
+.badge-waiting {
+	color: #EDB500;
+	background-color: #41455B
+}
+
+.badge-waiting[href]:hover, .badge-waiting[href]:focus {
+	color: #EDB500;
+	text-decoration: none;
+	background-color: #383B52
 }
 
 .badge-light {
