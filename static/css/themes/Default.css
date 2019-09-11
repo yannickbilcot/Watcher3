@@ -4136,26 +4136,49 @@ tbody.collapse.show {
 }
 
 .badge-light {
-	color: #fff;
-	background-color: #333336
-}
-
-.badge-light[href]:hover, .badge-light[href]:focus {
-	color: #fff;
-	text-decoration: none;
-	background-color: #151410
-}
-
-.badge-dark {
 	color: #333336;
 	background-color: #ebebeb
 }
 
-.badge-dark[href]:hover, .badge-dark[href]:focus {
+.badge-light[href]:hover, .badge-light[href]:focus {
 	color: #333336;
 	text-decoration: none;
 	background-color: #d2d2d2
 }
+
+.badge-dark {
+	color: #ffffff;
+	background-color: #333336
+}
+
+.badge-dark[href]:hover, .badge-dark[href]:focus {
+	color: #ffffff;
+	text-decoration: none;
+	background-color: #151410
+}
+
+.badge-waiting {
+	color: #edb500;
+	background-color: #41455B
+}
+
+.badge-waiting[href]:hover, .badge-waiting[href]:focus {
+	color: #edb500;
+	text-decoration: none;
+	background-color: #383B52
+}
+
+.badge-available {
+	color: #4CAF50;
+	background-color: #41455B
+}
+
+.badge-available[href]:hover, .badge-available[href]:focus {
+	color: #4CAF50;
+	text-decoration: none;
+	background-color: #383B52
+}
+
 
 .jumbotron {
 	padding: 2rem 1rem;
