@@ -40,10 +40,10 @@ window.addEventListener("DOMContentLoaded", function(){
                 }
     status_colors = {Finished: 'success',
                      Snatched: 'primary',
-                     Found: 'info',
+                     Found: 'warning',
                      Available: 'info',
-                     Wanted: 'warning',
-                     Waiting: 'dark',
+                     Wanted: 'info',
+                     Waiting: 'warning',
                      Bad: 'danger'
                      }
 
