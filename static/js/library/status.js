@@ -47,7 +47,7 @@ window.addEventListener("DOMContentLoaded", function(){
                      Snatched: 'primary',
                      Found: 'warning',
                      Bad: 'danger',
-                     Wanted: 'info',
+                     Wanted: 'wanted',
                      Available: 'available',
                      Waiting: 'waiting',
 
