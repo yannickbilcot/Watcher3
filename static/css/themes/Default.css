@@ -2138,8 +2138,8 @@ a.btn.disabled, fieldset:disabled a.btn {
 
 .btn-primary:hover {
 	color: #fff;
-	background-color: #0c83e2;
-	border-color: #0c7cd5
+	background-color: #d97806;
+	border-color: #A14800
 }
 
 .btn-primary:focus, .btn-primary.focus {
@@ -4070,13 +4070,13 @@ tbody.collapse.show {
 
 .badge-primary {
 	color: #fff;
-	background-color: #e97100
+	background-color: #F7931E
 }
 
 .badge-primary[href]:hover, .badge-primary[href]:focus {
 	color: #fff;
 	text-decoration: none;
-	background-color: #c15e00
+	background-color: #d97806
 }
 
 .badge-secondary {
@@ -4103,24 +4103,24 @@ tbody.collapse.show {
 
 .badge-info {
 	color: #fff;
-	background-color: #F7931E
+	background-color: #ffd13b
 }
 
 .badge-info[href]:hover, .badge-info[href]:focus {
 	color: #fff;
 	text-decoration: none;
-	background-color: #d97806
+	background-color: #edb500
 }
 
 .badge-warning {
-	color: #333336;
-	background-color: #ffd13b
+	color: #FFFFFF;
+	background-color: #41455B
 }
 
 .badge-warning[href]:hover, .badge-warning[href]:focus {
-	color: #333336;
+	color: #FFF;
 	text-decoration: none;
-	background-color: #edb500
+	background-color: #383B52
 }
 
 .badge-danger {
