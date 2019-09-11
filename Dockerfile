@@ -9,7 +9,7 @@ COPY . /opt/$APP_NAME
 
 WORKDIR /opt/watcher3
 
-VOLUME [ "/config" "/opt/$APP_NAME/userdata"]
+VOLUME [ "/config"]
 EXPOSE 9090
 
-CMD python3 /opt/$APP_NAME/watcher.py -c /config/watcher.cfg -l /config/logs/ --db /config/db/database.sqlite --plugins /config/plugins/
+CMD python3 /opt/$APP_NAME/watcher.py --userdata /config/
