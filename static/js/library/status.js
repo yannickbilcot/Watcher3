@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", function(){
     movie_count = parseInt(document.querySelector('meta[name="movie_count"]').content);
     finished_count = parseInt(document.querySelector('meta[name="finished_count"]').content);
     cached_movies = Array(movie_count);
-
+    
     per_page = 50;
 
     $page_select = document.querySelector("select#page_number");
@@ -14,6 +14,11 @@ window.addEventListener("DOMContentLoaded", function(){
         load_library(movie_sort_key, movie_sort_direction, current_page);
     });
 
+    $page_select.addEventListener('change', function(event){
+       per_page = parseInt(event.target.value);
+        load_library(movie_sort_key, movie_sort_direction, current_page);
+    });
+    
     pages = Math.ceil(movie_count / per_page);
     document.querySelector("button#page_count").innerText = "/ "+pages;
 
@@ -60,6 +65,9 @@ window.addEventListener("DOMContentLoaded", function(){
     movie_sort_direction = cookie["movie_sort_direction"] || "desc";
     movie_sort_key = cookie["movie_sort_key"] || "sort_title";
     hide_finished_movies = cookie["hide_finished_movies"] || "False";
+    if(per_page != cookie["per_page"]){
+	    per_page = cookie["per_page"]
+    }
     if(movie_sort_key == 'status_key'){
         movie_sort_key = 'status'
     } else if(movie_sort_key == 'title') {
@@ -77,7 +85,8 @@ window.addEventListener("DOMContentLoaded", function(){
         $sort_direction_button.classList.add("mdi-sort-descending");
     }
 
-    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true)
+//    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true)
+//    document.querySelector(`select#per_page > option[value=${per_page}]`).setAttribute("selected", true)
 
     if(hide_finished_movies == "True"){
         $hide_finished_movies_toggle.setAttribute('value', 'True');
@@ -89,7 +98,7 @@ window.addEventListener("DOMContentLoaded", function(){
     load_library(movie_sort_key, movie_sort_direction, 1)
 
 /* Toolbar action bindings
-    /* Movie sort key */
+    /* per page */
     document.getElementById('movie_sort_key').addEventListener('change', function(event){
         event.preventDefault();
         if(loading_library){
@@ -114,6 +123,21 @@ window.addEventListener("DOMContentLoaded", function(){
 
         load_library(movie_sort_key, movie_sort_direction, current_page);
 	});
+
+    /* per page key */
+    document.getElementById('per_page').addEventListener('change', function(event){
+        event.preventDefault();
+        if(loading_library){
+            return false
+        }
+
+        per_page = event.target.value;
+
+		set_cookie("per_page", per_page);
+
+        load_library(movie_sort_key, movie_sort_direction, current_page);
+	});
+
 
     /* Movie sort direction */
     // See fn switch_sort_direction()
