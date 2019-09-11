@@ -4157,29 +4157,6 @@ tbody.collapse.show {
 	background-color: #151410
 }
 
-.badge-waiting {
-	color: #edb500;
-	background-color: #41455B
-}
-
-.badge-waiting[href]:hover, .badge-waiting[href]:focus {
-	color: #edb500;
-	text-decoration: none;
-	background-color: #383B52
-}
-
-.badge-available {
-	color: #4CAF50;
-	background-color: #41455B
-}
-
-.badge-available[href]:hover, .badge-available[href]:focus {
-	color: #4CAF50;
-	text-decoration: none;
-	background-color: #383B52
-}
-
-
 .jumbotron {
 	padding: 2rem 1rem;
 	margin-bottom: 2rem;
