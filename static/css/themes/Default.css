@@ -5244,11 +5244,11 @@ a.bg-success:hover, a.bg-success:focus, button.bg-success:hover, button.bg-succe
 }
 
 .bg-info {
-	background-color: #e97100 !important
+	background-color: #F7931E !important
 }
 
 a.bg-info:hover, a.bg-info:focus, button.bg-info:hover, button.bg-info:focus {
-	background-color: #c15e00 !important
+	background-color: #d97806 !important
 }
 
 .bg-warning {
@@ -5279,6 +5279,38 @@ a.bg-light:hover, a.bg-light:focus, button.bg-light:hover, button.bg-light:focus
 	background-color: #ebebeb !important
 }
 
+.bg-morris-1 {
+	background-color: #41455B !important
+}
+
+.bg-morris-2 {
+	background-color: #7f231c !important
+}
+
+.bg-morris-3 {
+	background-color: #4CAF50 !important
+}
+
+.bg-morris-4 {
+	background-color: #F7931E !important
+}
+
+.bg-morris-5 {
+	background-color: #F44336 !important
+}
+
+.bg-morris-6 {
+	background-color: #114e7e !important
+}
+
+.bg-morris-7 {
+	background-color: #ffd13b !important
+}
+
+.bg-morris-8 {
+	background-color: #872E94 !important
+}
+
 a.bg-dark:hover, a.bg-dark:focus, button.bg-dark:hover, button.bg-dark:focus {
 	background-color: #d2d2d2 !important
 }
@@ -5286,6 +5318,8 @@ a.bg-dark:hover, a.bg-dark:focus, button.bg-dark:hover, button.bg-dark:focus {
 .bg-white {
 	background-color: #fff !important
 }
+
+
 
 .bg-transparent {
 	background-color: transparent !important
