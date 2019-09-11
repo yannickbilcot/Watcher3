@@ -7,8 +7,8 @@ body, html{
 
 div#content{
     position: relative;
-    height: 50%;
-    background-image: url('../../images/logo_big.png');
+    height: 100%;
+    background-image: url('../../images/logo.png');
     background-position: 50% 25%;
     background-repeat: no-repeat;
 }
