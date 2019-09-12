@@ -12,4 +12,5 @@ WORKDIR /opt/watcher3
 VOLUME [ "/config"]
 EXPOSE 9090
 
-CMD python3 /opt/$APP_NAME/watcher.py --userdata /config/
+CMD python3 /opt/$APP_NAME/watcher.py -c /config/watcher.cfg -l /config/logs/ --db /config/db/database.sqlite --plugins /config/plugins/ --posters /config/posters
+
