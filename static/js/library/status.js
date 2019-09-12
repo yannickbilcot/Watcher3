@@ -44,11 +44,12 @@ window.addEventListener("DOMContentLoaded", function(){
                 }
     status_colors = {Finished: 'success',
                      Snatched: 'primary',
-                     Found: 'info',
-                     Available: 'info',
-                     Wanted: 'warning',
-                     Waiting: 'dark',
-                     Bad: 'danger'
+                     Found: 'warning',
+                     Bad: 'danger',
+                     Wanted: 'wanted',
+                     Available: 'available',
+                     Waiting: 'waiting',
+
                      }
 
     var cookie = read_cookie();
