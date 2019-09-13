@@ -26,7 +26,7 @@ Please submit all PRs to https://github.com/barbequesauce/Watcher3
 
 ## Recent Highlights
 
-Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container.
+Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container. Also, you can now specify the --poster flag for custom posters dir. This is great news for docker users, as the poster dir has been moved to the config folder - no more losing meta on each update - yay!
  
 ## Installation
 
@@ -90,6 +90,10 @@ Open browser on launch.
 Change path to config file. If not present, one will be created.
 
      watcher.py --conf /path/to/config.cfg
+     
+Change path to poster directory - where watcher saves posters. Default is in the userdata folder.
+
+     watcher.py --posters /path/to/posters/dir
 
 Change path of log directory.
 
@@ -149,5 +153,3 @@ My docker may be broken or may have interesting/odd changes :)
 If you wish to exec into the container to have a look around, use:
 
 ``` docker exec -it watcher3 /bin/bash```
-
-You may also wish to checkout ellnic's docker: https://hub.docker.com/r/ellnic/watcher3
