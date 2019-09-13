@@ -190,6 +190,8 @@ window.addEventListener("DOMContentLoaded", function(){
         } else {
             set_cookie('hide_finished_movies', 'False')
             cached_movies = Array(movie_count)
+            pages = Math.ceil((movie_count) / per_page);
+            document.querySelector("button#page_count").innerText = "/ "+pages;
             hf = 'False'
         }
         $page_select.value = 1;
