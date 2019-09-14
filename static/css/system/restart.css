@@ -1,32 +1,28 @@
+
 body, html{
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 0;
+    padding: 10;
 }
 
 div#content{
-	display: flex;
+    position: centre;
+    height: 70%;
+	width: 60%;
     background-image: url('../../images/logo_bg.png');
-	background-attachment: fixed;
-	background-position: center;
+    background-position: center;
     background-repeat: no-repeat;
-	background-size: cover;
+	background-size: contain;
+    transition: 2s;
 }
 
 div.message{
     font-size: 1.75em;
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
-    top: 70%;
+    top: 90%;
     text-align: center;
-}
-
-div#thinker{
-    width: 4em;
-    height: 4em;
-    line-height: 4em;
-    bottom: calc(50% - 2.25em);
-    right: calc(50% - 2em);
+	vertical-align: bottom;
 }
