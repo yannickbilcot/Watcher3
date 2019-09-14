@@ -1,24 +1,13 @@
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
+    per_page = 50;
 
     movie_count = parseInt(document.querySelector('meta[name="movie_count"]').content);
     finished_count = parseInt(document.querySelector('meta[name="finished_count"]').content);
     cached_movies = Array(movie_count);
     
-    per_page = 50;
-
     $page_select = document.querySelector("select#page_number");
 
-    $page_select.addEventListener('change', function(event){
-        current_page = parseInt(event.target.value);
-        load_library(movie_sort_key, movie_sort_direction, current_page);
-    });
-
-    $page_select.addEventListener('change', function(event){
-       per_page = parseInt(event.target.value);
-        load_library(movie_sort_key, movie_sort_direction, current_page);
-    });
-    
     pages = Math.ceil(movie_count / per_page);
     document.querySelector("button#page_count").innerText = "/ "+pages;
 
@@ -30,6 +19,16 @@ window.addEventListener("DOMContentLoaded", function(){
         $page_select.innerHTML += `<option value="">0</option>`;
     }
 
+    $page_select.addEventListener('change', function(event){
+        current_page = parseInt(event.target.value);
+        load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
+    });
+
+    $page_select.addEventListener('change', function(event){
+        per_page = parseInt(event.target.value);
+        load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
+    });
+    
     $page_select.value = '1';
 
     loading_library = false; // Indicates that a library ajax request is being executed
@@ -85,7 +84,7 @@ window.addEventListener("DOMContentLoaded", function(){
         $sort_direction_button.classList.add("mdi-sort-descending");
     }
 
-//    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true)
+    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true)
 //    document.querySelector(`select#per_page > option[value=${per_page}]`).setAttribute("selected", true)
 
     if(hide_finished_movies == "True"){
@@ -95,7 +94,7 @@ window.addEventListener("DOMContentLoaded", function(){
     }
 
 /* Finish by loading page 1 */
-    load_library(movie_sort_key, movie_sort_direction, 1)
+    load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages)
 
 /* Toolbar action bindings
     /* per page */
@@ -121,7 +120,7 @@ window.addEventListener("DOMContentLoaded", function(){
         }
 		set_cookie("movie_sort_key", movie_sort_key);
 
-        load_library(movie_sort_key, movie_sort_direction, current_page);
+        load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
 	});
 
     /* per page key */
@@ -134,8 +133,11 @@ window.addEventListener("DOMContentLoaded", function(){
         per_page = event.target.value;
 
 		set_cookie("per_page", per_page);
+		
+        pages = Math.ceil((movie_count - finished_count) / per_page);
+        document.querySelector("button#page_count").innerText = "/ "+pages;
 
-        load_library(movie_sort_key, movie_sort_direction, current_page);
+        load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
 	});
 
 
@@ -188,10 +190,12 @@ window.addEventListener("DOMContentLoaded", function(){
         } else {
             set_cookie('hide_finished_movies', 'False')
             cached_movies = Array(movie_count)
+            pages = Math.ceil((movie_count) / per_page);
+            document.querySelector("button#page_count").innerText = "/ "+pages;
             hf = 'False'
         }
         $page_select.value = 1;
-        load_library(movie_sort_key, movie_sort_direction, 1, hf);
+        load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages, hf);
     })
 
 });
@@ -253,7 +257,7 @@ function sort_movie_cache(key){
     });
 }
 
-function load_library(sort_key, sort_direction, page, hf){
+function load_library(sort_key, sort_direction, page, per_page, pages, hf){
     /* Loads library into DOM
     sort_key: str value with which to sort movies
     sort_direction: str [asc, desc] direction to sort movies
@@ -377,7 +381,7 @@ function change_page_sequential(event, direction){
     }
     $page_select.value = page;
 
-    load_library(movie_sort_key, movie_sort_direction, page)
+    load_library(movie_sort_key, movie_sort_direction, page, per_page, pages)
     current_page = page;
 }
 
@@ -403,7 +407,7 @@ function switch_sort_direction(event, elem){
     cached_movies.reverse();
     reversed_pages = [];
 
-    load_library(movie_sort_key, movie_sort_direction, current_page);
+    load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
 }
 
 function open_info_modal(event, elem){
