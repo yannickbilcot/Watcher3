@@ -299,7 +299,7 @@ class YouTube(object):
 
 class Poster(object):
 
-    folder = os.path.join(core.USERDATA, 'posters')
+    folder = os.path.join(core.POSTER_DIR)
 
     if not os.path.exists(folder):
         os.makedirs(folder)

@@ -290,7 +290,7 @@ class API(object):
 
         cherrypy.response.headers['Content-Type'] = "image/jpeg"
         try:
-            with open(os.path.abspath(os.path.join(core.USERDATA, 'posters', '{}.jpg'.format(params['imdbid']))), 'rb') as f:
+            with open(os.path.abspath(os.path.join(core.POSTERDIR, '{}.jpg'.format(params['imdbid']))), 'rb') as f:
                 img = f.read()
             return img
         except KeyError as e:
