@@ -48,6 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--log', help='Directory in which to create log files.', type=str)
     parser.add_argument('--db', help='Absolute path to database file.', type=str)
     parser.add_argument('--plugins', help='Directory in which plugins are stored.', type=str)
+    parser.add_argument('--posters', help='Directory in which posters are stored.', type=str)
     parser.add_argument('--pid', help='Directory in which to store pid file.', type=str)
     parser.add_argument('--stdout', help='Print all log messages to STDOUT.', action='store_true')
     passed_args = parser.parse_args()
@@ -68,7 +69,11 @@ if __name__ == '__main__':
         core.LOG_DIR = passed_args.log
     if passed_args.plugins:
         core.PLUGIN_DIR = passed_args.plugins
-
+    if passed_args.posters:
+        core.POSTER_DIR = passed_args.posters
+    else:
+        core.POSTER_DIR = os.path.join(core.PROG_PATH, core.USERDATA, 'posters')
+        
     # set up db connection
     from core import sqldb
     core.sql = sqldb.SQL()

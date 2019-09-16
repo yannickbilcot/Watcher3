@@ -26,7 +26,7 @@ You may also wish to checkout ellnic's repo, which may (or may not) have certain
 
 ## Recent Highlights
 
-Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container.
+Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container. You can now select items per page in the library and the vanishing library bug is fixed. The docker container now runs with the newly added --posters flag so that the poster meta is stored in /config and is not lost on container update.
  
 ## Installation
 
@@ -88,6 +88,10 @@ Open browser on launch.
 Change path to config file. If not present, one will be created.
 
      watcher.py --conf /path/to/config.cfg
+
+Specify custom posters dir (where watcher saves posters to).
+
+     watcher.py --posters /path/to/posters/dir
 
 Change path of log directory.
 
