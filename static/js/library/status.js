@@ -272,7 +272,8 @@ function load_library(sort_key, sort_direction, page, per_page, pages, hf){
     if(page == 0){
         return;
     }
-
+    
+    showLoader();
     loading_library = true;
 
     $movie_list.innerHTML = '';
@@ -317,6 +318,7 @@ function load_library(sort_key, sort_direction, page, per_page, pages, hf){
             loading_library = false;
         });
     }
+    hideLoader();
 }
 
 function _render_library(movies){
@@ -808,4 +810,13 @@ function swap_settings(event){
         $i.dataset.open = 'basic';
     }
 
+}
+
+function showLoader()
+{
+    $(".loader").fadeIn("slow");
+}
+function hideLoader()
+{
+    $(".loader").fadeOut("slow");
 }
