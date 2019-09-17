@@ -57,6 +57,11 @@ if __name__ == '__main__':
         core.USERDATA = passed_args.userdata
         core.CONF_FILE = os.path.join(passed_args.userdata, 'config.cfg')
         core.DB_FILE = os.path.join(passed_args.userdata, 'watcher.sqlite')
+        if not os.path.exists(core.USERDATA):
+            os.mkdir(core.USERDATA)
+            print("Specified userdata directory created.")
+        else:
+            print("Userdata directory exists, continuing.")
     if passed_args.db:
         core.DB_FILE = passed_args.db
     else:
