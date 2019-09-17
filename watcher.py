@@ -72,7 +72,7 @@ if __name__ == '__main__':
     if passed_args.posters:
         core.POSTER_DIR = passed_args.posters
     else:
-        core.POSTER_DIR = os.path.join(core.PROG_PATH, 'posters')
+        core.POSTER_DIR = os.path.join(core.USERDATA, 'posters')
         
     # set up db connection
     from core import sqldb
