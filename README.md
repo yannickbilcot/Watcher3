@@ -145,10 +145,11 @@ My docker may be broken or may have interesting/odd changes :)
   -v /path/to/config/:/config \
   -v /path/to/downloads/:/downloads \
   -v /path/to/movies/:/movies \
+  -e UMASK_SET=022 \
   -e PGID=1000 -e PUID=1000 \
   -p 9090:9090 \
   ellnic/watcher3
-```
+``` 
 
 If you wish to exec into the container to have a look around, use:
 
