@@ -7,7 +7,7 @@ Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a
 <p align="center"><a href="https://gitter.im/barbequesauce-Watcher3/development"><img alt="Gitter" src="https://img.shields.io/gitter/room/barbequesauce/watcher3.svg"/></a>
 <a href="https://kiwiirc.com/client/freenode.net/#watcher3"><img alt="IRC" src="https://img.shields.io/badge/Freenode-Online-Success.svg"/></a>
 <a href="https://discord.gg/wrHPyre"><img alt="Discord" src="https://img.shields.io/discord/620536178881331200?color=Green&label=discord&style=flat"/></a>
-<p align="center">[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3392120a6afe40cc8dcfbb8b7e7b3713)](https://www.codacy.com/manual/saucebarbeque/Watcher3?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=barbequesauce/Watcher3&amp;utm_campaign=Badge_Grade)
+<p align="center"><img alt="Codacy" src="https://api.codacy.com/project/badge/Grade/3392120a6afe40cc8dcfbb8b7e7b3713"/>
 <a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a>
 <a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/barbequesauce/watcher3.svg"/></a>
 <a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/barbequesauce/watcher3.svg"/></a>
