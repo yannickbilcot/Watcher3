@@ -71,7 +71,7 @@ function _render_task_row(task){
     Returns string html for row
     */
 
-    var le = Date.parse(task["last_execution"]) / 1000;
+    var le = parseDate(task["last_execution"]) / 1000;
 
     var next = le + task["interval"]
 
@@ -325,6 +325,15 @@ function time_difference(now, time){
         var t = Math.round(diff/spd) + ' days';
     }
     return t + a;
+}
+
+function parseDate(date) {
+  const parsed = Date.parse(date);
+  if (!isNaN(parsed)) {
+    return parsed;
+  }
+
+  return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
 }
 
 /* Delcaring some time vars */
