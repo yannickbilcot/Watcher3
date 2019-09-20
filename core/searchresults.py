@@ -320,7 +320,7 @@ def fuzzy_title(releases, titles, year='\n'):
     else:
         for result in releases:
             if result['type'] == 'import' and result not in keep:
-                logging.debug('{} is an Import, soring as a perfect match.'.format(result['title']))
+                logging.debug('{} is an Import, sorting as a perfect match.'.format(result['title']))
                 result['score'] += 20
                 keep.append(result)
                 continue
@@ -368,6 +368,10 @@ def _fuzzy_title(a, b):
 
     a = a.replace('&', 'and')
     b = b.replace('&', 'and')
+    a = a.replace('\'', '')
+    b = b.replace('\'', '')
+    a = a.replace(':', '')
+    b = b.replace(':', '')
 
     a_words = Url.normalize(a).split(' ')
     b_words = Url.normalize(b).split(' ')
