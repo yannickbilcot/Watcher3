@@ -78,6 +78,7 @@ class App(object):
     server_template = Template(filename='templates/settings/server.html', module_directory=core.MAKO_CACHE)
     search_template = Template(filename='templates/settings/search.html', module_directory=core.MAKO_CACHE)
     quality_template = Template(filename='templates/settings/quality.html', module_directory=core.MAKO_CACHE)
+    categories_template = Template(filename='templates/settings/categories.html', module_directory=core.MAKO_CACHE)
     indexers_template = Template(filename='templates/settings/indexers.html', module_directory=core.MAKO_CACHE)
     downloader_template = Template(filename='templates/settings/downloader.html', module_directory=core.MAKO_CACHE)
     postprocessing_template = Template(filename='templates/settings/postprocessing.html', module_directory=core.MAKO_CACHE)
@@ -157,6 +158,8 @@ class App(object):
             return App.search_template.render(config=core.CONFIG['Search'], **self.defaults())
         elif page == 'quality':
             return App.quality_template.render(config=core.CONFIG['Quality'], sources=core.SOURCES, **self.defaults())
+        elif page == 'categories':
+            return App.categories_template.render(config=core.CONFIG['Categories'], sources=core.SOURCES, **self.defaults())
         elif page == 'indexers':
             return App.indexers_template.render(config=core.CONFIG['Indexers'], **self.defaults())
         elif page == 'downloader':

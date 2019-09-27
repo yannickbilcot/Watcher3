@@ -1,0 +1,88 @@
+<%
+    tags = '{title} {sort_title} {year} {resolution} {rated} {edition} {imdbid} {videocodec} {audiocodec} {releasegroup} {source} {quality}'
+%>
+
+<%def name="generate_category(name, category)">
+    <div id="${name}" class="category row bg-light rounded mx-auto py-3">
+        <div class="col-md-6 input-group my-0">
+            <input type="text" id="name" class="form-control" value="${name}">
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-light border float-right" onclick="edit_category(event, this)">
+                <i class="mdi mdi-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="col-md-12 category_contents mt-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>${_('General')}</h5>
+                    <div data-sub-category="general">
+                        <label>${_('Move Movies')}</label>
+                        <div class="input-group">
+                            <input type="text" id="moverpath" class="form-control" placeholder="/users/ricksanchez/movies/{title} ({year})/" value="${category['moverpath']}" data-toggle="tooltip" title="${tags}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>${_('Filters')}</h5>
+                    <div data-sub-category="filters" data-toggle="tooltip" title="${_('Group words with ampersands and split groups with commas')}">
+                        <label>${_('Required Words')}</label>
+                        <input type="text" id="requiredwords" class="form-control" value="${category['requiredwords']}">
+
+                        <label>${_('Preferred Words')}</label>
+                        <input type="text" id="preferredwords" class="form-control" placeholder='this&is&a&group, one, two, three' value="${category['preferredwords']}">
+
+                        <label>${_('Ignored Words')}</label>
+                        <input type="text" id="ignoredwords" class="form-control" value="${category['ignoredwords']}">
+                    </div>
+
+                    <button class="btn btn-outline-danger float-right" onclick="delete_category(event, this)">
+                        <i class="mdi mdi-delete"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</%def>
+
+
+<!DOCTYPE HTML5>
+<html>
+    <head>
+        ${head}
+        <link href="${url_base}/static/css/settings/shared.css?v=010" rel="stylesheet">
+        <link href="${url_base}/static/css/settings/categories.css?v=010" rel="stylesheet">
+
+        <script src="${url_base}/static/js/settings/shared.js?v=012" type="text/javascript"></script>
+        <script src="${url_base}/static/js/settings/categories.js?v=012" type="text/javascript"></script>
+    </head>
+    <body>
+        ${navbar}
+        <div class="container">
+            <h1>${_('Categories')}</h1>
+            <form id='categories' class="mx-auto">
+                %for name, category in config.items():
+                ${generate_category(name, category)}
+                %endfor
+            </form>
+
+            <div class='col-md-12' id="add_category">
+                <button class="btn btn-outline-primary" onclick="add_category(event)">
+                    <i class="mdi mdi-plus"></i>
+                </button>
+            </div>
+
+            <button id="save_settings" class="btn btn-success float-right" onclick="save_settings(event, this)">
+                <i class="mdi mdi-content-save"></i>
+
+            </button>
+        </div>
+
+        <template id="category_template">
+            ${generate_category('', {'moverpath': '', 'ignoredwords': '', 'preferredwords': '', 'requiredwords': ''})}
+        </template>
+
+    </body>
+</html>
