@@ -145,7 +145,7 @@ class App(object):
 
     @cherrypy.expose
     def add_movie(self):
-        return App.add_movie_template.render(profiles=[(k, v.get('default', False)) for k, v in core.CONFIG['Quality']['Profiles'].items()], **self.defaults())
+        return App.add_movie_template.render(profiles=[(k, v.get('default', False)) for k, v in core.CONFIG['Quality']['Profiles'].items()], categories=core.CONFIG['Categories'].keys(), **self.defaults())
 
     @cherrypy.expose
     def settings(self, *path):

@@ -160,22 +160,41 @@ function populate_movie_select(){
     });
 }
 
-function add_movie(event, elem, quality_profile, modal=false){
+function add_movie_settings(event, button){
+    event.preventDefault();
+    $contents = $(button).closest('div.btn-group').find('div.add-movie-form');
+    if($contents.is(':visible')){
+        $contents.slideUp();
+    } else {
+        $contents.slideDown();
+    }
+}
+
+function select_item(event, item){
+    event.preventDefault();
+    $dropdown = $(item).closest('div.dropdown-menu');
+    $dropdown.find('.mdi.mdi-star').removeClass('mdi mdi-star');
+    $(item).addClass('mdi mdi-star');
+    $dropdown.parent().find('button[data-toggle="dropdown"]').text($(item).text());
+}
+
+function add_movie(event, elem, modal=false){
     $this = $(elem);
 
-    $add_button = $this.closest("div.dropdown").find("button.dropdown-toggle");
+    $add_button = $this;
     add_oc = $add_button.html();
     $add_button.html("<i class='mdi mdi-circle animated'></i>");
     $add_button.attr("disabled", true);
 
     if(modal){
         var data = $modal.data("movie");
-        var $add_button = $this.closest("div.btn-group").find("button.dropdown-toggle");
     } else {
         var data = $this.closest("li").data("movie");
     }
+    var $form = $this.closest(".add-movie-form");
+    data['quality_profile'] = $form.find('.quality_profile').text().trim();
+    data['category'] = $form.find('.category').text().trim();
 
-    data['quality'] = quality_profile;
     var title = data['title'];
 
     $.post(url_base + "/ajax/add_wanted_movie", {"data":JSON.stringify(data)})
@@ -191,7 +210,6 @@ function add_movie(event, elem, quality_profile, modal=false){
         $.notify({message: err}, {type: "danger"});
     })
     .always(function(){
-        $add_button = $this.closest("div.dropdown").find("button.dropdown-toggle");
         $add_button.html(add_oc);
         $add_button.removeAttr("disabled");
     });
