@@ -246,6 +246,30 @@ class SQL(object):
             logging.error('Unable to update database row.')
             return False
 
+    def update_all(self, TABLE, data):
+        ''' Updates single value in all rows on table.
+        TABLE (str): name of database table to write to
+        data (dict): key/value pairs to update in table
+
+        Writes VALUE into COLUMN
+
+        Returns Bool.
+        '''
+
+        logging.debug('Updating to {} in {}.'.format(data, TABLE))
+
+        columns = '{}=?'.format('=?,'.join(data.keys()))
+        sql = 'UPDATE {} SET {}'.format(TABLE, columns)
+        vals = list(data.values())
+
+        command = [sql, vals]
+
+        if self.execute(command):
+            return True
+        else:
+            logging.error('Unable to update database rows.')
+            return False
+
     def update_multiple_values(self, TABLE, data, idcol, idval):
         ''' Updates mulitple values in a single sql row
         TABLE (str): database table to access
@@ -1001,5 +1025,6 @@ class DatabaseUpdate(object):
     def update_10():
         ''' Add category column to MOVIES '''
         core.sql.update_tables()
+        core.sql.update_all('MOVIES', {'category': 'Default'})
 
     # Adding a new method? Remember to update the current_version #
