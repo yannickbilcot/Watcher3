@@ -161,6 +161,7 @@
         <template id="category_select">
             <select class="form-control btn-light border mt-3 border" id="category" value="">
                 <option value="" selected="selected">${_('Choose a Category')}</option>
+                <option value="Default">Default</option>
                 %for i in categories:
                 <option value="${i}">${i}</option>
                 %endfor
