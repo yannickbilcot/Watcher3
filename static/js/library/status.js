@@ -444,6 +444,7 @@ function open_info_modal(event, elem){
 
         $movie_status_modal.data("movie", movie);
         $movie_status_modal.find("select#movie_quality > option[value='"+movie["quality"]+"']").attr("selected", true)
+        $movie_status_modal.find("select#movie_category > option[value='"+movie["category"]+"']").attr("selected", true)
         $status_select = $movie_status_modal.find("select#movie_status");
 
         if(movie["status_select"] == "Disabled"){
@@ -648,6 +649,7 @@ function update_movie_options(event, elem, imdbid){
     var $i = elem.querySelector('i');
 
     var quality = document.getElementById('movie_quality').value;
+    var category = document.getElementById('movie_category').value;
     var status = document.getElementById('movie_status').value;
 
     var filters = {};
@@ -657,6 +659,7 @@ function update_movie_options(event, elem, imdbid){
 
     $.post(url_base+"/ajax/update_movie_options", {
         "quality": quality,
+        "category": category,
         "status": status,
         "filters": JSON.stringify(filters),
         "imdbid": imdbid

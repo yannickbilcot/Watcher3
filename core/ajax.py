@@ -464,7 +464,7 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def update_movie_options(self, quality, status, filters, imdbid):
+    def update_movie_options(self, quality, category, status, filters, imdbid):
         ''' Updates quality settings for individual title
         quality (str): name of new quality
         status (str): management state ('automatic', 'disabled')
@@ -478,7 +478,7 @@ class Ajax(object):
 
         logging.info('Setting Quality and filters for {}.'.format(imdbid))
 
-        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'filters': filters}, 'imdbid', imdbid):
+        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'category': category, 'filters': filters}, 'imdbid', imdbid):
             return {'response': False, 'error': Errors.database_write}
 
         logging.info('Updating status to {} for {}.'.format(status, imdbid))
