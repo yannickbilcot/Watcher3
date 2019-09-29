@@ -38,11 +38,19 @@ function render_charts(stats){
         colors: status_colors,
         labelColor: label_color,
         labelSize: label_size
-    })
+    });
 
     Morris.Donut({
         element: document.querySelector("div#chart_profiles .chart"),
         data: stats["qualities"],
+        colors: profile_colors,
+        labelColor: label_color,
+        labelSize: label_size
+    });
+
+    Morris.Donut({
+        element: document.querySelector("div#chart_categories .chart"),
+        data: stats["categories"],
         colors: profile_colors,
         labelColor: label_color,
         labelSize: label_size
@@ -58,7 +66,7 @@ function render_charts(stats){
         lineColors: label_color,
         xLabelAngle: 35,
         grid: true
-    })
+    });
 
     Morris.Line({
         element: document.querySelector("div#chart_added .chart"),
@@ -71,7 +79,7 @@ function render_charts(stats){
         pointStrokeColors: label_color,
         xLabels: "month",
         smooth: false
-    })
+    });
 
     Morris.Bar({
         element: document.querySelector("div#chart_scores .chart"),
@@ -82,12 +90,12 @@ function render_charts(stats){
         barColors: label_color,
         pointFillColors: label_color,
         pointStrokeColors: label_color
-    })
+    });
 
     each(document.querySelectorAll("svg text"), function(svg){
         svg.style.fontFamily = font_family;
-    })
+    });
     each(document.querySelectorAll("#chart_status svg path, #chart_profiles svg path"), function(svg){
         svg.setAttribute('stroke', 'transparent');
-    })
+    });
 }
