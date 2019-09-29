@@ -1,36 +1,12 @@
 window.addEventListener("DOMContentLoaded", function(){
     category_template = document.querySelector("template#category_template").innerHTML;
-
     $categories_form = $("form#categories");
-
-    each(document.querySelectorAll('i.mdi.radio'), function(r, i){
-        r.addEventListener('click', function(){
-            toggle_default()
-        })
-    })
-
 });
-
-function toggle_default(){
-    var $i = event.target;
-    if($i.getAttribute('value') == 'True'){
-        return;
-    } else {
-        each(document.querySelectorAll('i.mdi.radio'), function(radio){
-            radio.classList.remove('mdi-star');
-            radio.classList.add('mdi-star-outline');
-            radio.setAttribute('value', 'False');
-        })
-        $i.setAttribute('value', 'True');
-        $i.classList.remove('mdi-star-outline');
-        $i.classList.add('mdi-star');
-    }
-}
 
 function edit_category(event, button){
     event.preventDefault();
     $i = button.children[0];
-    $contents = $(button).closest('div.category').find('div.category_contents')
+    $contents = $(button).closest('div.category').find('div.category_contents');
     if($i.classList.contains('mdi-chevron-down')){
         $i.classList.remove('mdi-chevron-down');
         $i.classList.add('mdi-chevron-up');
@@ -45,16 +21,8 @@ function edit_category(event, button){
 function add_category(event){
     event.preventDefault();
     var $new_category = $(category_template);
-    $new_category.find("i.c_box").each(function(){
-        var $this = $(this);
-        if(this.getAttribute("value") == "True"){
-            this.classList.remove("mdi-checkbox-blank-outline");
-            this.classList.add("mdi-checkbox-marked");
-        }
-    })
-    $categories_form.append($new_category)
-    $new_category.find('[data-toggle="tooltip"]').tooltip()
-    $new_category.find('i.mdi.radio').click(toggle_default);
+    $categories_form.append($new_category);
+    $new_category.find('[data-toggle="tooltip"]').tooltip();
 }
 
 function delete_category(event, button){
