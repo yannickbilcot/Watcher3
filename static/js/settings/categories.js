@@ -30,10 +30,6 @@ function delete_category(event, button){
     var $category = $(button).closest('div.category');
     $category.slideUp(500, function(){
         $category.remove();
-        $rads = $('i.mdi.radio');
-        if($rads.filter('[value="true"]').length == 0){
-            $rads[0].click();
-        }
     });
 }
 
@@ -42,7 +38,7 @@ function _get_settings(){
     var blanks = false;
 
 // Categories
-    var required_fields = ['name', 'moverpath']
+    var required_fields = ['name', 'moverpath'];
 
     each(document.querySelectorAll('div.category'), function(element){
         category = {};
