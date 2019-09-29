@@ -1,5 +1,6 @@
 <%
     applied_profiles = {i['quality'] for i in movies}
+    applied_categories = {i['category'] for i in movies}
     status_colors = {'Finished': 'success', 'Snatched': 'primary', 'Found': 'warning', 'Available': 'available', 'Wanted': 'info', 'Waiting': 'waiting', 'Bad': 'danger'}
 %>
 
@@ -44,6 +45,12 @@
                                 %for i in applied_profiles:
                                 <a class="dropdown-item" href="#" onclick="select_attrib(event, this, 'quality', '${i}')">${i}</a>
                                 %endfor
+
+                                <div class="divider"></div>
+                                <h6 class="dropdown-header">${_('Category')}</h6>
+                                %for i in applied_categories:
+                                <a class="dropdown-item" href="#" onclick="select_attrib(event, this, 'category', '${i}')">${i}</a>
+                                %endfor
                             </div>
                         </div>
                     </div>
@@ -75,7 +82,7 @@
                     _status = 'Finished' if movie['status'] == 'Disabled' else movie['status']
                     _poster = url_base + '/posters/' + movie['poster'] if movie.get('poster') else url_base + '/static/images/missing_poster.jpg'
                 %>
-                <li data-imdbid="${movie['imdbid']}" data-status="${_status}" data-quality="${movie['quality']}">
+                <li data-imdbid="${movie['imdbid']}" data-status="${_status}" data-quality="${movie['quality']}" data-category="${movie['category']}">
                     <div class="card">
                         <img data-echo="${_poster}" src="${url_base}/static/images/missing_poster.jpg" class="card-img-top">
                         <div class="card-body" data-imdbid="${movie['imdbid']}" data-tmdbid="${movie['tmdbid']}">
