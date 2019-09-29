@@ -29,6 +29,10 @@ window.addEventListener("DOMContentLoaded", function(){
                                       body: 'Quality profiles will be changed for selected movies.' + document.querySelector('template#quality_select').innerHTML,
                                       task: '_change_quality'
                                       },
+                   'change_category': {title: 'Change Category',
+                                      body: 'Category will be changed for selected movies.' + document.querySelector('template#category_select').innerHTML,
+                                      task: '_change_category'
+                                      },
                    'reset': {title: 'Reset Movies',
                              body: 'Selected movies will be reset.<br/>Quality Profile will be set to Default.<br/>Status will be set to wanted.<br/>Search Results will be removed (including Imports).<br/>This cannot be undone.',
                              task: '_reset'
@@ -127,11 +131,24 @@ function _change_quality(event, elem){
 
     var quality = document.querySelector('#task_modal .modal-body select#quality').value;
     if(!quality){
-        $.notify({message: _("Select a new Quality Profile.")}, {type: "warning"})
+        $.notify({message: _("Select a new Quality Profile.")}, {type: "warning"});
         return
     }
 
     _manager_request("manager_change_quality", {"movies": movies, "quality": quality});
+}
+
+function _change_category(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+
+    var category = document.querySelector('#task_modal .modal-body select#category').value;
+    if(!category){
+        $.notify({message: _("Select a new Category.")}, {type: "warning"});
+        return
+    }
+
+    _manager_request("manager_change_category", {"movies": movies, "category": category});
 }
 
 function _reset(event, elem){

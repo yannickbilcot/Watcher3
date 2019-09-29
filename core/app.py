@@ -113,7 +113,8 @@ class App(object):
             return App.status_template.render(profiles=core.CONFIG['Quality']['Profiles'].keys(), movie_count=mc, finished_count=fc, **self.defaults())
         elif page == 'manage':
             movies = core.sql.get_user_movies()
-            return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+            return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                              categories=core.CONFIG['Categories'].keys(), **self.defaults())
         elif page == 'import':
             subpage = path[1] if len(path) > 1 else None
 

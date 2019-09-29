@@ -1197,6 +1197,29 @@ class Ajax(object):
     manager_change_quality._cp_config = {'response.stream': True, 'tools.gzip.on': False}
 
     @cherrypy.expose
+    def manager_change_category(self, movies, category):
+        ''' Bulk manager action to change movie category
+        movies (list): dicts of movies, must contain keys imdbid
+        category (str): category to set movies to
+
+        Yields dict ajax-style response
+        '''
+
+        movies = json.loads(movies)
+
+        logging.info('Setting category to {} for: {}'.format(category, ', '.join(i['imdbid'] for i in movies)))
+
+        for i, movie in enumerate(movies):
+            if not core.sql.update('MOVIES', 'category', category, 'imdbid', movie['imdbid']):
+                response = {'response': False, 'error': Errors.database_write, 'imdbid': movie['imdbid'], 'index': i + 1}
+            else:
+                response = {'response': True, 'index': i + 1}
+
+            yield json.dumps(response)
+
+    manager_change_category._cp_config = {'response.stream': True, 'tools.gzip.on': False}
+
+    @cherrypy.expose
     def manager_reset_movies(self, movies):
         ''' Bulk manager action to reset movies
         movies (list): dicts of movies, must contain key imdbid
