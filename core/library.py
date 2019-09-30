@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import datetime
 import logging
@@ -321,6 +322,11 @@ class ImportCPLibrary(object):
                         movie['audiocodec'] = title_data.get('audio')
                         movie['videocodec'] = title_data.get('codec')
 
+                        for filepath in i.get('files', {}).get('movie', []):
+                            movie['category'] = Metadata.get_category_from_path(filepath)
+                            if movie['category']:
+                                break
+
                         try:
                             movie['size'] = i.get('info', {}).get('size', 0) * 1024 * 1024
                         except Exception as e:
@@ -399,6 +405,7 @@ class Metadata(object):
             'releasegroup': None,
             'source': None,
             'quality': None,
+            'category': None,
             'path': filepath,
             'edition': []
         }
@@ -537,6 +544,7 @@ class Metadata(object):
             meta_data['year'] = str(meta_data['year'])
         meta_data['videocodec'] = meta_data.pop('codec', None)
         meta_data['audiocodec'] = meta_data.pop('audio', None)
+        meta_data['category'] = Metadata.get_category_from_path(filepath)
 
         qual = meta_data.pop('quality', '')
         for source, aliases in core.CONFIG['Quality']['Aliases'].items():
@@ -548,6 +556,22 @@ class Metadata(object):
         meta_data['releasegroup'] = meta_data.pop('group', None)
 
         return meta_data
+
+    @staticmethod
+    def get_category_from_path(filepath):
+        moverpath = core.CONFIG['Postprocessing']['moverpath']
+        if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+            return 'Default'
+        for category, category_config in core.CONFIG['Categories'].items():
+            moverpath = category_config['moverpath']
+            if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+                return category
+        return None
+
+    @staticmethod
+    def root_mover_path(path):
+        path = os.path.join(path, '') # ensure path ends with /
+        return os.path.split(re.sub("{.+}.*$", '', path))[0]
 
     @staticmethod
     def convert_to_db(movie):
@@ -608,6 +632,9 @@ class Metadata(object):
 
         if not movie.get('quality'):
             movie['quality'] = 'Default'
+
+        if not movie.get('category'):
+            movie['category'] = 'Default'
 
         movie['finished_file'] = movie.get('finished_file')
 
@@ -861,6 +888,7 @@ class Manage(object):
             return response
 
         movie.setdefault('quality', 'Default')
+        movie.setdefault('category', 'Default')
         movie.setdefault('status', 'Waiting')
         movie.setdefault('origin', 'Search')
 

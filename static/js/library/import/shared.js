@@ -8,6 +8,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
     $source_select = document.querySelector('template#source_select').content.children[0];
     $quality_select = document.querySelector('template#quality_select').content.children[0];
+    $category_select = document.querySelector('template#category_select').content.children[0];
 
     // Clear empty highlight on input
     $("body").on("click", "input", function(){

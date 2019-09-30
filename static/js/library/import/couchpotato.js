@@ -48,8 +48,12 @@ function connect(event, elem){
         }
 
         each(response['movies'], function(movie, index){
-            var select = $source_select.cloneNode(true);
-            select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
+            var source_select = $source_select.cloneNode(true);
+            source_select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
+            var category_select = $category_select.cloneNode(true);
+                if (movie['category']) {
+                category_select.querySelector(`option[value="${movie["category"]}"]`).setAttribute("selected", true);
+            }
 
             if(movie["status"] === "Disabled"){
                 var $row = $(`<tr>
@@ -63,7 +67,10 @@ function connect(event, elem){
                                     ${movie["imdbid"]}
                                 </td>
                                 <td class="resolution">
-                                    ${select.outerHTML}
+                                    ${source_select.outerHTML}
+                                </td>
+                                <td class="category">
+                                    ${category_select.outerHTML}
                                 </td>
                             </tr>`)[0];
                 $row.dataset.movie = JSON.stringify(movie);
@@ -82,6 +89,9 @@ function connect(event, elem){
                                 </td>
                                 <td class="profile">
                                     ${$quality_select.outerHTML}
+                                </td>
+                                <td class="category">
+                                    ${$category_select.outerHTML}
                                 </td>
                             </tr>`)[0];
                 $row.dataset.movie = JSON.stringify(movie);
@@ -123,6 +133,7 @@ function start_import(event, elem){
         movie = JSON.parse(row.dataset.movie);
 
         movie["resolution"] = row.querySelector("select.source_select").value;
+        movie["category"] = row.querySelector("select.category_select").value;
         finished_movies.push(movie);
     });
 
@@ -133,6 +144,7 @@ function start_import(event, elem){
 
         movie = JSON.parse(row.dataset.movie);
         movie["quality"] = row.querySelector("select.quality_select").value;
+        movie["category"] = row.querySelector("select.category_select").value;
         wanted_movies.push(movie);
     });
 

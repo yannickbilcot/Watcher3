@@ -122,7 +122,8 @@ class App(object):
             if not subpage:
                 return App.import_template.render(**self.defaults())
             elif subpage == 'couchpotato':
-                return App.couchpotato_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.couchpotato_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                       categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'kodi':
                 return App.kodi_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
             elif subpage == 'plex':
