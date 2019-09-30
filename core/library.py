@@ -325,6 +325,7 @@ class ImportCPLibrary(object):
                         for filepath in i.get('files', {}).get('movie', []):
                             movie['category'] = Metadata.get_category_from_path(filepath)
                             if movie['category']:
+                                movie['finished_file'] = filepath
                                 break
 
                         try:
