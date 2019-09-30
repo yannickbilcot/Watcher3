@@ -888,6 +888,8 @@ class Manage(object):
             response['error'] = _('{} already exists in library.').format(movie['title'])
             return response
 
+        if not movie.get('category', None) and movie.get('finished_file', None):
+            movie['category'] = Metadata.get_category_from_path((movie['finished_file']))
         movie.setdefault('quality', 'Default')
         movie.setdefault('category', 'Default')
         movie.setdefault('status', 'Waiting')
