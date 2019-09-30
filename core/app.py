@@ -125,9 +125,11 @@ class App(object):
                 return App.couchpotato_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
                                                        categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'kodi':
-                return App.kodi_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.kodi_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'plex':
-                return App.plex_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.plex_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'directory':
                 try:
                     start_dir = os.path.expanduser('~')
@@ -136,7 +138,9 @@ class App(object):
                     start_dir = core.PROG_PATH
                     file_list = [i for i in os.listdir(start_dir) if os.path.isdir(os.path.join(start_dir, i)) and not i.startswith('.')]
                 file_list.append('..')
-                return App.directory_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), current_dir=start_dir, file_list=file_list, **self.defaults())
+                return App.directory_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                     current_dir=start_dir, file_list=file_list,
+                                                     categories=core.CONFIG['Categories'].keys(), **self.defaults())
             else:
                 return self.error_page_404()
         elif page == 'stats':

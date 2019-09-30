@@ -202,6 +202,15 @@
             </select>
         </template>
 
+        <template id="category_select">
+            <select class="category_select btn btn-sm btn-light border">
+                <option value="Default">Default</option>
+                %for category in categories:
+                    <option value="${category}">${category}</option>
+                %endfor
+            </select>
+        </template>
+
         <div id="modal_browser" class="modal fade">
             <div class="modal-dialog modal-wide">
                 <div class="modal-content">

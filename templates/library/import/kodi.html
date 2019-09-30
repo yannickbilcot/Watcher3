@@ -174,5 +174,14 @@
                 %endfor
             </select>
         </template>
+
+        <template id="category_select">
+            <select class="category_select btn btn-sm btn-light border">
+                <option value="Default">Default</option>
+                %for category in categories:
+                    <option value="${category}">${category}</option>
+                %endfor
+            </select>
+        </template>
     </body>
 </html>
