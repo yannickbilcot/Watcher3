@@ -8,7 +8,6 @@ window.addEventListener("DOMContentLoaded", function(){
     // Set selects on page load
     each($usenet_clients, function(client){
         if(client.dataset.enabled == 'True'){
-            client.style.maxHeight = '100%';
             $select_usenet.value = client.id;
             return false;
         }
@@ -16,7 +15,6 @@ window.addEventListener("DOMContentLoaded", function(){
 
     each($torrent_clients, function(client){
         if(client.dataset.enabled == 'True'){
-            client.style.maxHeight = '100%';
             $select_torrent.value = client.id;
             return false;
         }
@@ -27,9 +25,9 @@ window.addEventListener("DOMContentLoaded", function(){
         each($usenet_clients, function(client){
 
             if(client.id == val){
-                client.style.maxHeight = '100%';
+                client.dataset.enabled = 'True';
             } else {
-                client.style.maxHeight = '0%';
+                client.dataset.enabled = 'False';
             }
         })
     });
@@ -37,9 +35,10 @@ window.addEventListener("DOMContentLoaded", function(){
     $select_torrent.addEventListener('change', function(event){
         var val = event.target.value;
         each($torrent_clients, function(client){
-            client.style.maxHeight = '0%';
             if(client.id == val){
-                client.style.maxHeight = '100%';
+                client.dataset.enabled = 'True';
+            } else {
+                client.dataset.enabled = 'False';
             }
         })
     });
@@ -106,7 +105,7 @@ function _get_settings(){
     each(document.querySelectorAll("div#usenet_client_settings > div"), function(client){
         var name = client.id;
         var config = {};
-        config['enabled'] = (client.style.maxHeight == '100%')
+        config['enabled'] = (client.dataset.enabled == 'True')
 
         each(client.querySelectorAll('i.c_box'), function(checkbox){
             config[checkbox.dataset.id] = is_checked(checkbox);
@@ -123,7 +122,7 @@ function _get_settings(){
     each(document.querySelectorAll("div#torrent_client_settings > div"), function(client){
         var name = client.id;
         var config = {};
-        config['enabled'] = (client.style.maxHeight == '100%')
+        config['enabled'] = (client.dataset.enabled == 'True')
 
         each(client.querySelectorAll('i.c_box'), function(checkbox){
             config[checkbox.dataset.id] = is_checked(checkbox);
