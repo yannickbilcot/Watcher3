@@ -1,3 +1,4 @@
+/* each */
 window.addEventListener("DOMContentLoaded", function(){
     category_template = document.querySelector("template#category_template").innerHTML;
     $categories_form = $("form#categories");
