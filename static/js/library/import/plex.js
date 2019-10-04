@@ -1,3 +1,4 @@
+/* global each, _, url_base, $source_select, notify_error */
 var import_cache;
 
 var template_import_complete = (index, movie, select) => $(`<tr data-index="${index}">

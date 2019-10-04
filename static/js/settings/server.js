@@ -1,12 +1,12 @@
+/* global url_base, notify_error, each, $input_api_key */
 $(document).ready(function () {
     $input_api_key = document.querySelector('input#apikey');
 });
 
 function new_key(event){
     event.preventDefault();
-    var key = _generate_key(32);
-    $input_api_key.value = key;
-};
+    $input_api_key.value = _generate_key(32);
+}
 
 function update_check(event, elem){
     event.preventDefault();
@@ -33,7 +33,7 @@ function update_now(){
         window.location = url_base + "/update";
     })
     .fail(notify_error);
-};
+}
 
 function _get_settings(){
 
@@ -46,7 +46,7 @@ function _get_settings(){
 
     each(document.querySelectorAll("form[data-category='server'] i.c_box"), function(checkbox){
         settings[checkbox.id] = is_checked(checkbox);
-    })
+    });
 
 
     if(settings['customwebroot']){
@@ -66,12 +66,12 @@ function _get_settings(){
             return
         }
         settings[input.id] = parse_input(input);
-    })
+    });
 
 // SERVER['PROXY']
     each(document.querySelectorAll("form[data-category='proxy'] i.c_box"), function(checkbox){
         settings['Proxy'][checkbox.id] = is_checked(checkbox);
-    })
+    });
 
     if(settings['Proxy']['enabled']){
         required_fields = ["host", "port"];
@@ -89,9 +89,9 @@ function _get_settings(){
         settings['Proxy'][input.id] = parse_input(input);
     });
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
 
     return {"Server": settings}
 }
@@ -101,6 +101,6 @@ function _generate_key(length){
     var possible = "abcdef0123456789";
     for(var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
-    };
+    }
     return text;
-};
+}

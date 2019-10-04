@@ -1,15 +1,14 @@
+/* global url_base, notify_error, $thinker */
 window.addEventListener("DOMContentLoaded", function(){
     var updating = $("meta[name='updating']").attr("content");
 
-    if(updating.toLowerCase() == 'false'){
+    if(updating.toLowerCase() === 'false'){
         window.location = url_base + "/library/status/";
         return;
     }
 
     $thinker = document.getElementById("thinker");
     $thinker.style.maxHeight = '100%';
-
-    $message = $("div.message");
 
     document.title = "Watcher - Updating Server";
     var last_response_len = false;
@@ -29,40 +28,40 @@ window.addEventListener("DOMContentLoaded", function(){
                 }
                 var r = JSON.parse(response_update);
 
-                var $tasks_list = $("div.tasks")
+                var $tasks_list = $("div.tasks");
 
-                if(r["response"] == false){
+                if(r["response"] === false){
                     $thinker.style.maxHeight = '0%';
                     $.notify({message: r["error"]}, {type: "danger", delay: 0});
-                    return
+                    return;
                 }
-                else if(r["status"] == "waiting"){
+                else if(r["status"] === "waiting"){
                     $tasks_list.show();
                     $thinker.style.opacity = 0.25;
-                    var $active_tasks = $("div.tasks > div")
+                    var $active_tasks = $("div.tasks > div");
                     var active_names = [];
 
                     $active_tasks.each(function(index, element){
                         var $task = $(element);
                         var name = $task.text();
                         active_names.push(name);
-                        if(r["active_tasks"].indexOf(name) == -1){
+                        if(r["active_tasks"].indexOf(name) === -1){
                             $task.slideUp();
                         }
                     });
 
                     $(r["active_tasks"]).each(function(index, name){
-                        if(active_names.indexOf(name) == -1){
+                        if(active_names.indexOf(name) === -1){
                             $tasks_list.innerHTML += `<div>${name}</div>`;
                         }
                     });
                 }
-                else if(r["status"] == "updating"){
+                else if(r["status"] === "updating"){
                     $tasks_list.fadeOut();
                     $thinker.style.opacity = 1;
                     $("div.updating").fadeIn();
                 }
-                else if(r["status"] == "complete"){
+                else if(r["status"] === "complete"){
                     $.notify({message: _("Update successful.")}, {delay: 0});
                     $("div.updating").text(_("Restarting."));
                     restart();
@@ -82,7 +81,7 @@ function restart(){
         shows span.error message.
     */
     document.title = "Watcher - Restarting Server";
-    var try_count = 0
+    var try_count = 0;
     var check = setInterval(function(){
         if(try_count < 10){
             try_count += 1;

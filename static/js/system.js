@@ -1,3 +1,4 @@
+/* global url_base, notify_error, each */
 window.addEventListener("DOMContentLoaded", function(){
     $tasks_table = document.querySelector("table#tasks > tbody");
     server_time = document.querySelector('meta[name="server_time"]').content;
@@ -7,14 +8,14 @@ window.addEventListener("DOMContentLoaded", function(){
 
     $.each(tasks, function(i, task){
         $tasks_table.innerHTML += _render_task_row(task);
-    })
+    });
 
     $restore_modal = document.getElementById("modal_restore_backup");
     var restore_modal_html = $restore_modal.innerHTML;
 
     $restore_modal.addEventListener('hidden.bs.modal', function(){
         $restore_modal.innerHTML = restore_modal_html;
-    })
+    });
 
     each(document.querySelectorAll('input[type="time"]'), function(input){
         var hr = input.dataset.hour.toString().padStart(2, 0);
@@ -31,11 +32,11 @@ function _get_settings(){
     var blanks = false;
 
 // FILEMANAGEMENT
-    var required_fields = []
+    var required_fields = [];
 
     each(document.querySelectorAll("form[data-category='filemanagement'] i.c_box"), function(checkbox){
         settings['FileManagement'][checkbox.id] = is_checked(checkbox);
-    })
+    });
 
     if(settings['scanmissingfiles']){
         required_fields.push("scanmissinghour", "scanmissingmin");
@@ -56,11 +57,11 @@ function _get_settings(){
         }
 
         settings['FileManagement'][input.id] = parse_input(input);
-    })
+    });
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
     return {"System": settings}
 }
 
@@ -73,21 +74,21 @@ function _render_task_row(task){
 
     var le = parseDate(task["last_execution"]) / 1000;
 
-    var next = le + task["interval"]
+    var next = le + task["interval"], enabled;
 
     while(next < server_time){
         next += task["interval"];
     }
 
     if(task["enabled"]){
-        var next = time_difference(server_time, next);
-        var enabled = "<i class='mdi mdi-check'></i>";
+        next = time_difference(server_time, next);
+        enabled = "<i class='mdi mdi-check'></i>";
     } else {
-        var next = "--";
-        var enabled = "";
-    };
+        next = "--";
+        enabled = "";
+    }
 
-    var le = time_difference(server_time, le);
+    le = time_difference(server_time, le);
 
     var interval = interval_string(task["interval"]);
 
@@ -100,8 +101,8 @@ function _render_task_row(task){
                 <td class="center">
                     <i class="mdi mdi-play-circle task_execute" onclick="execute_task(event, this, '${task["name"]}')"></i>
                 </td>
-            </tr>`
-    return row
+            </tr>`;
+    return row;
 }
 
 function interval_string(seconds){
@@ -111,15 +112,15 @@ function interval_string(seconds){
     Returns string
     */
 
-    var times = ['seconds', 'minutes', 'hours']
+    var times = ['seconds', 'minutes', 'hours'];
 
-    if(seconds % 3600 == 0){
+    if(seconds % 3600 === 0){
         return seconds / 3600 + " Hours";
-    } else if(seconds % 60 == 0){
+    } else if(seconds % 60 === 0){
         return seconds / 60 + " Minutes";
     } else {
         return seconds + " Seconds";
-    };
+    }
 }
 
 function time_string(time){
@@ -151,13 +152,13 @@ function create_backup(event, button){
 
     each($btns, function(button){
         button.setAttribute('disabled', true);
-    })
+    });
 
     $thinker.style.maxHeight = "100%";
 
     $.post(url_base + "/ajax/create_backup", {})
     .done(function(response){
-        if(response["response"] == true){
+        if(response["response"] === true){
             $.notify({message: response["message"]}, {delay: 0})
         } else {
             $.notify({message: `${response['error']}`}, {type: "danger", delay: 0})
@@ -167,7 +168,7 @@ function create_backup(event, button){
     .always(function(){
         each($btns, function(button){
             button.removeAttribute('disabled');
-        })
+        });
 
         $thinker.style.maxHeight = "0%";
     });
@@ -202,7 +203,7 @@ function upload_restore_zip(event, button){
         script: url_base + "/ajax/restore_backup",
     })
     .on("lu:errors", function (e, errors) {
-        if(errors[0]["errors"][0]["type"] == "type"){
+        if(errors[0]["errors"][0]["type"] === "type"){
             $.notify({message: _("Select a ZIP file.")}, {type: "warning"})
         } else {
             each(errors[0]['errors'], function(err){
@@ -218,13 +219,13 @@ function upload_restore_zip(event, button){
     })
     .on("lu:progress", function (e, state) {
         $progress_bar.style.width = (state.percentage + "%");
-        if(state.percentage == 100){
+        if(state.percentage === 100){
             $title_text.innerText = _("Restoring Backup.");
         }
     })
     .on("lu:success", function (e, response) {
         response = JSON.parse(response);
-        if(response["response"] == true){
+        if(response["response"] === true){
             $.notify({message: "Restore finished, restarting..."});
             setTimeout(function(){
                 window.location = url_base + "/system/restart?e=false";
@@ -234,13 +235,11 @@ function upload_restore_zip(event, button){
         }
     })
     .on("lu:fail", function (e, data) {
-        var err = data.status + ' ' + data.statusText
+        var err = data.status + ' ' + data.statusText;
         $.notify({message: err}, {type: "danger", delay: 0});
     });
 
     $($input).data("liteUploader").startUpload();
-
-    return
 }
 
 function execute_task(event, elem, name){
@@ -263,12 +262,12 @@ function execute_task(event, elem, name){
     $.post(url_base + "/ajax/manual_task_execute", {name: name})
     .done(function(response){
         var t = tasks[name];
-        t["last_execution"] = response["last_execution"]
+        t["last_execution"] = response["last_execution"];
 
         $tr.innerHTML = _render_task_row(t);
 
-        if(response["response"] == true){
-            $.notify({message: response["message"]})
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
             $.each(response["notifications"], function(i, notif){
                 notif[1]["onClose"] = remove_notif;
                 var n = $.notify(notif[0], notif[1]);
@@ -300,23 +299,23 @@ function time_difference(now, time){
     Returns string
     */
 
-    var diff = time - now;
+    var diff = time - now, a, t;
     if(diff > 0){
-        var a = "";
+        a = "";
     } else {
-        var a = " ago";
-    };
+        a = " ago";
+    }
 
     diff = Math.abs(diff);
 
     if(diff < spmin){
-         var t = diff + ' seconds';
+        t = diff + ' seconds';
     } else if(diff < sphr){
-         var t = Math.round(diff/spmin) + ' minutes';
+        t = Math.round(diff/spmin) + ' minutes';
     } else if(diff < spd ){
-         var t = Math.round(diff/sphr ) + ' hours';
+        t = Math.round(diff/sphr ) + ' hours';
     } else {
-        var t = Math.round(diff/spd) + ' days';
+        t = Math.round(diff/spd) + ' days';
     }
     return t + a;
 }

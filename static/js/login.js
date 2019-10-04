@@ -1,3 +1,4 @@
+/* global url_base, notify_error */
 window.addEventListener("DOMContentLoaded", function(){
     url_base = document.querySelector("meta[name='url_base']").content;
 
@@ -10,7 +11,7 @@ window.addEventListener("DOMContentLoaded", function(){
     for (var i = 0; i < ins.length; i++){
         var input = ins[i];
         input.addEventListener('keyup', function(event){
-            if(event.keyCode == 13){
+            if(event.keyCode === 13){
                 login(event);
             }
         });
@@ -35,9 +36,9 @@ function login(event){
         $input_password.classList.add("border-danger");
     }
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
 
     $.post(url_base + "/auth/login", {
         "username": $input_user.value,
@@ -49,7 +50,7 @@ function login(event){
             if(loc.endsWith('/')){
                 loc = loc.slice(0, -1);
             }
-            if(loc.split("/").pop() == "auth"){
+            if(loc.split("/").pop() === "auth"){
                 window.location = url_base + "/library/status"
             } else {
                 location.reload()

@@ -1,7 +1,8 @@
+/* global url_base, notify_error */
 $(document).ready(function () {
     document.title = "Watcher - Shutting Down Server";
 
-    $thinker = document.getElementById("thinker");
+    var $thinker = document.getElementById("thinker");
     $thinker.style.maxHeight = '100%';
 
     $.post(url_base + "/ajax/server_status", {

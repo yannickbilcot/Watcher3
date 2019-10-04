@@ -1,3 +1,4 @@
+/* global url_base, notify_error */
 /* Automatically restarts server when loaded.
 
 If url has query string ?e=false, does not instruct server to restart, only checks for server to come back online
@@ -9,7 +10,7 @@ window.addEventListener("DOMContentLoaded", function(){
     document.title = "Watcher - Restarting Server";
     var qstring = new URLSearchParams(window.location.search);
 
-    $thinker = document.getElementById("thinker");
+    var $thinker = document.getElementById("thinker");
     $thinker.style.maxHeight = '100%';
 
     if(qstring.get("e") !== "false"){

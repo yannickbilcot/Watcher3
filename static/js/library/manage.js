@@ -1,4 +1,4 @@
-/*global each, echo, _, url_base  */
+/*global each, echo, _, url_base, notify_error */
 window.addEventListener("DOMContentLoaded", function(){
     $checkboxes = document.querySelectorAll("ul#movie_list i.c_box");
     $movie_lis = document.querySelectorAll("ul#movie_list > li");

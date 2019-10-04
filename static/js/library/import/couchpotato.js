@@ -1,4 +1,4 @@
-/*global each, $progress, $progress_bar, $progress_text, $source_select, $quality_select, $category_select, set_stepper, is_checked, url_base */
+/*global each, $progress, $progress_bar, $progress_text, $source_select, $quality_select, $category_select, set_stepper, is_checked, url_base, notify_error */
 function connect(event, elem){
     event.preventDefault();
 

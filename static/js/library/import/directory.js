@@ -1,3 +1,4 @@
+/* global each, _, url_base, $source_select, notify_error */
 window.addEventListener("DOMContentLoaded", function(){
     $dir_input = document.getElementById("directory_input");
 
@@ -22,18 +23,15 @@ window.addEventListener("DOMContentLoaded", function(){
                                       <i class="mdi mdi-folder"></i>
                                       ${f}
                                   </li>`
-                })
+                });
                 file_list += `<li class="col-md-6 p-1 border">
                                   <i class="mdi mdi-folder"></i>
                                   ..
-                              </li>`
+                              </li>`;
                 $modal_file_list.html(file_list);
             }
         })
-        .fail(function(data){
-            var err = data.status + ' ' + data.statusText
-            $.notify({message: err}, {type: "danger", delay: 0});
-        });
+        .fail(notify_error);
     });
 });
 
@@ -63,9 +61,9 @@ function connect(event, elem){
         if(minsize < 0){
             minsize = 0;
         }
-    };
+    }
 
-    var recursive = is_checked(document.getElementById("scan_recursive"))
+    var recursive = is_checked(document.getElementById("scan_recursive"));
 
     $('form#connect').slideUp(600);
     $progress_bar.style.width = '0%';
@@ -83,7 +81,7 @@ function connect(event, elem){
         data: {"directory": directory, "minsize": minsize, "recursive": recursive},
         xhrFields: {
             onprogress: function(e){
-                var response_update;
+                var response_update, $row;
                 var response = e.currentTarget.response;
                 if(last_response_len === false)
                 {
@@ -93,22 +91,22 @@ function connect(event, elem){
                     response_update = response.substring(last_response_len);
                     last_response_len = response.length;
                 }
-                var response = JSON.parse(response_update);
+                response = JSON.parse(response_update);
                 if(response['response'] == null){
-                    return
+                    return;
                 }
 
-                if(response['response'] != 'in_library'){
+                if(response['response'] !== 'in_library'){
                     var movie = response["movie"];
                     var select = $source_select.cloneNode(true);
                     select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
                 }
 
-                if(response["response"] == "incomplete"){
+                if(response["response"] === "incomplete"){
                     no_imports = false;
-                    var $row = $(`<tr>
+                    $row = $(`<tr>
                                     <td>
-                                        <i class="mdi mdi-checkbox-marked c_box", value="True"></i>
+                                        <i class="mdi mdi-checkbox-marked c_box" value="True"></i>
                                     </td>
                                     <td>
                                         ${movie["finished_file"]}
@@ -125,15 +123,15 @@ function connect(event, elem){
                                     <td>
                                         ${movie["human_size"]}
                                     </td>
-                                </tr>`)[0]
+                                </tr>`)[0];
                     $row.dataset.movie = JSON.stringify(movie);
                     $incomplete_table.innerHTML += $row.outerHTML;
                     $incomplete_div.classList.remove('hidden');
-                } else if(response["response"] == "complete"){
+                } else if(response["response"] === "complete"){
                     no_imports = false;
-                    var $row = $(`<tr>
+                    $row = $(`<tr>
                                     <td>
-                                        <i class="mdi mdi-checkbox-marked c_box", value="True"></i>
+                                        <i class="mdi mdi-checkbox-marked c_box" value="True"></i>
                                     </td>
                                     <td>
                                         ${movie["finished_file"]}
@@ -150,7 +148,7 @@ function connect(event, elem){
                                     <td>
                                         ${movie["human_size"]}
                                     </td>
-                                </tr>`)[0]
+                                </tr>`)[0];
                     $row.dataset.movie = JSON.stringify(movie);
                     $complete_table.innerHTML += $row.outerHTML;
                     $complete_div.classList.remove('hidden');
@@ -165,7 +163,7 @@ function connect(event, elem){
     .done(function(data){
         set_stepper('import');
 
-        if(no_imports == true){
+        if(no_imports === true){
             document.getElementById('no_imports').classList.remove('hidden');
         } else {
             document.getElementById('button_import').classList.remove('hidden');
@@ -239,7 +237,7 @@ function start_import(event, button){
                },
         xhrFields: {
             onprogress: function(e){
-                var response_update;
+                var response_update, row;
                 var response = e.currentTarget.response;
                 if(last_response_len === false){
                     response_update = response;
@@ -250,19 +248,19 @@ function start_import(event, button){
                 }
                 var r = JSON.parse(response_update);
 
-                if(r['response'] == true){
+                if(r['response'] === true){
                     $success_div.classList.remove('hidden');
-                    var row = `<tr>
+                    row = `<tr>
                                     <td>${r['movie']['title']}</td>
                                     <td>${r['movie']['tmdbid']}</td>
-                                </tr>`
+                                </tr>`;
                     $success_table.innerHTML += row;
                 } else {
                     $error_div.classList.remove('hidden');
-                    var row = `<tr>
+                    row = `<tr>
                                     <td>${r['movie']['title']}</td>
                                     <td>${r['error']}</td>
-                                </tr>`
+                                </tr>`;
                     $error_table.innerHTML += row;
                 }
 

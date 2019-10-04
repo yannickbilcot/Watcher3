@@ -1,3 +1,4 @@
+/* global each, url_base, $source_select, notify_error */
 function connect(event, elem){
     event.preventDefault();
 

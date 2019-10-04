@@ -1,3 +1,4 @@
+/* global each, _, url_base, $source_select, notify_error */
 window.addEventListener("DOMContentLoaded", function(){
     $select_usenet = document.querySelector('select#usenet_client');
     $select_torrent = document.querySelector("select#torrent_client");
@@ -7,20 +8,20 @@ window.addEventListener("DOMContentLoaded", function(){
 
     // Set selects on page load
     each($usenet_clients, function(client){
-        if(client.dataset.enabled == 'True'){
+        if(client.dataset.enabled === 'True'){
             client.style.maxHeight = '100%';
             $select_usenet.value = client.id;
             return false;
         }
-    })
+    });
 
     each($torrent_clients, function(client){
-        if(client.dataset.enabled == 'True'){
+        if(client.dataset.enabled === 'True'){
             client.style.maxHeight = '100%';
             $select_torrent.value = client.id;
             return false;
         }
-    })
+    });
 
     $select_usenet.addEventListener('change', function(event){
         var val = event.target.value;
@@ -48,10 +49,11 @@ window.addEventListener("DOMContentLoaded", function(){
 
 function test_connection(event, button, mode){
     event.preventDefault();
-    if(mode == 'usenet'){
-        var client = $select_usenet.value;
-    } else if(mode == 'torrent'){
-        var client = $select_torrent.value;
+    var client;
+    if(mode === 'usenet'){
+        client = $select_usenet.value;
+    } else if(mode === 'torrent'){
+        client = $select_torrent.value;
     } else {
         return;
     }
@@ -76,7 +78,7 @@ function test_connection(event, button, mode){
         "data": settings
     })
     .done(function(response){
-        if(response["response"] == true){
+        if(response["response"] === true){
             $.notify({message: response["message"]});
         } else {
             $.notify({message: response["error"]}, {type: "danger"})
@@ -103,7 +105,7 @@ function _get_settings(){
     each(document.querySelectorAll("div#usenet_client_settings > div"), function(client){
         var name = client.id;
         var config = {};
-        config['enabled'] = (client.style.maxHeight == '100%')
+        config['enabled'] = (client.style.maxHeight === '100%');
 
         each(client.querySelectorAll('i.c_box'), function(checkbox){
             config[checkbox.dataset.id] = is_checked(checkbox);
@@ -120,7 +122,7 @@ function _get_settings(){
     each(document.querySelectorAll("div#torrent_client_settings > div"), function(client){
         var name = client.id;
         var config = {};
-        config['enabled'] = (client.style.maxHeight == '100%')
+        config['enabled'] = (client.style.maxHeight === '100%');
 
         each(client.querySelectorAll('i.c_box'), function(checkbox){
             config[checkbox.dataset.id] = is_checked(checkbox);
@@ -133,8 +135,8 @@ function _get_settings(){
         settings['Torrent'][name] = config;
     });
 
-    settings['Torrent']['DelugeWeb']['category'] = settings['Torrent']['DelugeWeb']['category'].toLowerCase().replace(/[^a-z0-9_-]/g, '')
-    settings['Torrent']['DelugeRPC']['category'] = settings['Torrent']['DelugeRPC']['category'].toLowerCase().replace(/[^a-z0-9_-]/g, '')
+    settings['Torrent']['DelugeWeb']['category'] = settings['Torrent']['DelugeWeb']['category'].toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    settings['Torrent']['DelugeRPC']['category'] = settings['Torrent']['DelugeRPC']['category'].toLowerCase().replace(/[^a-z0-9_-]/g, '');
 
 // DOWNLOADER['SOURCES']
     if($select_usenet.value){

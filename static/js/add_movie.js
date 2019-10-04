@@ -1,3 +1,4 @@
+/* global url_base, notify_error, each */
 window.addEventListener("DOMContentLoaded", function(){
     details_template = document.querySelector("template#details_template").innerHTML;
     item_template = document.querySelector("template#movie_template").innerHTML;
@@ -9,18 +10,18 @@ window.addEventListener("DOMContentLoaded", function(){
     $similar_select = document.getElementById('movie_names');
 
     $search_input.addEventListener('keyup', function(event){
-        if(event.keyCode == 13){
+        if(event.keyCode === 13){
             search(event, $search_button)
         }
-    })
+    });
 
     $pills = $('ul.nav-pills a');
     $pills.on('shown.bs.tab', function(e){
         clear_movies();
-        if(e.target.dataset.cat == 'search'){
+        if(e.target.dataset.cat === 'search'){
             return;
-        } else if(e.target.dataset.cat == 'similar'){
-            if($similar_select.children.length == 0){
+        } else if(e.target.dataset.cat === 'similar'){
+            if($similar_select.children.length === 0){
                 populate_movie_select();
             }
             return;
@@ -74,13 +75,13 @@ function load_suggestions(category, tmdbid=null){
     if(['popular', 'now_playing', 'top_rated', 'upcoming'].includes(category) && cache[category]){
         display_movies(cache[category]);
         return
-    };
+    }
 
     if(category === 'similar'){
         clear_movies();
         tmdbid = $similar_select.value;
         if(similar_cache[tmdbid]){
-            display_movies(similar_cache[tmdbid])
+            display_movies(similar_cache[tmdbid]);
             return;
         }
     }
@@ -93,7 +94,7 @@ function load_suggestions(category, tmdbid=null){
         tmdbid: tmdbid
     })
     .done(function(results){
-        display_movies(results)
+        display_movies(results);
         if(category === 'similar'){
             similar_cache[tmdbid] = results;
         } else {
@@ -121,7 +122,7 @@ function display_movies(movies){
             poster_path = movie['poster_url'] = url_base + "/static/images/missing_poster.jpg"
         }
 
-        movie["year"] = (movie["release_date"] || "N/A").slice(0,4)
+        movie["year"] = (movie["release_date"] || "N/A").slice(0,4);
 
         var template_dictionary = {"img_url": poster_path,
                                     "title": movie["title"],
