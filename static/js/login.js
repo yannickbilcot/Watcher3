@@ -46,14 +46,14 @@ function login(event){
     })
     .done(function(response){
         if(response){
-            loc = window.location.href;
+            var loc = window.location.href;
             if(loc.endsWith('/')){
                 loc = loc.slice(0, -1);
             }
             if(loc.split("/").pop() === "auth"){
-                window.location = url_base + "/library/status"
+                window.location = url_base + "/library/status";
             } else {
-                location.reload()
+                location.reload();
             }
         } else {
             $input_password.value = '';

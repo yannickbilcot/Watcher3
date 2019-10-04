@@ -13,7 +13,6 @@ $(document).ready(function () {
     /*
     This repeats every 3 seconds to check if the server is still online.
     */
-    var try_count = 0;
     var check = setInterval(function(){
         $.post(url_base + "/ajax/server_status", {
             "mode": "online",

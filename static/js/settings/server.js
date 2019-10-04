@@ -3,6 +3,15 @@ $(document).ready(function () {
     $input_api_key = document.querySelector('input#apikey');
 });
 
+function _generate_key(length){
+    var text = "";
+    var possible = "abcdef0123456789";
+    for(var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
 function new_key(event){
     event.preventDefault();
     $input_api_key.value = _generate_key(32);
@@ -94,13 +103,4 @@ function _get_settings(){
     }
 
     return {"Server": settings}
-}
-
-function _generate_key(length){
-    var text = "";
-    var possible = "abcdef0123456789";
-    for(var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 }

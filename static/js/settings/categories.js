@@ -1,4 +1,4 @@
-/*global each */
+/*global each, category_template, $categories_form */
 window.addEventListener("DOMContentLoaded", function(){
     category_template = document.querySelector("template#category_template").innerHTML;
     $categories_form = $("form#categories");

@@ -1,4 +1,41 @@
-/* global each, echo, current_page, per_page, pages, movie_sort_direction, movie_sort_key, cached_movies, $page_select, loading_library, $sort_direction_button, $movie_list, $hide_finished_movies_toggle, templates, status_colors, notify_error */
+/* global each, echo, url_base, current_page, per_page, pages, movie_sort_direction, movie_sort_key, cached_movies, $page_select, loading_library, $sort_direction_button, $movie_list, $hide_finished_movies_toggle, templates, status_colors, notify_error */
+exp_date = new Date();
+exp_date.setFullYear(exp_date.getFullYear() + 10);
+exp_date = exp_date.toUTCString();
+
+function read_cookie(){
+    /* Read document cookie
+    Returns dict
+    */
+    var dcookie = document.cookie;
+    var cookie_obj = {};
+    var cookiearray = dcookie.split("; ");
+
+    for (var i = 0; i < cookiearray.length; i++) {
+        key = cookiearray[i].split("=")[0];
+        value = decodeURIComponent(cookiearray[i].split("=")[1]);
+        cookie_obj[key] = value;
+    }
+    return cookie_obj;
+}
+
+function set_cookie(k, v){
+    /* Helper method to set cookies
+    k (str): cookie key
+    v (str): cookie value
+
+    Constructs and sets cookie in browser
+
+    Returns cookie string
+    */
+
+    var c = `${k}=${encodeURIComponent(v)};path=/;expires=${exp_date}`;
+
+    document.cookie = c;
+
+    return c;
+}
+
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
     per_page = 50;
@@ -187,56 +224,19 @@ window.addEventListener("DOMContentLoaded", function(){
             cached_movies = Array(movie_count - finished_count);
             pages = Math.ceil((movie_count - finished_count) / per_page);
             document.querySelector("button#page_count").innerText = "/ " + pages;
-            hf = "True"
+            hf = "True";
         } else {
             set_cookie("hide_finished_movies", "False");
             cached_movies = Array(movie_count);
             pages = Math.ceil((movie_count) / per_page);
             document.querySelector("button#page_count").innerText = "/ " + pages;
-            hf = "False"
+            hf = "False";
         }
         $page_select.value = 1;
         load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages, hf);
     })
 
 });
-
-exp_date = new Date();
-exp_date.setFullYear(exp_date.getFullYear() + 10);
-exp_date = exp_date.toUTCString();
-
-function read_cookie(){
-    /* Read document cookie
-    Returns dict
-    */
-    var dcookie = document.cookie;
-    cookie_obj = {};
-    cookiearray = dcookie.split("; ");
-
-    for (var i = 0; i < cookiearray.length; i++) {
-        key = cookiearray[i].split("=")[0];
-        value = decodeURIComponent(cookiearray[i].split("=")[1]);
-        cookie_obj[key] = value;
-    }
-    return cookie_obj;
-}
-
-function set_cookie(k, v){
-    /* Helper method to set cookies
-    k (str): cookie key
-    v (str): cookie value
-
-    Constructs and sets cookie in browser
-
-    Returns cookie string
-    */
-
-    var c = `${k}=${encodeURIComponent(v)};path=/;expires=${exp_date}`;
-
-    document.cookie = c;
-
-    return c;
-}
 
 function sort_movie_cache(key){
     var forward, backward;
@@ -285,7 +285,7 @@ function load_library(sort_key, sort_direction, page, per_page, pages, hf){
     var use_cache = true;
     var cached_page = cached_movies.slice(offset, offset + per_page);
 
-    for (i = 0; i < cached_page.length; i++) {
+    for (var i = 0; i < cached_page.length; i++) {
         if(cached_page[i] === undefined){
             use_cache = false;
             break

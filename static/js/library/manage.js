@@ -1,4 +1,4 @@
-/*global each, echo, _, url_base, notify_error */
+/*global each, echo, _, url_base, notify_error, modal_template, edit_modal, modal_dicts, $checkboxes, $movie_lis */
 window.addEventListener("DOMContentLoaded", function(){
     $checkboxes = document.querySelectorAll("ul#movie_list i.c_box");
     $movie_lis = document.querySelectorAll("ul#movie_list > li");
@@ -101,6 +101,21 @@ function select_attrib(event, button, key, value){
     });
 }
 
+function _selected_movies(){
+    // Returns list of dicts of selected movies.
+    // IE [{imdbid: 'tt1234567', tmdbid: '123456'}, {imdbid: 'tt7654321', tmdbid: '654321'}]
+    var movies = [];
+    each($checkboxes, function(checkbox){
+        if(checkbox.getAttribute("value") === "True"){
+            movies.push({
+                "imdbid": checkbox.parentElement.dataset.imdbid,
+                "tmdbid": checkbox.parentElement.dataset.tmdbid
+            });
+        }
+    });
+    return movies;
+}
+
 function show_modal(event, button, task){
     var selected_movies = _selected_movies();
     if(selected_movies.length === 0){
@@ -114,59 +129,6 @@ function show_modal(event, button, task){
     $modal.on("hidden.bs.modal", function(modal){
         $modal.remove();
     });
-}
-
-function begin_task(event, button, task){
-    window[task]();
-}
-
-function _backlog_search(event, elem){
-    var movies = _selected_movies();
-    _manager_request("manager_backlog_search", {"movies": movies});
-}
-
-function _update_metadata(event, elem){
-    // Preps call to _manager_request
-    var movies = _selected_movies();
-    _manager_request("manager_update_metadata", {"movies": movies});
-}
-
-function _change_quality(event, elem){
-    // Preps call to _manager_request
-    var movies = _selected_movies();
-
-    var quality = document.querySelector("#task_modal .modal-body select#quality").value;
-    if(!quality){
-        $.notify({message: _("Select a new Quality Profile.")}, {type: "warning"});
-        return;
-    }
-
-    _manager_request("manager_change_quality", {"movies": movies, "quality": quality});
-}
-
-function _change_category(event, elem){
-    // Preps call to _manager_request
-    var movies = _selected_movies();
-
-    var category = document.querySelector("#task_modal .modal-body select#category").value;
-    if(!category){
-        $.notify({message: _("Select a new Category.")}, {type: "warning"});
-        return;
-    }
-
-    _manager_request("manager_change_category", {"movies": movies, "category": category});
-}
-
-function _reset(event, elem){
-    // Preps call to _manager_request
-    var movies = _selected_movies();
-    _manager_request("manager_reset_movies", {"movies": movies});
-}
-
-function _remove(event, elem){
-    // Preps call to _manager_request
-    var movies = _selected_movies();
-    _manager_request("manager_remove_movies", {"movies": movies});
 }
 
 function _manager_request(url, payload){
@@ -243,19 +205,57 @@ function _manager_request(url, payload){
     });
 }
 
-function _selected_movies(){
-    // Returns list of dicts of selected movies.
-    // IE [{imdbid: 'tt1234567', tmdbid: '123456'}, {imdbid: 'tt7654321', tmdbid: '654321'}]
-    var movies = [];
-    each($checkboxes, function(checkbox){
-        if(checkbox.getAttribute("value") === "True"){
-            movies.push({
-                "imdbid": checkbox.parentElement.dataset.imdbid,
-                "tmdbid": checkbox.parentElement.dataset.tmdbid
-            });
-        }
-    });
-    return movies;
+function begin_task(event, button, task){
+    window[task]();
+}
+
+function _backlog_search(event, elem){
+    var movies = _selected_movies();
+    _manager_request("manager_backlog_search", {"movies": movies});
+}
+
+function _update_metadata(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+    _manager_request("manager_update_metadata", {"movies": movies});
+}
+
+function _change_quality(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+
+    var quality = document.querySelector("#task_modal .modal-body select#quality").value;
+    if(!quality){
+        $.notify({message: _("Select a new Quality Profile.")}, {type: "warning"});
+        return;
+    }
+
+    _manager_request("manager_change_quality", {"movies": movies, "quality": quality});
+}
+
+function _change_category(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+
+    var category = document.querySelector("#task_modal .modal-body select#category").value;
+    if(!category){
+        $.notify({message: _("Select a new Category.")}, {type: "warning"});
+        return;
+    }
+
+    _manager_request("manager_change_category", {"movies": movies, "category": category});
+}
+
+function _reset(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+    _manager_request("manager_reset_movies", {"movies": movies});
+}
+
+function _remove(event, elem){
+    // Preps call to _manager_request
+    var movies = _selected_movies();
+    _manager_request("manager_remove_movies", {"movies": movies});
 }
 
 function edit_movie(event, button){

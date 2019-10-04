@@ -1,6 +1,6 @@
-/* global url_base, notify_error, each */
+/* global url_base, notify_error, each, server_time, tasks */
 window.addEventListener("DOMContentLoaded", function(){
-    $tasks_table = document.querySelector("table#tasks > tbody");
+    var $tasks_table = document.querySelector("table#tasks > tbody");
     server_time = document.querySelector('meta[name="server_time"]').content;
     tasks = JSON.parse(document.querySelector('meta[name="tasks"]').content);
 
@@ -63,6 +63,51 @@ function _get_settings(){
         return false;
     }
     return {"System": settings}
+}
+
+/* Delcaring some time vars */
+var spmin = 60;
+var sphr = spmin * 60;
+var spd = sphr * 24;
+
+function time_difference(now, time){
+    /* Returns an english relative-time string ie '3 hours ago'
+    now (int): current epoch time
+    time (int): time in future/past to find difference for
+
+    Use server time for now since all times are relative to the server
+
+    Returns string
+    */
+
+    var diff = time - now, a, t;
+    if(diff > 0){
+        a = "";
+    } else {
+        a = " ago";
+    }
+
+    diff = Math.abs(diff);
+
+    if(diff < spmin){
+        t = diff + ' seconds';
+    } else if(diff < sphr){
+        t = Math.round(diff/spmin) + ' minutes';
+    } else if(diff < spd ){
+        t = Math.round(diff/sphr ) + ' hours';
+    } else {
+        t = Math.round(diff/spd) + ' days';
+    }
+    return t + a;
+}
+
+function parseDate(date) {
+  const parsed = Date.parse(date);
+  if (!isNaN(parsed)) {
+    return parsed;
+  }
+
+  return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
 }
 
 function _render_task_row(task){
@@ -288,48 +333,3 @@ function execute_task(event, elem, name){
     });
 
 }
-
-function time_difference(now, time){
-    /* Returns an english relative-time string ie '3 hours ago'
-    now (int): current epoch time
-    time (int): time in future/past to find difference for
-
-    Use server time for now since all times are relative to the server
-
-    Returns string
-    */
-
-    var diff = time - now, a, t;
-    if(diff > 0){
-        a = "";
-    } else {
-        a = " ago";
-    }
-
-    diff = Math.abs(diff);
-
-    if(diff < spmin){
-        t = diff + ' seconds';
-    } else if(diff < sphr){
-        t = Math.round(diff/spmin) + ' minutes';
-    } else if(diff < spd ){
-        t = Math.round(diff/sphr ) + ' hours';
-    } else {
-        t = Math.round(diff/spd) + ' days';
-    }
-    return t + a;
-}
-
-function parseDate(date) {
-  const parsed = Date.parse(date);
-  if (!isNaN(parsed)) {
-    return parsed;
-  }
-
-  return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
-}
-
-/* Delcaring some time vars */
-var spmin = 60;
-var sphr = spmin * 60;
-var spd = sphr * 24;

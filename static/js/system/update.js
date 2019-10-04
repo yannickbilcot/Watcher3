@@ -2,17 +2,17 @@
 window.addEventListener("DOMContentLoaded", function(){
     var updating = $("meta[name='updating']").attr("content");
 
-    if(updating.toLowerCase() === 'false'){
+    if(updating.toLowerCase() === "false"){
         window.location = url_base + "/library/status/";
         return;
     }
 
     $thinker = document.getElementById("thinker");
-    $thinker.style.maxHeight = '100%';
+    $thinker.style.maxHeight = "100%";
 
     document.title = "Watcher - Updating Server";
     var last_response_len = false;
-    $.ajax(url_base + '/ajax/update_server', {
+    $.ajax(url_base + "/ajax/update_server", {
         method: "POST",
         data: {"mode": "update_now"},
         xhrFields: {
@@ -31,11 +31,10 @@ window.addEventListener("DOMContentLoaded", function(){
                 var $tasks_list = $("div.tasks");
 
                 if(r["response"] === false){
-                    $thinker.style.maxHeight = '0%';
+                    $thinker.style.maxHeight = "0%";
                     $.notify({message: r["error"]}, {type: "danger", delay: 0});
                     return;
-                }
-                else if(r["status"] === "waiting"){
+                } else if(r["status"] === "waiting"){
                     $tasks_list.show();
                     $thinker.style.opacity = 0.25;
                     var $active_tasks = $("div.tasks > div");
@@ -55,13 +54,11 @@ window.addEventListener("DOMContentLoaded", function(){
                             $tasks_list.innerHTML += `<div>${name}</div>`;
                         }
                     });
-                }
-                else if(r["status"] === "updating"){
+                } else if(r["status"] === "updating"){
                     $tasks_list.fadeOut();
                     $thinker.style.opacity = 1;
                     $("div.updating").fadeIn();
-                }
-                else if(r["status"] === "complete"){
+                } else if(r["status"] === "complete"){
                     $.notify({message: _("Update successful.")}, {delay: 0});
                     $("div.updating").text(_("Restarting."));
                     restart();
@@ -90,13 +87,16 @@ function restart(){
             })
             .done(function(r){
                 if(r !== "states.STOPPING"){
-                    window.location = url_base+"/library/status/";
+                    window.location = url_base + "/library/status/";
                 }
             });
         } else {
             clearInterval(check);
-            $.notify({title: "<u>Timout Exceeded</u><br/>", message: "Watcher is taking too long to restart. Please check your logs and restart manually."}, {type: "warning", delay: 0})
-            $thinker.style.maxHeight = '0%';
+            $.notify({
+                title: "<u>Timout Exceeded</u><br/>",
+                message: "Watcher is taking too long to restart. Please check your logs and restart manually."
+            }, {type: "warning", delay: 0});
+            $thinker.style.maxHeight = "0%";
         }
     }, 3000);
 }

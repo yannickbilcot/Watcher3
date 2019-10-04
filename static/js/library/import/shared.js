@@ -1,3 +1,4 @@
+/* global $stepper, $progress, $progress_bar, $progress_text, $source_select, $quality_select, $category_select */
 window.addEventListener("DOMContentLoaded", function(){
     $stepper = document.getElementById("stepper");
     $progress = $("div.progress");
