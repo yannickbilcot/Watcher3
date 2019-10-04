@@ -1,3 +1,4 @@
+/*global each */
 window.addEventListener("DOMContentLoaded", function(){
     $checkboxes = document.querySelectorAll("ul#movie_list i.c_box");
     $movie_lis = document.querySelectorAll("ul#movie_list > li");

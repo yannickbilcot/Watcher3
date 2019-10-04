@@ -1,3 +1,4 @@
+/*global each, $progress, $progress_bar, $progress_text, $source_select, $quality_select, $category_select */
 function connect(event, elem){
     event.preventDefault();
 
