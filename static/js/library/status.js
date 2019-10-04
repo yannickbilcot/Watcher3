@@ -1,10 +1,10 @@
-/* global each */
+/* global each, echo, current_page, per_page, pages, movie_sort_direction, movie_sort_key, cached_movies, $page_select, loading_library, $sort_direction_button, $movie_list, $hide_finished_movies_toggle, templates, status_colors */
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
     per_page = 50;
 
-    movie_count = parseInt(document.querySelector("meta[name=\"movie_count\"]").content, 10);
-    finished_count = parseInt(document.querySelector("meta[name=\"finished_count\"]").content, 10);
+    var movie_count = parseInt(document.querySelector("meta[name=\"movie_count\"]").content, 10);
+    var finished_count = parseInt(document.querySelector("meta[name=\"finished_count\"]").content, 10);
     cached_movies = Array(movie_count);
 
     $page_select = document.querySelector("select#page_number");
@@ -63,10 +63,10 @@ window.addEventListener("DOMContentLoaded", function(){
     });
 
     /* Read cookie vars */
-    movie_layout = (cookie["movie_layout"] || "").split(" ")[0] || "posters";
+    var movie_layout = (cookie["movie_layout"] || "").split(" ")[0] || "posters";
     movie_sort_direction = cookie["movie_sort_direction"] || "desc";
     movie_sort_key = cookie["movie_sort_key"] || "sort_title";
-    hide_finished_movies = cookie["hide_finished_movies"] || "False";
+    var hide_finished_movies = cookie["hide_finished_movies"] || "False";
     if(per_page !== cookie["per_page"]){
         per_page = cookie["per_page"]
     }
@@ -87,7 +87,7 @@ window.addEventListener("DOMContentLoaded", function(){
         $sort_direction_button.classList.add("mdi-sort-descending");
     }
 
-    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true)
+    document.querySelector(`select#movie_sort_key > option[value=${movie_sort_key}]`).setAttribute("selected", true);
 //    document.querySelector(`select#per_page > option[value=${per_page}]`).setAttribute("selected", true)
 
     if(hide_finished_movies === "True"){
@@ -593,7 +593,7 @@ function _remove_movie(event, elem, imdbid){
     /* Removes movie from library
     imdbid: str imdb id# of movie to remove
     */
-    var movie = $movie_status_modal.data("movie"), delete_file;
+    var delete_file;
 
     if(document.querySelector("div#delete_file > i.c_box").getAttribute("value") === "True"){
         delete_file = true;
@@ -651,8 +651,6 @@ function _remove_movie(event, elem, imdbid){
 }
 
 function update_movie_options(event, elem, imdbid){
-    var $i = elem.querySelector("i");
-
     var quality = document.getElementById("movie_quality").value;
     var category = document.getElementById("movie_category").value;
     var status = document.getElementById("movie_status").value;
