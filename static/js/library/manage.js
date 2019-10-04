@@ -5,8 +5,6 @@ window.addEventListener("DOMContentLoaded", function(){
     modal_template = document.querySelector("template#template_modal").innerHTML;
     edit_modal = document.querySelector("template#template_edit").innerHTML;
 
-    selected_movies = [];
-
     echo.init({
         offsetVertical: 100,
         callback: function(element, op){
@@ -244,7 +242,7 @@ function _manager_request(url, payload){
     })
     .always(function(){
         $close_button.removeAttribute("disabled");
-    })
+    });
 }
 
 function _selected_movies(){
@@ -256,7 +254,7 @@ function _selected_movies(){
             movies.push({
                 "imdbid": checkbox.parentElement.dataset.imdbid,
                 "tmdbid": checkbox.parentElement.dataset.tmdbid
-            })
+            });
         }
     });
     return movies;
@@ -297,7 +295,7 @@ function save_movie_details(event, button, tmdbid){
 
     if(!date_format.test(data.release_date) || !date_format.test(data.media_release_date)){
         $.notify({message: "Dates must match format YYYY-MM-DD"}, {type: "danger", delay: 0});
-        return
+        return;
     }
 
     var $i = button.children[0];
@@ -312,9 +310,9 @@ function save_movie_details(event, button, tmdbid){
     })
     .done(function(response){
         if(response["response"] === true){
-            $.notify({message: response["message"]})
+            $.notify({message: response["message"]});
         } else {
-            $.notify({message: response["error"]}, {type: "danger", delay: 0})
+            $.notify({message: response["error"]}, {type: "danger", delay: 0});
         }
     })
     .fail(function(data){
