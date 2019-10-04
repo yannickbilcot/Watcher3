@@ -8,7 +8,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
     each(document.querySelectorAll("div#status_colors > span"), function(span){
         status_colors.push(getComputedStyle(span).backgroundColor);
-    })
+    });
 
     profile_colors = [];
     each(document.querySelectorAll("div#profile_colors > span"), function(span){
@@ -18,9 +18,9 @@ window.addEventListener("DOMContentLoaded", function(){
     var get_stats = $.get(url_base + "/ajax/generate_stats")
     .done(function(response){
         render_charts(response)
-    })
+    });
 
-    window.addEventListener('beforeunload', function(){
+    window.addEventListener("beforeunload", function(){
         get_stats.abort();
     });
 });
@@ -96,6 +96,6 @@ function render_charts(stats){
         svg.style.fontFamily = font_family;
     });
     each(document.querySelectorAll("#chart_status svg path, #chart_profiles svg path"), function(svg){
-        svg.setAttribute('stroke', 'transparent');
+        svg.setAttribute("stroke", "transparent");
     });
 }

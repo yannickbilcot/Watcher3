@@ -22,15 +22,15 @@ function connect(event, elem){
     var url = $address_input.value + ":" + $port_input.value;
 
     $("form#connect").slideUp();
-    $progress_bar.style.width = '0%';
-    $progress.style.maxHeight = '100%';
+    $progress_bar.style.width = "0%";
+    $progress.style.maxHeight = "100%";
 
     $wanted_div = document.querySelector("div#wanted_movies");
     $wanted_table = document.querySelector("div#wanted_movies table > tbody");
     $finished_div = document.querySelector("div#finished_movies");
     $finished_table = document.querySelector("div#finished_movies table > tbody");
 
-    $.post(url_base+"/ajax/get_cp_movies", {
+    $.post(url_base + "/ajax/get_cp_movies", {
         "url": url,
         "apikey": $apikey_input.value
     })
@@ -44,14 +44,14 @@ function connect(event, elem){
         }
 
         if(response["movies"].length == 0){
-            document.getElementById('no_imports').classList.remove('hidden');
+            document.getElementById("no_imports").classList.remove("hidden");
         }
 
-        each(response['movies'], function(movie, index){
+        each(response["movies"], function(movie, index){
             var source_select = $source_select.cloneNode(true);
             source_select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
             var category_select = $category_select.cloneNode(true);
-                if (movie['category']) {
+            if(movie["category"]){
                 category_select.querySelector(`option[value="${movie["category"]}"]`).setAttribute("selected", true);
             }
 
@@ -75,7 +75,7 @@ function connect(event, elem){
                             </tr>`)[0];
                 $row.dataset.movie = JSON.stringify(movie);
                 $finished_table.innerHTML += $row.outerHTML;
-                $finished_div.classList.remove('hidden');
+                $finished_div.classList.remove("hidden");
             } else {
                 var $row = $(`<tr>
                                 <td>
@@ -96,25 +96,25 @@ function connect(event, elem){
                             </tr>`)[0];
                 $row.dataset.movie = JSON.stringify(movie);
                 $wanted_table.innerHTML += $row.outerHTML;
-                $wanted_div.classList.remove('hidden');
+                $wanted_div.classList.remove("hidden");
             }
 
             $progress_bar.style.width = Math.round(index / response["movies"].length * 100);
-        })
+        });
 
-        set_stepper('import');
-        document.getElementById('button_import').classList.remove('hidden');
+        set_stepper("import");
+        document.getElementById("button_import").classList.remove("hidden");
 
         $("form#import").slideDown();
         window.setTimeout(function(){
-            $progress.style.maxHeight = '0%';
-            $progress_text.innerText = '';
-            $progress_bar.style.width = '0%';
+            $progress.style.maxHeight = "0%";
+            $progress_text.innerText = "";
+            $progress_bar.style.width = "0%";
         }, 500)
 
     })
     .fail(function(data){
-        var err = data.status + ' ' + data.statusText
+        var err = data.status + " " + data.statusText
         $.notify({message: err}, {type: "danger", delay: 0});
     });
 }
@@ -126,7 +126,7 @@ function start_import(event, elem){
     var finished_movies = [];
 
     each(document.querySelectorAll("div#finished_movies table > tbody > tr "), function(row, index){
-        if(!is_checked(row.querySelector('i.c_box'))){
+        if(!is_checked(row.querySelector("i.c_box"))){
             return
         }
 
@@ -138,7 +138,7 @@ function start_import(event, elem){
     });
 
     each(document.querySelectorAll("div#wanted_movies table > tbody > tr "), function(row, index){
-        if(!is_checked(row.querySelector('i.c_box'))){
+        if(!is_checked(row.querySelector("i.c_box"))){
             return
         }
 
@@ -148,9 +148,9 @@ function start_import(event, elem){
         wanted_movies.push(movie);
     });
 
-    $('form#import').slideUp(600);
-    $progress_bar.style.width = '0%';
-    $progress.style.maxHeight = '100%';
+    $("form#import").slideUp(600);
+    $progress_bar.style.width = "0%";
+    $progress.style.maxHeight = "100%";
 
     var $success_div = document.querySelector("div#import_success");
     var $success_table = document.querySelector("div#import_success table > tbody");
@@ -158,7 +158,7 @@ function start_import(event, elem){
     var $error_table = document.querySelector("div#import_error table > tbody");
 
     var last_response_len = false;
-    $.ajax(url_base + '/ajax/import_cp_movies', {
+    $.ajax(url_base + "/ajax/import_cp_movies", {
         method: "POST",
         data: {"wanted": JSON.stringify(wanted_movies), "finished": JSON.stringify(finished_movies)},
         xhrFields: {
@@ -174,40 +174,40 @@ function start_import(event, elem){
                 }
                 var r = JSON.parse(response_update);
 
-                if(r['response'] === true){
-                    $success_div.classList.remove('hidden');
+                if(r["response"] === true){
+                    $success_div.classList.remove("hidden");
                     var row = `<tr>
-                                    <td>${r['movie']['title']}</td>
-                                    <td>${r['movie']['imdbid']}</td>
-                                </tr>`
+                                    <td>${r["movie"]["title"]}</td>
+                                    <td>${r["movie"]["imdbid"]}</td>
+                                </tr>`;
                     $success_table.innerHTML += row;
                 } else {
-                    $error.slideDown()
+                    $error.slideDown();
                     var row = `<tr>
-                                    <td>${r['movie']['title']}</td>
-                                    <td>${r['error']}</td>
-                                </tr>`
+                                    <td>${r["movie"]["title"]}</td>
+                                    <td>${r["error"]}</td>
+                                </tr>`;
                     $error_table.innerHTML += row;
                 }
 
-                var progress_percent = Math.round(parseInt(r['progress'][0]) / parseInt(r['progress'][1]) * 100);
-                $progress_text.innerText = `${r['progress'][0]} / ${r['progress'][1]} ${r['movie']['title']}.`;
+                var progress_percent = Math.round(parseInt(r["progress"][0]) / parseInt(r["progress"][1]) * 100);
+                $progress_text.innerText = `${r["progress"][0]} / ${r["progress"][1]} ${r["movie"]["title"]}.`;
                 $progress_bar.style.width = (progress_percent + "%");
 
             }
         }
     })
     .done(function(data){
-        set_stepper('review');
+        set_stepper("review");
         $("form#review").slideDown();
         window.setTimeout(function(){
-            $progress.style.maxHeight = '0%';
-            $progress_text.innerText = '';
-            $progress_bar.style.width = '0%';
+            $progress.style.maxHeight = "0%";
+            $progress_text.innerText = "";
+            $progress_bar.style.width = "0%";
         }, 500)
     })
     .fail(function(data){
-        var err = data.status + ' ' + data.statusText
+        var err = data.status + " " + data.statusText;
         $.notify({message: err}, {type: "danger"});
     })
 }

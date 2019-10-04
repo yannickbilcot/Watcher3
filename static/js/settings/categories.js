@@ -6,14 +6,14 @@ window.addEventListener("DOMContentLoaded", function(){
 function edit_category(event, button){
     event.preventDefault();
     $i = button.children[0];
-    $contents = $(button).closest('div.category').find('div.category_contents');
-    if($i.classList.contains('mdi-chevron-down')){
-        $i.classList.remove('mdi-chevron-down');
-        $i.classList.add('mdi-chevron-up');
+    $contents = $(button).closest("div.category").find("div.category_contents");
+    if($i.classList.contains("mdi-chevron-down")){
+        $i.classList.remove("mdi-chevron-down");
+        $i.classList.add("mdi-chevron-up");
         $contents.slideDown();
     } else {
-        $i.classList.remove('mdi-chevron-up');
-        $i.classList.add('mdi-chevron-down');
+        $i.classList.remove("mdi-chevron-up");
+        $i.classList.add("mdi-chevron-down");
         $contents.slideUp();
     }
 }
@@ -22,12 +22,12 @@ function add_category(event){
     event.preventDefault();
     var $new_category = $(category_template);
     $categories_form.append($new_category);
-    $new_category.find('[data-toggle="tooltip"]').tooltip();
+    $new_category.find("[data-toggle=\"tooltip\"]").tooltip();
 }
 
 function delete_category(event, button){
     event.preventDefault();
-    var $category = $(button).closest('div.category');
+    var $category = $(button).closest("div.category");
     $category.slideUp(500, function(){
         $category.remove();
     });
@@ -38,26 +38,26 @@ function _get_settings(){
     var blanks = false;
 
 // Categories
-    var required_fields = ['name', 'moverpath'];
+    var required_fields = ["name", "moverpath"];
 
-    each(document.querySelectorAll('div.category'), function(element){
+    each(document.querySelectorAll("div.category"), function(element){
         category = {};
 
         // Name
-        var name = element.querySelector('input#name').value;
+        var name = element.querySelector("input#name").value;
         if(!name){
-            element.querySelector('input#name').classList.add('border-danger');
+            element.querySelector("input#name").classList.add("border-danger");
             blanks = true;
             return;
         }
 
-        var moverpath = element.querySelector('input#moverpath').value;
+        var moverpath = element.querySelector("input#moverpath").value;
         if(!moverpath){
-            element.querySelector('input#moverpath').classList.add('border-danger');
+            element.querySelector("input#moverpath").classList.add("border-danger");
             blanks = true;
             return;
         }
-        category['moverpath'] = moverpath;
+        category["moverpath"] = moverpath;
 
         // Word Lists
         each(element.querySelectorAll("div[data-sub-category='filters'] input"), function(input){
