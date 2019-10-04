@@ -25,10 +25,10 @@ function connect(event, elem){
     $progress_bar.style.width = "0%";
     $progress.style.maxHeight = "100%";
 
-    $wanted_div = document.querySelector("div#wanted_movies");
-    $wanted_table = document.querySelector("div#wanted_movies table > tbody");
-    $finished_div = document.querySelector("div#finished_movies");
-    $finished_table = document.querySelector("div#finished_movies table > tbody");
+    var $wanted_div = document.querySelector("div#wanted_movies");
+    var $wanted_table = document.querySelector("div#wanted_movies table > tbody");
+    var $finished_div = document.querySelector("div#finished_movies");
+    var $finished_table = document.querySelector("div#finished_movies table > tbody");
 
     $.post(url_base + "/ajax/get_cp_movies", {
         "url": url,
@@ -131,7 +131,7 @@ function start_import(event, elem){
             return
         }
 
-        movie = JSON.parse(row.dataset.movie);
+        var movie = JSON.parse(row.dataset.movie);
 
         movie["resolution"] = row.querySelector("select.source_select").value;
         movie["category"] = row.querySelector("select.category_select").value;
@@ -143,7 +143,7 @@ function start_import(event, elem){
             return
         }
 
-        movie = JSON.parse(row.dataset.movie);
+        var movie = JSON.parse(row.dataset.movie);
         movie["quality"] = row.querySelector("select.quality_select").value;
         movie["category"] = row.querySelector("select.category_select").value;
         wanted_movies.push(movie);
@@ -183,7 +183,7 @@ function start_import(event, elem){
                                 </tr>`;
                     $success_table.innerHTML += row;
                 } else {
-                    $error.slideDown();
+                    $error_div.slideDown();
                     row = `<tr>
                                     <td>${r["movie"]["title"]}</td>
                                     <td>${r["error"]}</td>
@@ -191,7 +191,7 @@ function start_import(event, elem){
                     $error_table.innerHTML += row;
                 }
 
-                var progress_percent = Math.round(parseInt(r["progress"][0]) / parseInt(r["progress"][1]) * 100);
+                var progress_percent = Math.round(parseInt(r["progress"][0], 10) / parseInt(r["progress"][1], 10) * 100);
                 $progress_text.innerText = `${r["progress"][0]} / ${r["progress"][1]} ${r["movie"]["title"]}.`;
                 $progress_bar.style.width = (progress_percent + "%");
 
