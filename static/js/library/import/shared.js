@@ -11,19 +11,20 @@ window.addEventListener("DOMContentLoaded", function(){
     $category_select = document.querySelector("template#category_select").content.children[0];
 
     // Clear empty highlight on input
-    $("body").on("click", "input", function(){
+    var $body = $("body");
+    $body.on("click", "input", function(){
         $(this).removeClass("empty");
     });
 
     // toggle checkbox status on click
-    $("body").on("click", "i.c_box", function(){
-        $this = $(this);
+    $body.on("click", "i.c_box", function(){
+        var $this = $(this);
         // turn on
-        if($this.attr("value") == "False"){
+        if($this.attr("value") === "False"){
             $this.attr("value", "True");
             $this.removeClass("mdi-checkbox-blank-outline").addClass("mdi-checkbox-marked");
         // turn off
-        } else if($this.attr("value") == "True"){
+        } else if($this.attr("value") === "True"){
             $this.attr("value", "False");
             $this.removeClass("mdi-checkbox-marked").addClass("mdi-checkbox-blank-outline");
         }
@@ -34,13 +35,13 @@ window.addEventListener("DOMContentLoaded", function(){
 function is_checked($checkbox){
     // Turns value of checkbox "True"/"False" into bool
     // checkbox: jquery object of checkbox <i>
-    return $checkbox.getAttribute("value") == "True";
+    return $checkbox.getAttribute("value") === "True";
 }
 
 
 function set_stepper(value){
     each($stepper.children, function(pill){
-        if(pill.getAttribute("target") == value){
+        if(pill.getAttribute("target") === value){
             pill.classList.add("active");
         } else {
             pill.classList.remove("active");
@@ -48,7 +49,7 @@ function set_stepper(value){
     })
 }
 
-function select_all(table){
+function select_all(event, table){
     // table (str): table id to apply select to
     event.preventDefault();
     var $checkboxes = document.querySelectorAll(`div#${table} > table i.c_box`);
@@ -58,7 +59,7 @@ function select_all(table){
     });
 }
 
-function select_none(table){
+function select_none(event, table){
     // table (str): table id to apply select to
     event.preventDefault();
     var $checkboxes = document.querySelectorAll(`div#${table} > table i.c_box`);
@@ -68,7 +69,7 @@ function select_none(table){
     });
 }
 
-function select_inverse(table){
+function select_inverse(event, table){
     // table (str): table id to apply select to
     event.preventDefault();
     var $checkboxes = document.querySelectorAll(`div#${table} > table i.c_box`);
@@ -80,12 +81,12 @@ function select_inverse(table){
 function checkbox_switch(event){
     var checkbox = event.target;
     // turn on
-    if(checkbox.getAttribute("value") == "False"){
+    if(checkbox.getAttribute("value") === "False"){
         checkbox.setAttribute("value", "True");
         checkbox.classList.remove("mdi-checkbox-blank-outline");
         checkbox.classList.add("mdi-checkbox-marked");
     // turn off
-    } else if(checkbox.getAttribute("value") == "True"){
+    } else if(checkbox.getAttribute("value") === "True"){
         checkbox.setAttribute("value", "False");
         checkbox.classList.remove("mdi-checkbox-marked");
         checkbox.classList.add("mdi-checkbox-blank-outline");

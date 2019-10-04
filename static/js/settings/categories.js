@@ -5,8 +5,8 @@ window.addEventListener("DOMContentLoaded", function(){
 
 function edit_category(event, button){
     event.preventDefault();
-    $i = button.children[0];
-    $contents = $(button).closest("div.category").find("div.category_contents");
+    var $i = button.children[0];
+    var $contents = $(button).closest("div.category").find("div.category_contents");
     if($i.classList.contains("mdi-chevron-down")){
         $i.classList.remove("mdi-chevron-down");
         $i.classList.add("mdi-chevron-up");
@@ -41,7 +41,7 @@ function _get_settings(){
     var required_fields = ["name", "moverpath"];
 
     each(document.querySelectorAll("div.category"), function(element){
-        category = {};
+        var category = {};
 
         // Name
         var name = element.querySelector("input#name").value;

@@ -4,19 +4,19 @@ function connect(event, elem){
     var $address_input = document.querySelector("input#address");
     if(!$address_input.value){
         $address_input.classList.add("border-danger");
-        return false
+        return false;
     }
 
     var $port_input = document.querySelector("input#port");
     if(!$port_input.value){
         $port_input.classList.add("border-danger");
-        return false
+        return false;
     }
 
     var $apikey_input = document.querySelector("input#apikey");
     if(!$apikey_input.value){
         $apikey_input.classList.add("border-danger");
-        return false
+        return false;
     }
 
     var url = $address_input.value + ":" + $port_input.value;
@@ -39,11 +39,11 @@ function connect(event, elem){
         if(response["response"] !== true){
             $("div#server_info").slideDown();
             $("a#scan_library").slideDown();
-            $.notify({message: response["error"]}, {type: "warning"})
-            return false
+            $.notify({message: response["error"]}, {type: "warning"});
+            return false;
         }
 
-        if(response["movies"].length == 0){
+        if(response["movies"].length === 0){
             document.getElementById("no_imports").classList.remove("hidden");
         }
 
@@ -55,8 +55,9 @@ function connect(event, elem){
                 category_select.querySelector(`option[value="${movie["category"]}"]`).setAttribute("selected", true);
             }
 
+            var $row;
             if(movie["status"] === "Disabled"){
-                var $row = $(`<tr>
+                $row = $(`<tr>
                                 <td>
                                     <i class="mdi mdi-checkbox-marked c_box", value="True"></i>
                                 </td>
@@ -77,7 +78,7 @@ function connect(event, elem){
                 $finished_table.innerHTML += $row.outerHTML;
                 $finished_div.classList.remove("hidden");
             } else {
-                var $row = $(`<tr>
+                $row = $(`<tr>
                                 <td>
                                     <i class="mdi mdi-checkbox-marked c_box", value="True"></i>
                                 </td>
@@ -110,11 +111,11 @@ function connect(event, elem){
             $progress.style.maxHeight = "0%";
             $progress_text.innerText = "";
             $progress_bar.style.width = "0%";
-        }, 500)
+        }, 500);
 
     })
     .fail(function(data){
-        var err = data.status + " " + data.statusText
+        var err = data.status + " " + data.statusText;
         $.notify({message: err}, {type: "danger", delay: 0});
     });
 }
@@ -172,18 +173,18 @@ function start_import(event, elem){
                     response_update = response.substring(last_response_len);
                     last_response_len = response.length;
                 }
-                var r = JSON.parse(response_update);
+                var r = JSON.parse(response_update), row;
 
                 if(r["response"] === true){
                     $success_div.classList.remove("hidden");
-                    var row = `<tr>
+                    row = `<tr>
                                     <td>${r["movie"]["title"]}</td>
                                     <td>${r["movie"]["imdbid"]}</td>
                                 </tr>`;
                     $success_table.innerHTML += row;
                 } else {
                     $error.slideDown();
-                    var row = `<tr>
+                    row = `<tr>
                                     <td>${r["movie"]["title"]}</td>
                                     <td>${r["error"]}</td>
                                 </tr>`;
