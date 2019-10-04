@@ -163,10 +163,7 @@ function create_backup(event, button){
             $.notify({message: `${response['error']}`}, {type: "danger", delay: 0})
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         each($btns, function(button){
             button.removeAttribute('disabled');
@@ -281,10 +278,7 @@ function execute_task(event, elem, name){
             $.notify({message: response["error"]}, {type: "danger", delay: 0})
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         elem.classList.remove("mdi-circle");
         elem.classList.remove("animated");

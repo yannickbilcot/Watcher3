@@ -312,10 +312,7 @@ function load_library(sort_key, sort_direction, page, per_page, pages, hf){
             _render_library(response);
 
         })
-        .fail(function(data){
-            var err = data.status + " " + data.statusText;
-            $.notify({message: err}, {type: "danger", delay: 0});
-        })
+        .fail(notify_error)
         .always(function(){
             loading_library = false;
         });
@@ -466,10 +463,7 @@ function open_info_modal(event, elem){
         })
 
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 }
 
 function _results_table(results){
@@ -526,10 +520,7 @@ function manual_search(event, button, imdbid){
             update_movie_status(imdbid, response["movie_status"]);
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $search_results_table.style.maxHeight = orig_maxHeight;
         $i.classList.remove("mdi-circle");
@@ -558,10 +549,7 @@ function update_metadata(event, elem, imdbid, tmdbid){
             $.notify({message: response["error"]}, {type: "danger"});
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $i.classList.remove("mdi-circle");
         $i.classList.remove("animated");
@@ -620,10 +608,7 @@ function _remove_movie(event, elem, imdbid){
             $movie_status_modal.modal("hide");
 
         })
-        .fail(function(data){
-            var err = data.status + " " + data.statusText;
-            $.notify({message: err}, {type: "danger", delay: 0});
-        });
+        .fail(notify_error);
     }
 
     if(delete_file){
@@ -635,10 +620,7 @@ function _remove_movie(event, elem, imdbid){
                 $.notify({message: response["error"]}, {type: "danger"});
             }
         })
-        .fail(function(data){
-            var err = data.status + " " + data.statusText;
-            $.notify({message: err}, {type: "danger", delay: 0});
-        })
+        .fail(notify_error)
         .always(function(){
             $delete.modal("hide");
             // Makes sure the file removal is done after file removal
@@ -675,10 +657,7 @@ function update_movie_options(event, elem, imdbid){
             $.notify({message: response["error"]}, {type: "danger"});
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 }
 
 function manual_download(event, elem, guid, kind, imdbid){
@@ -706,10 +685,7 @@ function manual_download(event, elem, guid, kind, imdbid){
             $.notify({message: response["error"]}, {type: "danger"})
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $i.classList.remove("mdi-circle");
         $i.classList.remove("animated");
@@ -748,10 +724,7 @@ function mark_bad(event, elem, guid, imdbid){
             $.notify({message: response["error"]}, {type: "danger"});
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $i.classList.remove("mdi-circle");
         $i.classList.remove("animated");

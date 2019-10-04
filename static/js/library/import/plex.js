@@ -117,10 +117,7 @@ function connect(event, elem){
         }, 500)
 
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 }
 
 function apply_remote(event){

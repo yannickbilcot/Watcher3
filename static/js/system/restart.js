@@ -16,10 +16,7 @@ window.addEventListener("DOMContentLoaded", function(){
         $.post(url_base + "/ajax/server_status", {
             mode: 'restart'
         })
-        .fail(function(data){
-            var err = data.status + ' ' + data.statusText
-            $.notify({message: err}, {type: "danger", delay: 0});
-        });
+        .fail(notify_error);
     }
 
     /*
@@ -34,7 +31,7 @@ window.addEventListener("DOMContentLoaded", function(){
                 mode: "online",
             })
             .done(function(r){
-                if(r != "states.STOPPING"){
+                if(r !== "states.STOPPING"){
                     window.location = url_base+"/library/status/";
                 }
             });

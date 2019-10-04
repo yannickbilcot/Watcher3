@@ -56,10 +56,7 @@ function search(event, button){
     .done(function(results){
         display_movies(results)
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         button.removeAttribute('disabled');
         $thinker.style.maxHeight = '0%';
@@ -79,7 +76,7 @@ function load_suggestions(category, tmdbid=null){
         return
     };
 
-    if(category == 'similar'){
+    if(category === 'similar'){
         clear_movies();
         tmdbid = $similar_select.value;
         if(similar_cache[tmdbid]){
@@ -97,16 +94,13 @@ function load_suggestions(category, tmdbid=null){
     })
     .done(function(results){
         display_movies(results)
-        if(category == 'similar'){
+        if(category === 'similar'){
             similar_cache[tmdbid] = results;
         } else {
             cache[category] = results;
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $thinker.style.maxHeight = '0%';
         $pills.removeClass('disabled');
@@ -120,10 +114,11 @@ function clear_movies(){
 
 function display_movies(movies){
     each(movies, function(movie, index){
+        var poster_path;
         if(movie["poster_path"] != null){
-            var poster_path = movie['poster_url'] = "http://image.tmdb.org/t/p/w300" + movie["poster_path"]
+            poster_path = movie['poster_url'] = "http://image.tmdb.org/t/p/w300" + movie["poster_path"]
         } else {
-            var poster_path = movie['poster_url'] = url_base + "/static/images/missing_poster.jpg"
+            poster_path = movie['poster_url'] = url_base + "/static/images/missing_poster.jpg"
         }
 
         movie["year"] = (movie["release_date"] || "N/A").slice(0,4)
@@ -131,7 +126,7 @@ function display_movies(movies){
         var template_dictionary = {"img_url": poster_path,
                                     "title": movie["title"],
                                     "year": movie["year"]
-                                    }
+                                    };
 
         var $li = format_template(item_template, template_dictionary);
         $li.dataset.movie = JSON.stringify(movie);
@@ -147,13 +142,10 @@ function populate_movie_select(){
         each(titles, function(title, index){
             $similar_select.innerHTML += `<option value="${title[1]}">
                                           ${title[0]}
-                                          </option>`
+                                          </option>`;
         })
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $thinker.style.maxHeight = '0%';
         $pills.removeClass('disabled');
@@ -179,17 +171,17 @@ function select_item(event, item){
 }
 
 function add_movie(event, elem, modal=false){
-    $this = $(elem);
+    var $this = $(elem), data;
 
-    $add_button = $this;
+    var $add_button = $this;
     add_oc = $add_button.html();
     $add_button.html("<i class='mdi mdi-circle animated'></i>");
     $add_button.attr("disabled", true);
 
     if(modal){
-        var data = $modal.data("movie");
+        data = $modal.data("movie");
     } else {
-        var data = $this.closest("li").data("movie");
+        data = $this.closest("li").data("movie");
     }
     var $form = $this.closest(".add-movie-form");
     data['quality_profile'] = $form.find('.quality_profile').text().trim();
@@ -199,16 +191,13 @@ function add_movie(event, elem, modal=false){
 
     $.post(url_base + "/ajax/add_wanted_movie", {"data":JSON.stringify(data)})
     .done(function(response){
-        if(response["response"] == true){
+        if(response["response"] === true){
             $.notify({message: response["message"]})
         } else {
             $.notify({message: response['error']}, {type: "warning"})
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger"});
-    })
+    .fail(notify_error)
     .always(function(){
         $add_button.html(add_oc);
         $add_button.removeAttr("disabled");
@@ -222,7 +211,7 @@ function show_details(event, elem){
 
     movie["trailer"] = "";
 
-    var modal = format_template(details_template, movie)
+    var modal = format_template(details_template, movie);
     $modal = $(modal);
     $modal.data("movie", movie);
     $modal.modal("show");

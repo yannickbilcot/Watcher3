@@ -178,10 +178,7 @@ function connect(event, elem){
             $progress_bar.style.width = '0%';
         }, 500)
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 };
 
 function start_import(event, button){
@@ -285,9 +282,6 @@ function start_import(event, button){
             $progress_bar.style.width = '0%';
         }, 500)
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger"});
-    })
+    .fail(notify_error)
 }
 

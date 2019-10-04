@@ -7,15 +7,12 @@ $(document).ready(function () {
     $.post(url_base + "/ajax/server_status", {
         "mode": "shutdown"
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 
     /*
     This repeats every 3 seconds to check if the server is still online.
     */
-    var try_count = 0
+    var try_count = 0;
     var check = setInterval(function(){
         $.post(url_base + "/ajax/server_status", {
             "mode": "online",

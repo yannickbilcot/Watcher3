@@ -237,10 +237,7 @@ function _manager_request(url, payload){
         $modal_body.innerText = "Finished -- Refresh page to see changes.";
         $modal_body.style.maxHeight = "100%";
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger"});
-    })
+    .fail(notify_error)
     .always(function(){
         $close_button.removeAttribute("disabled");
     });
@@ -316,10 +313,7 @@ function save_movie_details(event, button, tmdbid){
             $.notify({message: response["error"]}, {type: "danger", delay: 0});
         }
     })
-    .fail(function(data){
-        var err = data.status + " " + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $i.classList.remove("mdi-circle");
         $i.classList.add("mdi-content-save");

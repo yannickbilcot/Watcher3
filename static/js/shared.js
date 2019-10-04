@@ -21,6 +21,11 @@ function show_notifications(notifs){
     });
 }
 
+function notify_error(data){
+    var err = data.status + " " + data.statusText;
+    $.notify({message: err}, {type: "danger", delay: 0});
+}
+
 function logout(event){
     event.preventDefault();
 
@@ -28,10 +33,7 @@ function logout(event){
     .done(function(r){
         window.location = r;
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error);
 }
 
 $.notifyDefaults({type: "success",
@@ -81,10 +83,7 @@ function _start_update(event){
     .done(function(){
         window.location = url_base + "/system/update";
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 }
 
 function _(s){

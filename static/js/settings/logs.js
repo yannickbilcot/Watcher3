@@ -13,10 +13,7 @@ function view_log(){
         $log_display.innerText = r;
         $log_display.style.display = "block";
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 };
 
 function download_log(){

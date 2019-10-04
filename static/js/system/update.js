@@ -72,10 +72,7 @@ window.addEventListener("DOMContentLoaded", function(){
     })
     .done(function(data){
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger"});
-    });
+    .fail(notify_error);
 });
 
 
@@ -93,7 +90,7 @@ function restart(){
                 mode: "online",
             })
             .done(function(r){
-                if(r != "states.STOPPING"){
+                if(r !== "states.STOPPING"){
                     window.location = url_base+"/library/status/";
                 }
             });

@@ -82,10 +82,7 @@ function test_connection(event, button, mode){
             $.notify({message: response["error"]}, {type: "danger"})
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         $i.classList.remove('mdi-circle');
         $i.classList.add('mdi-lan-pending');

@@ -32,12 +32,7 @@ function edit_plugin_conf(event, elem, folder, filename){
         $conf_modal.modal('show');
 
     })
-    .fail(function(response){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
-
-    return
+    .fail(notify_error);
 }
 
 function save_plugin_conf(event, button){
@@ -93,10 +88,7 @@ function save_plugin_conf(event, button){
             $.notify({message: response["error"]}, {type: "danger"});
         };
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         icon.classList.remove('mdi-circle');
         icon.classList.add('mdi-content-save');
