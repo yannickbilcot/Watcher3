@@ -787,7 +787,10 @@ class Postprocessing(object):
         if config['recyclebinenabled']:
             recycle_bin = self.compile_path(config['recyclebindirectory'], data)
         category = data.get('category', None)
-        moverpath = core.CONFIG['Categories'][category]['moverpath'] if category else config['moverpath']
+        if category in core.CONFIG['Categories']:
+            moverpath = core.CONFIG['Categories'][category]['moverpath']
+        else:
+            moverpath = config['moverpath']
         target_folder = os.path.normpath(self.compile_path(moverpath, data))
         target_folder = os.path.join(target_folder, '')
 
