@@ -1,4 +1,4 @@
-/* global each, _, url_base, $select_usenet, $select_torrent, notify_error */
+/* global each, url_base, $select_usenet, $select_torrent, notify_error */
 window.addEventListener("DOMContentLoaded", function(){
     $select_usenet = document.querySelector("select#usenet_client");
     $select_torrent = document.querySelector("select#torrent_client");
@@ -104,7 +104,7 @@ function _get_settings(){
     each(document.querySelectorAll("div#usenet_client_settings > div"), function(client){
         var name = client.id;
         var config = {};
-        config["enabled"] = (client.dataset.enabled === "True")
+        config["enabled"] = (client.dataset.enabled === "True");
 
         each(client.querySelectorAll("i.c_box"), function(checkbox){
             config[checkbox.dataset.id] = is_checked(checkbox);
@@ -157,6 +157,6 @@ function _get_settings(){
 function register_putio(){
     var client_id = "3328";
     var redirect = encodeURIComponent("https://nosmokingbandit.github.io/putioregister");
-    url = `https://api.put.io/v2/oauth2/authenticate?client_id=${client_id}&response_type=token&redirect_uri=${redirect}`;
+    var url = `https://api.put.io/v2/oauth2/authenticate?client_id=${client_id}&response_type=token&redirect_uri=${redirect}`;
     window.open(url, "_blank");
 }

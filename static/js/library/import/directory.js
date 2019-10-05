@@ -1,4 +1,4 @@
-/* global each, _, url_base, $source_select, notify_error, is_checked */
+/* global each, _, url_base, $source_select, notify_error, is_checked, $modal_current_dir, $dir_input, $progress, $progress_text, $progress_bar, set_stepper */
 window.addEventListener("DOMContentLoaded", function(){
     $dir_input = document.getElementById("directory_input");
 
@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", function(){
         })
         .done(function(response){
             if(response["error"]){
-                $.notify({message: response["error"]}, {type: "danger"})
+                $.notify({message: response["error"]}, {type: "danger"});
             } else {
                 $modal_current_dir.value = response["new_path"];
 
@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", function(){
                     file_list += `<li class="col-md-6 p-1 border">
                                       <i class="mdi mdi-folder"></i>
                                       ${f}
-                                  </li>`
+                                  </li>`;
                 });
                 file_list += `<li class="col-md-6 p-1 border">
                                   <i class="mdi mdi-folder"></i>
@@ -46,18 +46,18 @@ function connect(event, elem){
     event.preventDefault();
 
     directory = $dir_input.value;
-    if(directory == ""){
+    if(directory === ""){
         $dir_input.classList.add("border-danger");
         return false;
     }
 
     var $minsize = document.getElementById("min_file_size");
     var minsize = $minsize.value;
-    if(minsize == ""){
+    if(minsize === ""){
         $minsize.classList.add("border-danger");
         return false;
     } else {
-        minsize = parseInt(minsize);
+        minsize = parseInt(minsize, 10);
         if(minsize < 0){
             minsize = 0;
         }
@@ -69,19 +69,19 @@ function connect(event, elem){
     $progress_bar.style.width = "0%";
     $progress.style.maxHeight = "100%";
 
-    $complete_div = document.querySelector("div#complete_movies");
-    $complete_table = document.querySelector("div#complete_movies table > tbody");
-    $incomplete_div = document.querySelector("div#incomplete_movies");
-    $incomplete_table = document.querySelector("div#incomplete_movies table > tbody");
+    var $complete_div = document.querySelector("div#complete_movies");
+    var $complete_table = document.querySelector("div#complete_movies table > tbody");
+    var $incomplete_div = document.querySelector("div#incomplete_movies");
+    var $incomplete_table = document.querySelector("div#incomplete_movies table > tbody");
 
-    no_imports = true;
+    var no_imports = true;
     var last_response_len = false;
     $.ajax(url_base + "/ajax/scan_library_directory", {
         method: "POST",
         data: {"directory": directory, "minsize": minsize, "recursive": recursive},
         xhrFields: {
             onprogress: function(e){
-                var response_update, $row;
+                var response_update, $row, movie, select;
                 var response = e.currentTarget.response;
                 if(last_response_len === false){
                     response_update = response;
@@ -96,8 +96,8 @@ function connect(event, elem){
                 }
 
                 if(response["response"] !== "in_library"){
-                    var movie = response["movie"];
-                    var select = $source_select.cloneNode(true);
+                    movie = response["movie"];
+                    select = $source_select.cloneNode(true);
                     select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
                 }
 
@@ -153,7 +153,7 @@ function connect(event, elem){
                     $complete_div.classList.remove("hidden");
                 }
 
-                var progress_percent = Math.round(parseInt(response["progress"][0]) / parseInt(response["progress"][1]) * 100);
+                var progress_percent = Math.round(parseInt(response["progress"][0], 10) / parseInt(response["progress"][1], 10) * 100);
                 $progress_text.innerText = `${response["progress"][0]} / ${response["progress"][1]} ${response["movie"]["title"]}.`.replace("_", " ");
                 $progress_bar.style.width = (progress_percent + "%");
             }
@@ -264,7 +264,7 @@ function start_import(event, button){
                     $error_table.innerHTML += row;
                 }
 
-                var progress_percent = Math.round(parseInt(r["progress"][0]) / parseInt(r["progress"][1]) * 100);
+                var progress_percent = Math.round(parseInt(r["progress"][0], 10) / parseInt(r["progress"][1], 10) * 100);
                 $progress_text.innerText = `${r["progress"][0]} / ${r["progress"][1]} ${r["movie"]["title"]}.`;
                 $progress_bar.style.width = (progress_percent + "%");
 

@@ -1,5 +1,5 @@
-/* global each, echo, url_base, current_page, per_page, pages, movie_sort_direction, movie_sort_key, cached_movies, $page_select, loading_library, $sort_direction_button, $movie_list, $hide_finished_movies_toggle, templates, status_colors, notify_error */
-exp_date = new Date();
+/* global each, _, echo, url_base, current_page, per_page, pages, movie_sort_direction, movie_sort_key, cached_movies, $page_select, loading_library, $sort_direction_button, $movie_list, $hide_finished_movies_toggle, templates, status_colors, notify_error */
+var exp_date = new Date();
 exp_date.setFullYear(exp_date.getFullYear() + 10);
 exp_date = exp_date.toUTCString();
 
@@ -12,8 +12,8 @@ function read_cookie(){
     var cookiearray = dcookie.split("; ");
 
     for (var i = 0; i < cookiearray.length; i++) {
-        key = cookiearray[i].split("=")[0];
-        value = decodeURIComponent(cookiearray[i].split("=")[1]);
+        var key = cookiearray[i].split("=")[0];
+        var value = decodeURIComponent(cookiearray[i].split("=")[1]);
         cookie_obj[key] = value;
     }
     return cookie_obj;
@@ -343,9 +343,9 @@ function _render_library(movies){
         movie["status_translated"] = _(movie["status"]);
         $item = format_template(template, movie);
 
-        var score = Math.round(movie["score"]) / 2;
+        var score = Math.round(movie["score"]) / 2, i_half_star;
         if(score % 1 === 0.5){
-            var i_half_star = Math.floor(score);
+            i_half_star = Math.floor(score);
         }
         each($item.querySelectorAll("span.score > i.mdi"), function(star, index){
             if(index + 1 <= score){
@@ -376,7 +376,7 @@ function change_page_sequential(event, direction){
         return false;
     }
 
-    page = current_page + direction;
+    var page = current_page + direction;
 
     if(page < 1 || page > pages){
         return false;
