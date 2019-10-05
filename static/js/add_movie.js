@@ -185,7 +185,7 @@ function add_movie(event, elem, modal=false){
         data = $this.closest("li").data("movie");
     }
     var $form = $this.closest(".add-movie-form");
-    data['quality_profile'] = $form.find('.quality_profile').text().trim();
+    data['quality'] = $form.find('.quality_profile').text().trim();
     data['category'] = $form.find('.category').text().trim();
 
     var title = data['title'];
