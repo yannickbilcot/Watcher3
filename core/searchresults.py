@@ -1,5 +1,6 @@
 import logging
 import datetime
+import PTN
 
 from base64 import b16encode
 import core
@@ -325,18 +326,7 @@ def fuzzy_title(releases, titles, year='\n'):
                 keep.append(result)
                 continue
 
-            rel_title_ss = result['title'].split(year)[0]
-            if len(rel_title_ss) == len(result['title']):
-                int_year = int(year)
-                int_year += 1
-                year = str(int_year)
-                rel_title_ss = result['title'].split(year)[0]
-
-            if len(rel_title_ss) == len(result['title']):
-                int_year = int(year)
-                int_year -= 2
-                year = str(int_year)
-                rel_title_ss = result['title'].split(year)[0]
+            rel_title_ss = result.get('ptn', PTN.parse(result['title']))['title']
 
             logging.debug('Comparing release substring {} with titles {}.'.format(rel_title_ss, titles))
             matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
