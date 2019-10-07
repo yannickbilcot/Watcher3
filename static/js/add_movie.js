@@ -155,7 +155,7 @@ function populate_movie_select(){
 
 function add_movie_settings(event, button){
     event.preventDefault();
-    $contents = $(button).closest('div.btn-group').find('div.add-movie-form');
+    $contents = $(button).closest('div.card').find('div.add-movie-form');
     if($contents.is(':visible')){
         $contents.slideUp();
     } else {
