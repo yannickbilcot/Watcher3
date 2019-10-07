@@ -142,11 +142,14 @@ class NewzNabProvider(object):
                     if rt == qs == '':
                         guid = None
                     else:
-                        rt = rt + '?'
                         qsprs = urllib.parse.parse_qs(qs)
+                        params = []
+                        if 'xt' in qsprs:
+                            params.append('xt=' + qsprs.pop('xt')[0])
                         for k in qsprs:
-                            rt += '{}={}&'.format(k, urllib.parse.quote(qsprs[k][0]))
-                        guid = rt[:-1]
+                            for v in qsprs[k]:
+                                params.append('{}={}'.format(k, urllib.parse.quote(v)))
+                        guid = rt + '?' + '&'.join(params)
                 else:
                     guid = item.get('link')
 

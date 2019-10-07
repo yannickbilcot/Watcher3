@@ -295,6 +295,33 @@
             </div>
         </div>
     </template>
+    <template id="template_delete_file">
+        <div class="modal fade" id="modal_delete">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            ${_('Remove File')}
+                        </h4>
+                        <button class="btn btn-light border btn-sm float-right" data-dismiss="modal">
+                            <i class="mdi mdi-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-12">
+                            ${_('Are you sure you want to remove <b>{finished_file}</b>?')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger float-right" onclick="delete_file_mark_bad(event, this, '{guid}', '{imdbid}')">
+                            <i class="mdi mdi-delete"></i>
+
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
     <template id="template_release">
         <li class="search_result list-group-item" data-guid="{guid}">
             <div class="title" title="{title}">
@@ -316,7 +343,7 @@
                     <button class="btn btn-sm btn-secondary w-100" title="Download" onclick="manual_download(event, this, '{guid}', '{type}', '{imdbid}')">
                         <i class="mdi mdi-download"></i>
                     </button>
-                    <button class="btn btn-sm btn-secondary w-100" onclick="mark_bad(event, this, '{guid}', '{imdbid}')" title="Mark release as Bad">
+                    <button class="btn btn-sm btn-secondary w-100" onclick="mark_bad(event, this, '{guid}', '{imdbid}', '{status}')" title="Mark release as Bad">
                         <i class="mdi mdi-cancel"></i>
                     </button>
                 </div>

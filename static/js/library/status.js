@@ -79,6 +79,7 @@ window.addEventListener("DOMContentLoaded", function(){
         movie: document.querySelector("template#template_movie").innerHTML,
         info: document.querySelector("template#template_movie_info").innerHTML,
         delete: document.querySelector("template#template_delete").innerHTML,
+        delete_file: document.querySelector("template#template_delete_file").innerHTML,
         release: document.querySelector("template#template_release").innerHTML
     };
     status_colors = {
@@ -693,13 +694,50 @@ function manual_download(event, elem, guid, kind, imdbid){
     });
 }
 
-function mark_bad(event, elem, guid, imdbid){
+function mark_bad(event, elem, guid, imdbid, status){
     /* Mark search result as Bad
     guid: str absolute guid of download
     imdbid: str imdb id# of movie
     */
     event.preventDefault();
 
+    var movie = $movie_status_modal.data("movie");
+    if(movie.finished_file && status === 'Finished'){
+        var modal = format_template(templates.delete_file, {guid: guid, imdbid: imdbid, finished_file: movie.finished_file});
+        $delete = $(modal);
+
+        $delete.modal("show");
+        $movie_status_modal.css("opacity", 0);
+        $delete.on("hide.bs.modal", function(){
+            $movie_status_modal.css("opacity", 1);
+            $delete.remove();
+        });
+    } else {
+        _mark_bad(elem, guid, imdbid);
+    }
+}
+
+function delete_file_mark_bad(event, elem, guid, imdbid){
+    $.post(url_base + "/ajax/delete_movie_file", {"imdbid": imdbid})
+    .done(function(response){
+        if(response["response"] === true){
+            $.notify({message: response["message"]}, {type: "success"});
+            $movie_status_modal.data("movie").finished_file = null;
+            $movie_status_modal.find('#finished_file_badge').addClass('hidden');
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $delete.modal("hide");
+        // Makes sure the release is mark bad after file removal
+        elem = document.querySelector(`li.search_result[data-guid="${guid}"] .mdi-cancel`).parentElement;
+        _mark_bad(elem, guid, imdbid);
+    });
+}
+
+function _mark_bad(elem, guid, imdbid){
     var $i = elem.querySelector("i.mdi");
 
     $i.classList.remove("mdi-cancel");
