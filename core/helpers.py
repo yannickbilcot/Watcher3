@@ -9,6 +9,7 @@ from lib import bencodepy
 from string import punctuation
 import core
 import logging
+import re
 
 
 logging.getLogger('lib.requests').setLevel(logging.CRITICAL)
@@ -58,7 +59,7 @@ class Url(object):
         return s.lower().strip()
 
     @staticmethod
-    def open(url, post_data=None, timeout=30, headers={}, stream=False, proxy_bypass=False, expose_user_agent=False):
+    def open(url, post_data=None, timeout=30, headers={}, stream=False, proxy_bypass=False, expose_user_agent=False, allow_redirects=True):
         ''' Assemles and executes requests call
         url (str): url to request
         post-data (dict): data to send via post                     <optional - default None>
@@ -78,7 +79,7 @@ class Url(object):
 
         verifySSL = core.CONFIG.get('Server', {}).get('verifyssl', False)
 
-        kwargs = {'timeout': timeout, 'verify': verifySSL, 'stream': stream, 'headers': headers}
+        kwargs = {'timeout': timeout, 'verify': verifySSL, 'stream': stream, 'headers': headers, 'allow_redirects': allow_redirects}
 
         if not proxy_bypass:
             kwargs['proxies'] = Url.proxies
@@ -164,6 +165,23 @@ class Torrent(object):
                 logging.error('Unable to get torrent hash', exc_info=True)
                 return ''
 
+    @staticmethod
+    def get_hash_and_magnet(torrent):
+        ''' Gets hash from torrent or magnet
+        torrent (str): torrent/magnet url
+
+        Returns tuple with str of lower-case torrent hash or '', and magnet uri
+        if torrent url redirects to magnet uri
+        '''
+
+        logging.debug('Finding hash for torrent {}'.format(torrent))
+        response = Url.open(torrent, stream=True, allow_redirects=False)
+        url = response.headers.get('Location', '')
+        match = re.search(r"[?&]xt=urn:btih:([A-Z0-9]*)", url, re.I)
+        if match and match.group(1):
+            return match.group(1), url
+        else:
+            return ''
 
 class Comparisons(object):
 
