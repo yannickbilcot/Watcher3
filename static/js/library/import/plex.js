@@ -1,3 +1,4 @@
+/* global each, _, url_base, $source_select, notify_error */
 var import_cache;
 
 var template_import_complete = (index, movie, select) => $(`<tr data-index="${index}">
@@ -117,10 +118,7 @@ function connect(event, elem){
         }, 500)
 
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+    .fail(notify_error);
 }
 
 function apply_remote(event){

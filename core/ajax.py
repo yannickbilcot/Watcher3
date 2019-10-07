@@ -465,7 +465,7 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def update_movie_options(self, quality, status, filters, imdbid):
+    def update_movie_options(self, quality, category, status, filters, imdbid):
         ''' Updates quality settings for individual title
         quality (str): name of new quality
         status (str): management state ('automatic', 'disabled')
@@ -479,7 +479,7 @@ class Ajax(object):
 
         logging.info('Setting Quality and filters for {}.'.format(imdbid))
 
-        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'filters': filters}, 'imdbid', imdbid):
+        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'category': category, 'filters': filters}, 'imdbid', imdbid):
             return {'response': False, 'error': Errors.database_write}
 
         logging.info('Updating status to {} for {}.'.format(status, imdbid))
@@ -1196,6 +1196,29 @@ class Ajax(object):
             yield json.dumps(response)
 
     manager_change_quality._cp_config = {'response.stream': True, 'tools.gzip.on': False}
+
+    @cherrypy.expose
+    def manager_change_category(self, movies, category):
+        ''' Bulk manager action to change movie category
+        movies (list): dicts of movies, must contain keys imdbid
+        category (str): category to set movies to
+
+        Yields dict ajax-style response
+        '''
+
+        movies = json.loads(movies)
+
+        logging.info('Setting category to {} for: {}'.format(category, ', '.join(i['imdbid'] for i in movies)))
+
+        for i, movie in enumerate(movies):
+            if not core.sql.update('MOVIES', 'category', category, 'imdbid', movie['imdbid']):
+                response = {'response': False, 'error': Errors.database_write, 'imdbid': movie['imdbid'], 'index': i + 1}
+            else:
+                response = {'response': True, 'index': i + 1}
+
+            yield json.dumps(response)
+
+    manager_change_category._cp_config = {'response.stream': True, 'tools.gzip.on': False}
 
     @cherrypy.expose
     def manager_reset_movies(self, movies):

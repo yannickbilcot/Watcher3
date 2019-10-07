@@ -78,6 +78,7 @@ class App(object):
     server_template = Template(filename='templates/settings/server.html', module_directory=core.MAKO_CACHE)
     search_template = Template(filename='templates/settings/search.html', module_directory=core.MAKO_CACHE)
     quality_template = Template(filename='templates/settings/quality.html', module_directory=core.MAKO_CACHE)
+    categories_template = Template(filename='templates/settings/categories.html', module_directory=core.MAKO_CACHE)
     indexers_template = Template(filename='templates/settings/indexers.html', module_directory=core.MAKO_CACHE)
     downloader_template = Template(filename='templates/settings/downloader.html', module_directory=core.MAKO_CACHE)
     postprocessing_template = Template(filename='templates/settings/postprocessing.html', module_directory=core.MAKO_CACHE)
@@ -109,21 +110,26 @@ class App(object):
 
             mc, fc = core.sql.get_library_count()
 
-            return App.status_template.render(profiles=core.CONFIG['Quality']['Profiles'].keys(), movie_count=mc, finished_count=fc, **self.defaults())
+            return App.status_template.render(profiles=core.CONFIG['Quality']['Profiles'].keys(), categories=core.CONFIG['Categories'].keys(),
+                                              movie_count=mc, finished_count=fc, **self.defaults())
         elif page == 'manage':
             movies = core.sql.get_user_movies()
-            return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+            return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                              categories=core.CONFIG['Categories'].keys(), **self.defaults())
         elif page == 'import':
             subpage = path[1] if len(path) > 1 else None
 
             if not subpage:
                 return App.import_template.render(**self.defaults())
             elif subpage == 'couchpotato':
-                return App.couchpotato_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.couchpotato_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                       categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'kodi':
-                return App.kodi_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.kodi_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'plex':
-                return App.plex_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), **self.defaults())
+                return App.plex_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                categories=core.CONFIG['Categories'].keys(), **self.defaults())
             elif subpage == 'directory':
                 try:
                     start_dir = os.path.expanduser('~')
@@ -132,7 +138,9 @@ class App(object):
                     start_dir = core.PROG_PATH
                     file_list = [i for i in os.listdir(start_dir) if os.path.isdir(os.path.join(start_dir, i)) and not i.startswith('.')]
                 file_list.append('..')
-                return App.directory_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(), current_dir=start_dir, file_list=file_list, **self.defaults())
+                return App.directory_template.render(sources=core.SOURCES, profiles=core.CONFIG['Quality']['Profiles'].keys(),
+                                                     current_dir=start_dir, file_list=file_list,
+                                                     categories=core.CONFIG['Categories'].keys(), **self.defaults())
             else:
                 return self.error_page_404()
         elif page == 'stats':
@@ -144,7 +152,7 @@ class App(object):
 
     @cherrypy.expose
     def add_movie(self):
-        return App.add_movie_template.render(profiles=[(k, v.get('default', False)) for k, v in core.CONFIG['Quality']['Profiles'].items()], **self.defaults())
+        return App.add_movie_template.render(profiles=[(k, v.get('default', False)) for k, v in core.CONFIG['Quality']['Profiles'].items()], categories=core.CONFIG['Categories'].keys(), **self.defaults())
 
     @cherrypy.expose
     def settings(self, *path):
@@ -157,6 +165,8 @@ class App(object):
             return App.search_template.render(config=core.CONFIG['Search'], **self.defaults())
         elif page == 'quality':
             return App.quality_template.render(config=core.CONFIG['Quality'], sources=core.SOURCES, **self.defaults())
+        elif page == 'categories':
+            return App.categories_template.render(config=core.CONFIG['Categories'], sources=core.SOURCES, **self.defaults())
         elif page == 'indexers':
             return App.indexers_template.render(config=core.CONFIG['Indexers'], **self.defaults())
         elif page == 'downloader':

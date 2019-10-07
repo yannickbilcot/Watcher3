@@ -1,0 +1,9 @@
+div.category input,
+div.category .input-group{
+    margin-bottom: 1.5em;
+}
+
+
+div.category_contents{
+    display: none;
+}

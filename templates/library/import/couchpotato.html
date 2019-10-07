@@ -3,8 +3,8 @@
     <head>
         ${head}
         <link href="${url_base}/static/css/library/import/couchpotato.css?v=010" rel="stylesheet">
-        <script src="${url_base}/static/js/library/import/shared.js?v=011" type="text/javascript"></script>
-        <script src="${url_base}/static/js/library/import/couchpotato.js?v=011" type="text/javascript"></script>
+        <script src="${url_base}/static/js/library/import/shared.js?v=013" type="text/javascript"></script>
+        <script src="${url_base}/static/js/library/import/couchpotato.js?v=014" type="text/javascript"></script>
     </head>
     <body>
         ${navbar}
@@ -62,6 +62,7 @@
                                 <th>${_('Title')}</th>
                                 <th>${_('IMDB ID')}</th>
                                 <th>${_('Quality&nbsp;Profile')}</th>
+                                <th>${_('Category')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,6 +78,7 @@
                                 <th>${_('Title')}</th>
                                 <th>${_('IMDB ID')}</th>
                                 <th>${_('Source')}</th>
+                                <th>${_('Category')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -138,6 +140,15 @@
                     %else:
                     <option value="${profile}">${profile}</option>
                     %endif
+                %endfor
+            </select>
+        </template>
+
+        <template id="category_select">
+            <select class="category_select btn btn-sm btn-light border">
+                <option value="Default">Default</option>
+                %for category in categories:
+                    <option value="${category}">${category}</option>
                 %endfor
             </select>
         </template>

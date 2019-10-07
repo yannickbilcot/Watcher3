@@ -30,6 +30,10 @@ ul#movies li{
     opacity: 0.6;
 }
 
+.card .add-movie-form{
+    display: none;
+}
+
 button.show_details{
     padding: 0;
 }

@@ -515,7 +515,9 @@ class Postprocessing(object):
 
         # set movie status and add finished date/score
         if data.get('imdbid'):
-            if not core.sql.row_exists('MOVIES', imdbid=data['imdbid']):
+            if core.sql.row_exists('MOVIES', imdbid=data['imdbid']):
+                data['category'] = core.sql.get_movie_details('imdbid', data['imdbid'])['category']
+            else:
                 logging.info('{} not found in library, adding now.'.format(data.get('title')))
                 data['status'] = 'Disabled'
                 Manage.add_movie(data)
@@ -784,7 +786,12 @@ class Postprocessing(object):
         config = core.CONFIG['Postprocessing']
         if config['recyclebinenabled']:
             recycle_bin = self.compile_path(config['recyclebindirectory'], data)
-        target_folder = os.path.normpath(self.compile_path(config['moverpath'], data))
+        category = data.get('category', None)
+        if category in core.CONFIG['Categories']:
+            moverpath = core.CONFIG['Categories'][category]['moverpath']
+        else:
+            moverpath = config['moverpath']
+        target_folder = os.path.normpath(self.compile_path(moverpath, data))
         target_folder = os.path.join(target_folder, '')
 
         # if the new folder doesn't exist, make it

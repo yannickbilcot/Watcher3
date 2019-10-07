@@ -5,7 +5,7 @@
     ${head}
     <link href="${url_base}/static/css/library/status.css?v=012" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=019" type="text/javascript"></script>
+    <script src="${url_base}/static/js/library/status.js?v=021" type="text/javascript"></script>
     <meta name="movie_count" content="${movie_count}" />
     <meta name="finished_count" content="${finished_count}" />
 </head>
@@ -191,6 +191,20 @@
                                         </div>
                                         <select id="movie_quality" class="btn border btn-light border form-control">
                                             %for i in profiles:
+                                            <option value="${i}">${i}</option>
+                                            %endfor
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="mdi mdi-library-books" title="${_('Category')}"></i>
+                                            </span>
+                                        </div>
+                                        <select id="movie_category" class="btn border btn-light border form-control">
+                                            <option value="Default">Default</option>
+                                            %for i in categories:
                                             <option value="${i}">${i}</option>
                                             %endfor
                                         </select>

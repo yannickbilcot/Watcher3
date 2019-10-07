@@ -1,3 +1,4 @@
+/* global url_base, notify_error, each */
 window.addEventListener("DOMContentLoaded", function(){
     indexer_template = document.querySelector("template#new_indexer").innerHTML;
 });
@@ -26,16 +27,13 @@ function test_indexer(event, button){
                                              "apikey": api,
                                              "mode": mode})
     .done(function(response){
-        if(response["response"] == true){
+        if(response["response"] === true){
             $.notify({message: response["message"]})
         } else {
             $.notify({message: response['error']}, {type: "danger"})
         }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         button.removeAttribute('disabled');
         icon.classList.remove('mdi-circle');
@@ -142,9 +140,9 @@ function _get_settings(){
 
     settings['PrivateTorrent'] = privateTrackers;
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
 
     return {"Indexers": settings}
 }

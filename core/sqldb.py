@@ -10,7 +10,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 9
+current_version = 10
 
 
 def proxy_to_dict(p):
@@ -70,7 +70,8 @@ class SQL(object):
                                  sqla.Column('media_release_date', sqla.TEXT),
                                  sqla.Column('origin', sqla.TEXT),
                                  sqla.Column('sort_title', sqla.TEXT),
-                                 sqla.Column('filters', sqla.TEXT)
+                                 sqla.Column('filters', sqla.TEXT),
+                                 sqla.Column('category', sqla.TEXT)
                                  )
         self.SEARCHRESULTS = sqla.Table('SEARCHRESULTS', self.metadata,
                                         sqla.Column('score', sqla.SMALLINT),
@@ -243,6 +244,30 @@ class SQL(object):
             return True
         else:
             logging.error('Unable to update database row.')
+            return False
+
+    def update_all(self, TABLE, data):
+        ''' Updates single value in all rows on table.
+        TABLE (str): name of database table to write to
+        data (dict): key/value pairs to update in table
+
+        Writes VALUE into COLUMN
+
+        Returns Bool.
+        '''
+
+        logging.debug('Updating to {} in {}.'.format(data, TABLE))
+
+        columns = '{}=?'.format('=?,'.join(data.keys()))
+        sql = 'UPDATE {} SET {}'.format(TABLE, columns)
+        vals = list(data.values())
+
+        command = [sql, vals]
+
+        if self.execute(command):
+            return True
+        else:
+            logging.error('Unable to update database rows.')
             return False
 
     def update_multiple_values(self, TABLE, data, idcol, idval):
@@ -995,5 +1020,11 @@ class DatabaseUpdate(object):
         if values:
             core.sql.update_multiple_rows('MOVIES', values, 'imdbid')
         print()
+
+    @staticmethod
+    def update_10():
+        ''' Add category column to MOVIES '''
+        core.sql.update_tables()
+        core.sql.update_all('MOVIES', {'category': 'Default'})
 
     # Adding a new method? Remember to update the current_version #
