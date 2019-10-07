@@ -1,5 +1,7 @@
 import datetime
 import logging
+import PTN
+import re
 
 import core
 from core import searchresults, snatcher, proxy
@@ -147,7 +149,8 @@ default status Available.
                 results[idx] = result
 
     for idx, result in enumerate(results):
-        results[idx]['resolution'] = get_source(result, year)
+        results[idx]['ptn'] = PTN.parse(result['title'])
+        results[idx]['resolution'] = get_source(results[idx]['ptn'])
 
     scored_results = searchresults.score(results, imdbid=imdbid)
 
@@ -236,7 +239,8 @@ def rss_sync(movies):
 
         # Get source media and resolution
         for idx, result in enumerate(new_results):
-            new_results[idx]['resolution'] = get_source(result, year)
+            new_results[idx]['ptn'] = PTN.parse(result['title'])
+            new_results[idx]['resolution'] = get_source(new_results[idx]['ptn'])
 
         scored_results = searchresults.score(new_results, imdbid=imdbid)
 
@@ -326,7 +330,7 @@ default False>
         return True
 
 
-def get_source(result, year):
+def get_source(ptn_data):
     ''' Parses release resolution and source from title.
     result (dict): individual search result info
     year (int): year of movie release
@@ -337,29 +341,38 @@ def get_source(result, year):
     Returns str source based on core.SOURCES
     '''
 
-    logging.info('Determining source media for {}'.format(result['title']))
+    logging.info('Determining source media for {}'.format(ptn_data))
 
-    scene_data = result['title'].split(str(year), 1)[-1].lower()
-
-    if any(i in scene_data for i in ('4k', 'uhd', '2160p')):
+    if not 'resolution' in ptn_data:
+        resolution = 'SD'
+    elif any(i in ptn_data['resolution'] for i in ('4k', 'uhd', '2160p')):
         resolution = '4K'
-    elif '1080' in scene_data:
+    elif '1080' in ptn_data['resolution']:
         resolution = '1080P'
-    elif '720' in scene_data:
+    elif '720' in ptn_data['resolution']:
         resolution = '720P'
     else:
+        logging.warning('Unknown resolution {}, default to SD'.format(ptn_data['resolution']))
         resolution = 'SD'
 
-    delimiters = ('.', '_', ' ', '-', '+')
-    for source, aliases in core.CONFIG['Quality']['Aliases'].items():
-        for a in aliases:
-            aliases_delimited = ['{}{}'.format(d, a) for d in delimiters]
-            if any(i in scene_data for i in aliases_delimited):
+    if 'quality' in ptn_data:
+        parsed_quality = ptn_data['quality'].lower()
+        for source, aliases in core.CONFIG['Quality']['Aliases'].items():
+            if re.search(r"\b(%s)\b" % '|'.join(aliases), parsed_quality):
                 src = '{}-{}'.format(source, resolution)
                 logging.info('Source media determined as {}'.format(src))
                 return src
 
-    src = 'Unknown'#.format(resolution)
+    # sometimes PTN doesn't find quality, but aliases may match with excess
+    if 'excess' in ptn_data:
+        parsed_quality = ' '.join(ptn_data['excess']).lower()
+        for source, aliases in core.CONFIG['Quality']['Aliases'].items():
+            if re.search(r"\b(%s)\b" % '|'.join(aliases), parsed_quality):
+                src = '{}-{}'.format(source, resolution)
+                logging.info('Source media determined as {}'.format(src))
+                return src
+
+    src = 'Unknown'
     logging.info('Source media determined as {}'.format(src))
     return src
 
