@@ -9,7 +9,7 @@ import logging
 logging = logging.getLogger(__name__)
 
 
-trackers = '&tr'.join(('udp://tracker.leechers-paradise.org:6969',
+trackers = '&tr='.join(('udp://tracker.leechers-paradise.org:6969',
                        'udp://zer0day.ch:1337',
                        'udp://tracker.coppersurfer.tk:6969',
                        'udp://public.popcorn-tracker.org:6969',
@@ -24,16 +24,17 @@ trackers = '&tr'.join(('udp://tracker.leechers-paradise.org:6969',
                        ))
 
 
-def magnet(hash_):
+def magnet(hash_, title):
     ''' Creates magnet link
     hash_ (str): base64 formatted torrent hash
+    title (str): name of the torrent
 
     Formats as magnet uri and adds trackers
 
     Returns str margnet uri
     '''
 
-    return 'magnet:?xt=urn:btih:{}&tr={}'.format(hash_, trackers)
+    return 'magnet:?xt=urn:btih:{}&dn={}&tr={}'.format(hash_, title, trackers)
 
 
 class Torrent(NewzNabProvider):

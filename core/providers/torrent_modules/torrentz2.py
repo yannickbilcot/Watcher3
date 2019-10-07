@@ -80,7 +80,7 @@ def _parse(xml, imdbid):
             result['imdbid'] = imdbid
             result['indexer'] = 'Torrentz2'
             result['info_link'] = i['link']
-            result['torrentfile'] = core.providers.torrent.magnet(hash_)
+            result['torrentfile'] = core.providers.torrent.magnet(hash_, i['title'])
             result['guid'] = hash_
             result['type'] = 'magnet'
             result['downloadid'] = None
