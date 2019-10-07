@@ -359,7 +359,7 @@ def get_source(result, year):
                 logging.info('Source media determined as {}'.format(src))
                 return src
 
-    src = 'Unknown-{}'.format(resolution)
+    src = 'Unknown'#.format(resolution)
     logging.info('Source media determined as {}'.format(src))
     return src
 
