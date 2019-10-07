@@ -76,7 +76,7 @@ def _parse(xml, imdbid):
             result['imdbid'] = imdbid
             result['indexer'] = 'TorrentDownloads'
             result['info_link'] = 'http://www.torrentdownloads.me{}'.format(i['link'])
-            result['torrentfile'] = core.providers.torrent.magnet(i['info_hash'])
+            result['torrentfile'] = core.providers.torrent.magnet(i['info_hash'], i['title'])
             result['guid'] = i['info_hash']
             result['type'] = 'magnet'
             result['downloadid'] = None

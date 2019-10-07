@@ -238,6 +238,13 @@ def snatch_torrent(data):
     if urllib.parse.urlparse(guid).netloc:
         # if guid is not a url and not hash we'll have to get the hash now
         guid_ = Torrent.get_hash(data['torrentfile'])
+        if not guid_:
+            # torrent url may redirect to magnet uri
+            guid_, magnet = Torrent.get_hash_and_magnet(data['torrentfile'])
+            if magnet:
+                data['torrentfile'] = magnet
+                core.sql.update('SEARCHRESULTS', 'torrentfile', magnet, 'guid', guid)
+
         if guid_:
             core.sql.update('SEARCHRESULTS', 'guid', guid_, 'guid', guid)
             guid = guid_
