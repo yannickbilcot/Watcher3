@@ -2,8 +2,8 @@
 <html>
     <head>
         ${head}
-        <link href="${url_base}/static/css/add_movie.css?v=012" rel="stylesheet">
-        <script src="${url_base}/static/js/add_movie.js?v=015" type="text/javascript"></script>
+        <link href="${url_base}/static/css/add_movie.css?v=013" rel="stylesheet">
+        <script src="${url_base}/static/js/add_movie.js?v=016" type="text/javascript"></script>
     </head>
     <body>
         ${navbar}
@@ -86,46 +86,44 @@
                 <div class="card">
                     <img src="{img_url}" class="card-img-top">
                     <div class='btn-group'>
-                        <div class="dropdown w-75">
-                            <button type="button" class="btn btn-secondary dropdown-toggle w-100 rounded-0" onclick="add_movie_settings(event, this)">
-                                ${_('Add')}
-                            </button>
-                            <div class="add-movie-form">
-                                <div>
-                                    <button type="button" class="quality_profile btn btn-secondary dropdown-toggle w-100 rounded-0" data-toggle="dropdown">
-                                        ${next((profile[0] for profile in profiles if profile[1]), _('Quality Profile'))}
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        %for profile in profiles:
-                                        <a class="dropdown-item ${'mdi mdi-star' if profile[1] else ''}" href="#" onclick="select_item(event, this)">
-                                            ${profile[0]}
-                                        </a>
-                                        %endfor
-                                    </div>
-                                </div>
-                                <div>
-                                    <button type="button" class="category btn btn-secondary dropdown-toggle w-100 rounded-0" data-toggle="dropdown">
-                                        ${_('Default')}
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item mdi mdi-star" href="#" onclick="select_item(event, this)">
-                                            ${_('Default')}
-                                        </a>
-                                        %for category in categories:
-                                        <a class="dropdown-item" href="#" onclick="select_item(event, this)">
-                                            ${category}
-                                        </a>
-                                        %endfor
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-secondary w-100 rounded-0" onclick="add_movie(event, this)">
-                                    ${_('Add')}
-                                </button>
-                            </div>
-                        </div>
+                        <button type="button" class="btn btn-secondary dropdown-toggle w-75 rounded-0" onclick="add_movie_settings(event, this)">
+                            ${_('Add')}
+                        </button>
                         <button class="btn btn-secondary w-25 rounded-0 show_details" onclick="show_details(event, this)">
                             <i class="mdi mdi-open-in-new"></i>
                         </button>
+                        <div class="add-movie-form">
+                            <div>
+                                <button type="button" class="quality_profile btn btn-secondary dropdown-toggle w-100 rounded-0" data-toggle="dropdown">
+                                    ${next((profile[0] for profile in profiles if profile[1]), _('Quality Profile'))}
+                                </button>
+                                <div class="dropdown-menu">
+                                    %for profile in profiles:
+                                    <a class="dropdown-item ${'mdi mdi-star' if profile[1] else ''}" href="#" onclick="select_item(event, this)">
+                                        ${profile[0]}
+                                    </a>
+                                    %endfor
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="category btn btn-secondary dropdown-toggle w-100 rounded-0" data-toggle="dropdown">
+                                    ${_('Default')}
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item mdi mdi-star" href="#" onclick="select_item(event, this)">
+                                        ${_('Default')}
+                                    </a>
+                                    %for category in categories:
+                                    <a class="dropdown-item" href="#" onclick="select_item(event, this)">
+                                        ${category}
+                                    </a>
+                                    %endfor
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary w-100 rounded-0" onclick="add_movie(event, this)">
+                                ${_('Add Movie')}
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <span class="title px-2">{title}</span>
