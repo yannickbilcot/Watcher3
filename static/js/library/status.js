@@ -1,3 +1,4 @@
+/*global status_colors */
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
     per_page = 50;
