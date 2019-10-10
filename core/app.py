@@ -6,6 +6,7 @@ from core.postprocessing import Postprocessing
 import os
 import json
 from mako.template import Template
+import logging
 
 import sys
 import time
@@ -168,6 +169,8 @@ class App(object):
         elif page == 'categories':
             return App.categories_template.render(config=core.CONFIG['Categories'], sources=core.SOURCES, **self.defaults())
         elif page == 'indexers':
+            for indexer in core.CONFIG['Indexers']['TorzNab'].values():
+                logging.debug(indexer)
             return App.indexers_template.render(config=core.CONFIG['Indexers'], **self.defaults())
         elif page == 'downloader':
             return App.downloader_template.render(config=core.CONFIG['Downloader'], **self.defaults())
