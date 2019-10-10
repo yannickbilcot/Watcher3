@@ -1,4 +1,4 @@
-/* global url_base, notify_error */
+/* global url_base */
 window.addEventListener("DOMContentLoaded", function(){
     url_base = document.querySelector("meta[name='url_base']").content;
 
@@ -59,6 +59,9 @@ function login(event){
             $input_password.value = '';
         }
     })
-    .fail(notify_error);
+    .fail(function(data){
+        var err = data.status + " " + data.statusText;
+        $.notify({message: err}, {type: "danger", delay: 0});
+    });
 
 }
