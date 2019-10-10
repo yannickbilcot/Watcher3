@@ -132,6 +132,13 @@ window.addEventListener("DOMContentLoaded", function(){
         $hide_finished_movies_toggle.setAttribute("value", "True");
         $hide_finished_movies_toggle.classList.remove("mdi-checkbox-blank-outline");
         $hide_finished_movies_toggle.classList.add("mdi-checkbox-marked");
+        cached_movies = Array(movie_count - finished_count)
+        pages = Math.ceil((movie_count - finished_count) / per_page);
+        document.querySelector("button#page_count").innerText = "/ " + pages;
+    } else {
+        cached_movies = Array(movie_count)
+        pages = Math.ceil((movie_count) / per_page);
+        document.querySelector("button#page_count").innerText = "/ " + pages;
     }
 
     /* Finish by loading page 1 */
@@ -174,13 +181,21 @@ window.addEventListener("DOMContentLoaded", function(){
         per_page = event.target.value;
 
         set_cookie("per_page", per_page);
+        var hf = cookie["hide_finished_movies"];
 
-        pages = Math.ceil((movie_count - finished_count) / per_page);
-        document.querySelector("button#page_count").innerText = "/ " + pages;
+        if(hf == "True"){
+            cached_movies = Array(movie_count - finished_count)
+            pages = Math.ceil((movie_count - finished_count) / per_page);
+            document.querySelector("button#page_count").innerText = "/ " + pages;
+        } else {
+            cached_movies = Array(movie_count)
+            pages = Math.ceil((movie_count) / per_page);
+            document.querySelector("button#page_count").innerText = "/ " + pages;
+      }
+//        document.querySelector("button#page_count").innerText = "/ " + pages;
 
         load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
     });
-
 
     /* Movie sort direction */
     // See fn switch_sort_direction()
@@ -223,13 +238,15 @@ window.addEventListener("DOMContentLoaded", function(){
         if(event.target.getAttribute("value") === "False"){
             set_cookie("hide_finished_movies", "True");
             cached_movies = Array(movie_count - finished_count);
-            pages = Math.ceil((movie_count - finished_count) / per_page);
+            var pp = document.getElementById('per_page').value;
+            pages = Math.ceil((movie_count - finished_count) / pp);
             document.querySelector("button#page_count").innerText = "/ " + pages;
             hf = "True";
         } else {
             set_cookie("hide_finished_movies", "False");
             cached_movies = Array(movie_count);
-            pages = Math.ceil((movie_count) / per_page);
+            var pp = document.getElementById('per_page').value;
+            pages = Math.ceil((movie_count) / pp);
             document.querySelector("button#page_count").innerText = "/ " + pages;
             hf = "False";
         }
