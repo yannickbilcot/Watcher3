@@ -66,6 +66,7 @@ class Torrent(NewzNabProvider):
             if url_base[-1] != '/':
                 url_base = url_base + '/'
             apikey = indexer[1]
+            no_year = indexer[3]
 
             caps = core.sql.torznab_caps(url_base)
             if not caps:
@@ -80,6 +81,9 @@ class Torrent(NewzNabProvider):
             else:
                 logging.info('{} does not support imdbid search, using q={}'.format(url_base, term))
                 r = self.search_newznab(url_base, apikey, 'search', q=term, imdbid=imdbid)
+                if not r and no_year:
+                    logging.info('{} does not find anything, trying without year, using q={}'.format(url_base, title))
+                    r = self.search_newznab(url_base, apikey, 'search', q=title, imdbid=imdbid)
             for i in r:
                 results.append(i)
 

@@ -4,13 +4,14 @@ import logging
 import time
 import os
 import shutil
+from core import config
 
 from core.helpers import Comparisons
 import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 10
+current_version = 11
 
 
 def proxy_to_dict(p):
@@ -1026,5 +1027,14 @@ class DatabaseUpdate(object):
         ''' Add category column to MOVIES '''
         core.sql.update_tables()
         core.sql.update_all('MOVIES', {'category': 'Default'})
+
+    @staticmethod
+    def update_11():
+        ''' Add category column to MOVIES '''
+        config.load()
+        for indexer in core.CONFIG['Indexers']['TorzNab'].values():
+            if len(indexer) == 3:
+                indexer.append(False)
+        config.write(core.CONFIG)
 
     # Adding a new method? Remember to update the current_version #

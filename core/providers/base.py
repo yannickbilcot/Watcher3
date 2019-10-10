@@ -53,7 +53,9 @@ class NewzNabProvider(object):
             else:
                 response = Url.open(url).text
 
-            return self.parse_newznab_xml(response, imdbid=imdbid)
+            results = self.parse_newznab_xml(response, imdbid=imdbid)
+            logging.info('Found {} results from {}.'.format(len(results), url_base))
+            return results
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception as e:
@@ -94,7 +96,9 @@ class NewzNabProvider(object):
                 else:
                     response = Url.open(url).text
 
-                return self.parse_newznab_xml(response)
+                results = self.parse_newznab_xml(response)
+                logging.info('Found {} results from {}.'.format(len(results), url_base))
+                return results
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception as e:
@@ -128,6 +132,7 @@ class NewzNabProvider(object):
                 items = [items]
         except Exception as e:
             logging.error('Unexpected XML format from NewzNab indexer.', exc_info=True)
+            logging.debug(feed)
             return []
 
         for item in items:
