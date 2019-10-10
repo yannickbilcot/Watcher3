@@ -314,7 +314,12 @@ class Postprocessing(object):
                 if result:
                     logging.info('Found match for {} in releases.'.format(fname))
                 else:
-                    logging.info('Unable to find local release info by release name.')
+                    logging.info('Unable to find local release info by release name, trying fuzzy search.')
+                    result = core.sql.get_single_search_result('title', re.sub(r'[\[\]\(\)\-.:]', '_', fname), like=True)
+                    if result:
+                        logging.info('Found match for {} in releases.'.format(fname))
+                    else:
+                        logging.info('Unable to find local release info by release name.')
 
         # if we found it, get local movie info
         if result:

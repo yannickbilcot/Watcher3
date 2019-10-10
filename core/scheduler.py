@@ -86,7 +86,7 @@ class PostProcessingScan(object):
             le = datetime.datetime.strptime(t, '%Y-%m-%d %H:%M:%S')
             threshold = time.mktime(le.timetuple())
 
-            logging.info('Scanning for new files only (last scan: {}).'.format(d, le))
+            logging.info('Scanning {} for new files only (last scan: {}).'.format(d, le))
 
             for i in os.listdir(d):
                 f = os.path.join(d, i)
