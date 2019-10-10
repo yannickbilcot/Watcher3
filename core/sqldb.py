@@ -614,7 +614,7 @@ class SQL(object):
         else:
             return True
 
-    def get_single_search_result(self, idcol, idval):
+    def get_single_search_result(self, idcol, idval, like=False):
         ''' Gets single search result
         idcol (str): identifying column
         idval (str): identifying value
@@ -626,7 +626,8 @@ class SQL(object):
 
         logging.debug('Retrieving search result details for {}.'.format(idval.split('&')[0]))
 
-        command = ['SELECT * FROM SEARCHRESULTS WHERE {}="{}" ORDER BY score DESC, size DESC'.format(idcol, idval)]
+        operator = 'LIKE' if like else '='
+        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
 
         result = self.execute(command)
 
