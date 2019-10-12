@@ -114,6 +114,7 @@ window.addEventListener("DOMContentLoaded", function(){
     $movie_list.classList = "";
     $movie_list.classList.add(movie_layout);
     document.querySelector(`div#movie_layout > div > button[data-layout="${movie_layout}"]`).classList.add("active");
+    document.getElementById("per_page").value = per_page;
     echo.render();
 
     if(movie_sort_direction === "asc"){
