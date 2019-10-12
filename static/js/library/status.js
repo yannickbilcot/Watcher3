@@ -178,9 +178,10 @@ window.addEventListener("DOMContentLoaded", function(){
         per_page = event.target.value;
 
         set_cookie("per_page", per_page);
+        var hf = $hide_finished_movies_toggle.getAttribute("value");
 
-        if(hide_finished_movies === "True"){
-            cached_movies = Array(movie_count - finished_count)
+        if(hf === "True"){
+            cached_movies = Array(movie_count - finished_count);
             pages = Math.ceil((movie_count - finished_count) / per_page);
         } else {
             cached_movies = Array(movie_count);
