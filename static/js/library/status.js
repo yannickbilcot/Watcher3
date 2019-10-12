@@ -233,13 +233,13 @@ window.addEventListener("DOMContentLoaded", function(){
         if(event.target.getAttribute("value") === "False"){
             set_cookie("hide_finished_movies", "True");
             cached_movies = Array(movie_count - finished_count);
-            var pp = document.getElementById('per_page').value;
+            var pp = document.getElementById("per_page").value;
             pages = Math.ceil((movie_count - finished_count) / pp);
             hf = "True";
         } else {
             set_cookie("hide_finished_movies", "False");
             cached_movies = Array(movie_count);
-            var pp = document.getElementById('per_page').value;
+            var pp = document.getElementById("per_page").value;
             pages = Math.ceil((movie_count) / pp);
             hf = "False";
         }
@@ -713,8 +713,12 @@ function mark_bad(event, elem, guid, imdbid, status){
     event.preventDefault();
 
     var movie = $movie_status_modal.data("movie");
-    if(movie.finished_file && status === 'Finished'){
-        var modal = format_template(templates.delete_file, {guid: guid, imdbid: imdbid, finished_file: movie.finished_file});
+    if(movie.finished_file && status === "Finished"){
+        var modal = format_template(templates.delete_file, {
+            guid: guid,
+            imdbid: imdbid,
+            finished_file: movie.finished_file
+        });
         $delete = $(modal);
 
         $delete.modal("show");
@@ -734,7 +738,7 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
         if(response["response"] === true){
             $.notify({message: response["message"]}, {type: "success"});
             $movie_status_modal.data("movie").finished_file = null;
-            $movie_status_modal.find('#finished_file_badge').addClass('hidden');
+            $movie_status_modal.find("#finished_file_badge").addClass("hidden");
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
         }
