@@ -293,8 +293,9 @@ class API(object):
         '''
 
         cherrypy.response.headers['Content-Type'] = "image/jpeg"
+        err = None
         try:
-            with open(os.path.abspath(os.path.join(core.POSTERDIR, '{}.jpg'.format(params['imdbid']))), 'rb') as f:
+            with open(os.path.abspath(os.path.join(core.POSTER_DIR, '{}.jpg'.format(params['imdbid']))), 'rb') as f:
                 img = f.read()
             return img
         except KeyError as e:
@@ -304,8 +305,9 @@ class API(object):
         except Exception as e:
             err = {'response': False, 'error': str(e)}
         finally:
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return json.dumps(err).encode('utf-8')
+            if err:
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps(err).encode('utf-8')
 
     @api_json_out
     def version(self, *args):
