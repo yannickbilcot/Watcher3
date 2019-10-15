@@ -134,12 +134,13 @@ window.addEventListener("DOMContentLoaded", function(){
         $hide_finished_movies_toggle.classList.add("mdi-checkbox-marked");
         cached_movies = Array(movie_count - finished_count)
         pages = Math.ceil((movie_count - finished_count) / per_page);
-        document.querySelector("button#page_count").innerText = "/ " + pages;
+
     } else {
         cached_movies = Array(movie_count)
         pages = Math.ceil((movie_count) / per_page);
-        document.querySelector("button#page_count").innerText = "/ " + pages;
     }
+    document.querySelector("button#page_count").innerText = "/ " + pages;
+
 
     /* Finish by loading page 1 */
     load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages);
@@ -181,19 +182,17 @@ window.addEventListener("DOMContentLoaded", function(){
         per_page = event.target.value;
 
         set_cookie("per_page", per_page);
-        var hf = cookie["hide_finished_movies"];
 
-        if(hf == "True"){
+        if(hide_finished_movies === "True"){
             cached_movies = Array(movie_count - finished_count)
             pages = Math.ceil((movie_count - finished_count) / per_page);
-            document.querySelector("button#page_count").innerText = "/ " + pages;
         } else {
             cached_movies = Array(movie_count)
             pages = Math.ceil((movie_count) / per_page);
-            document.querySelector("button#page_count").innerText = "/ " + pages;
-      }
-//        document.querySelector("button#page_count").innerText = "/ " + pages;
-
+        }
+        
+        document.querySelector("button#page_count").innerText = "/ " + pages;
+        
         load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
     });
 
