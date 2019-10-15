@@ -36,34 +36,52 @@ function set_cookie(k, v){
     return c;
 }
 
+function change_page_number(){
+    document.querySelector("button#page_count").innerText = "/ " + pages;
+    if(pages > 0){
+        $page_select.innerHTML = "";
+        each(Array(pages), function(item, index){
+            $page_select.innerHTML += `<option value="${index + 1}">${index + 1}</option>`;
+        });
+    } else {
+        $page_select.innerHTML = `<option value="">0</option>`;
+    }
+}
+
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
     per_page = 50;
+    var cookie = read_cookie();
+    echo.init({
+        offsetVertical: 100,
+        callback: function(element, op){
+            element.style.opacity = 1;
+        }
+    });
+
+    /* Read cookie vars */
+    var movie_layout = (cookie["movie_layout"] || "").split(" ")[0] || "posters";
+    movie_sort_direction = cookie["movie_sort_direction"] || "desc";
+    movie_sort_key = cookie["movie_sort_key"] || "sort_title";
+    var hide_finished_movies = cookie["hide_finished_movies"] || "False";
+    if(per_page !== cookie["per_page"]){
+        per_page = cookie["per_page"]
+    }
+    if(movie_sort_key === "status_key"){
+        movie_sort_key = "status";
+    } else if(movie_sort_key === "title"){
+        movie_sort_key = "sort_title";
+    }
 
     var movie_count = parseInt(document.querySelector("meta[name=\"movie_count\"]").content, 10);
     var finished_count = parseInt(document.querySelector("meta[name=\"finished_count\"]").content, 10);
     cached_movies = Array(movie_count);
 
     $page_select = document.querySelector("select#page_number");
-
     pages = Math.ceil(movie_count / per_page);
-    document.querySelector("button#page_count").innerText = "/ " + pages;
-
-    if(pages > 0){
-        each(Array(pages), function(item, index){
-            $page_select.innerHTML += `<option value="${index + 1}">${index + 1}</option>`;
-        });
-    } else {
-        $page_select.innerHTML += `<option value="">0</option>`;
-    }
 
     $page_select.addEventListener("change", function(event){
         current_page = parseInt(event.target.value);
-        load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
-    });
-
-    $page_select.addEventListener("change", function(event){
-        per_page = parseInt(event.target.value);
         load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
     });
 
@@ -92,31 +110,11 @@ window.addEventListener("DOMContentLoaded", function(){
         Waiting: "waiting",
     };
 
-    var cookie = read_cookie();
-    echo.init({
-        offsetVertical: 100,
-        callback: function(element, op){
-            element.style.opacity = 1;
-        }
-    });
-
-    /* Read cookie vars */
-    var movie_layout = (cookie["movie_layout"] || "").split(" ")[0] || "posters";
-    movie_sort_direction = cookie["movie_sort_direction"] || "desc";
-    movie_sort_key = cookie["movie_sort_key"] || "sort_title";
-    var hide_finished_movies = cookie["hide_finished_movies"] || "False";
-    if(per_page !== cookie["per_page"]){
-        per_page = cookie["per_page"]
-    }
-    if(movie_sort_key === "status_key"){
-        movie_sort_key = "status";
-    } else if(movie_sort_key === "title"){
-        movie_sort_key = "sort_title";
-    }
     /* Set sort ui elements off cookie */
     $movie_list.classList = "";
     $movie_list.classList.add(movie_layout);
     document.querySelector(`div#movie_layout > div > button[data-layout="${movie_layout}"]`).classList.add("active");
+    document.getElementById("per_page").value = per_page;
     echo.render();
 
     if(movie_sort_direction === "asc"){
@@ -134,13 +132,11 @@ window.addEventListener("DOMContentLoaded", function(){
         $hide_finished_movies_toggle.classList.add("mdi-checkbox-marked");
         cached_movies = Array(movie_count - finished_count)
         pages = Math.ceil((movie_count - finished_count) / per_page);
-
     } else {
         cached_movies = Array(movie_count)
         pages = Math.ceil((movie_count) / per_page);
     }
-    document.querySelector("button#page_count").innerText = "/ " + pages;
-
+    change_page_number();
 
     /* Finish by loading page 1 */
     load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages);
@@ -182,17 +178,17 @@ window.addEventListener("DOMContentLoaded", function(){
         per_page = event.target.value;
 
         set_cookie("per_page", per_page);
+        var hf = $hide_finished_movies_toggle.getAttribute("value");
 
-        if(hide_finished_movies === "True"){
-            cached_movies = Array(movie_count - finished_count)
+        if(hf === "True"){
+            cached_movies = Array(movie_count - finished_count);
             pages = Math.ceil((movie_count - finished_count) / per_page);
         } else {
-            cached_movies = Array(movie_count)
+            cached_movies = Array(movie_count);
             pages = Math.ceil((movie_count) / per_page);
         }
-        
-        document.querySelector("button#page_count").innerText = "/ " + pages;
-        
+        change_page_number();
+
         load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
     });
 
@@ -237,18 +233,17 @@ window.addEventListener("DOMContentLoaded", function(){
         if(event.target.getAttribute("value") === "False"){
             set_cookie("hide_finished_movies", "True");
             cached_movies = Array(movie_count - finished_count);
-            var pp = document.getElementById('per_page').value;
+            var pp = document.getElementById("per_page").value;
             pages = Math.ceil((movie_count - finished_count) / pp);
-            document.querySelector("button#page_count").innerText = "/ " + pages;
             hf = "True";
         } else {
             set_cookie("hide_finished_movies", "False");
             cached_movies = Array(movie_count);
-            var pp = document.getElementById('per_page').value;
+            var pp = document.getElementById("per_page").value;
             pages = Math.ceil((movie_count) / pp);
-            document.querySelector("button#page_count").innerText = "/ " + pages;
             hf = "False";
         }
+        change_page_number();
         $page_select.value = 1;
         load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages, hf);
     })
@@ -718,8 +713,12 @@ function mark_bad(event, elem, guid, imdbid, status){
     event.preventDefault();
 
     var movie = $movie_status_modal.data("movie");
-    if(movie.finished_file && status === 'Finished'){
-        var modal = format_template(templates.delete_file, {guid: guid, imdbid: imdbid, finished_file: movie.finished_file});
+    if(movie.finished_file && status === "Finished"){
+        var modal = format_template(templates.delete_file, {
+            guid: guid,
+            imdbid: imdbid,
+            finished_file: movie.finished_file
+        });
         $delete = $(modal);
 
         $delete.modal("show");
@@ -739,7 +738,7 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
         if(response["response"] === true){
             $.notify({message: response["message"]}, {type: "success"});
             $movie_status_modal.data("movie").finished_file = null;
-            $movie_status_modal.find('#finished_file_badge').addClass('hidden');
+            $movie_status_modal.find("#finished_file_badge").addClass("hidden");
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
         }
