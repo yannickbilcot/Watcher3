@@ -64,7 +64,9 @@ class Ajax(object):
         '''
 
         results = TheMovieDatabase.search(search_term)
-        if not results:
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
             logging.info('No Results found for {}'.format(search_term))
 
         return results
@@ -76,7 +78,13 @@ class Ajax(object):
 
         Returns list of dicts of movies
         '''
-        return TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        results = TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
+            logging.info('No Results found for {}'.format(cat))
+
+        return results
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

@@ -114,6 +114,15 @@ function clear_movies(){
 }
 
 function display_movies(movies){
+    var status_colors = {
+        Finished: "success",
+        Snatched: "primary",
+        Found: "warning",
+        Bad: "danger",
+        Wanted: "wanted",
+        Available: "available",
+        Waiting: "waiting",
+    };
     each(movies, function(movie, index){
         var poster_path;
         if(movie["poster_path"] != null){
@@ -129,8 +138,17 @@ function display_movies(movies){
             "title": movie["title"],
             "year": movie["year"]
         };
+        if(movie["status"]){
+            template_dictionary["translated_status"] = _(movie["status"]);
+            template_dictionary["status_color"] = status_colors[movie["status"]];
+        }
 
         var $li = format_template(item_template, template_dictionary);
+        if(movie["status"]){
+            $li.querySelector('.btn-group').remove();
+        } else {
+            $li.querySelector('.card-body.status').remove();
+        }
         $li.dataset.movie = JSON.stringify(movie);
         $movie_list.innerHTML += $li.outerHTML;
     });

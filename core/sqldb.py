@@ -429,6 +429,28 @@ class SQL(object):
         else:
             return {}
 
+    def get_movies_status(self, idcol, idvals):
+        ''' Returns dict of single movie details from MOVIES.
+        idcol (str): identifying column
+        idvals (str): list with identifying values
+
+        Looks through MOVIES for idcol IN (idvals)
+
+        Returns list with dict of matches
+        '''
+
+        logging.debug('Retrieving status for movies {}.'.format(idvals))
+
+        command = ['SELECT {}, status FROM MOVIES WHERE {} IN ({})'.format(idcol, idcol, ', '.join(map(str, idvals)))]
+
+        result = self.execute(command)
+
+        if result:
+            return proxy_to_dict(result)
+        else:
+            logging.error('Unable to get status of requested movies.')
+            return []
+
     def get_search_results(self, imdbid, quality=None):
         ''' Gets all search results for a given movie
         imdbid (str): imdb id #

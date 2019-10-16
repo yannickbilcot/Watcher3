@@ -3,7 +3,7 @@
     <head>
         ${head}
         <link href="${url_base}/static/css/add_movie.css?v=013" rel="stylesheet">
-        <script src="${url_base}/static/js/add_movie.js?v=016" type="text/javascript"></script>
+        <script src="${url_base}/static/js/add_movie.js?v=017" type="text/javascript"></script>
     </head>
     <body>
         ${navbar}
@@ -124,6 +124,9 @@
                                 ${_('Add Movie')}
                             </button>
                         </div>
+                    </div>
+                    <div class="card-body status">
+                        <span class="badge badge-{status_color} status" title="Status">{translated_status}</span>
                     </div>
                     <div class="card-body">
                         <span class="title px-2">{title}</span>

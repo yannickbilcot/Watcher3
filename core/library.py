@@ -1089,6 +1089,19 @@ class Manage(object):
             return ''
 
     @staticmethod
+    def add_status_to_search_movies(results):
+        tmdb_ids = [x.get('id') for x in results]
+        statuses = core.sql.get_movies_status('tmdbid', tmdb_ids)
+        for movie_status in statuses:
+            for movie in results:
+                # search from TMDB return id as int, but we saved as string in tmdbid
+                if str(movie['id']) == movie_status['tmdbid']:
+                    # we don't care about disabled in search result, show as finished
+                    movie['status'] = movie_status['status'] if movie_status['status'] != 'Disabled' else 'Finished'
+
+        return results
+
+    @staticmethod
     def get_stats():
         ''' Gets stats from database for graphing
         Formats data for use with Morris graphing library
