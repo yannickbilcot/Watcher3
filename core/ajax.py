@@ -317,6 +317,36 @@ class Ajax(object):
         return response
 
     @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def unmark_bad(self, guid, imdbid):
+        ''' Removes bad mark for guid in SEARCHRESULTS and MARKEDRESULTS
+        guid (str): guid of download to mark
+        imdbid (str): imdb id # of movie
+
+        Returns dict ajax-style response
+        '''
+
+        logging.info('Removing {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+        if not core.sql.delete('MARKEDRESULTS', 'guid', guid):
+            logging.info('Removing MARKEDRESULTS {} failed.'.format(guid.split('&')[0]))
+            return {'response': False, 'error': Errors.database_write}
+        else:
+            logging.info('Successfully removed {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+
+        sr = Manage.searchresults(guid, 'Available')
+        if sr:
+            response = {'response': True, 'message': _('Marked release as Available.')}
+        else:
+            response = {'response': False, 'error': Errors.database_write}
+
+        response['movie_status'] = Manage.movie_status(imdbid)
+        if not response['movie_status']:
+            response['error'] = (Errors.database_write)
+            response['response'] = False
+
+        return response
+
+    @cherrypy.expose
     def notification_remove(self, index):
         ''' Removes notification from core.notification
         index (str/int): index of notification to remove

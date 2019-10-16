@@ -493,6 +493,8 @@ function _results_table(results){
         result["translated_status"] = _(result["status"]);
         result["status_color"] = status_colors[result["status"]];
         result["guid"] = result["guid"].replace(/'/g, "\\'");
+        result["mark_bad_hidden"] = result["status"] === "Bad" ? "hidden" : "";
+        result["unmark_bad_hidden"] = result["status"] !== "Bad" ? "hidden" : "";
         rows += format_template(templates.release, result).outerHTML;
     });
 
@@ -762,6 +764,9 @@ function _mark_bad(elem, guid, imdbid){
         "cancel_download": true
     })
     .done(function(response){
+        elem.classList.add('hidden');
+        var unmark_bad = elem.parentElement.querySelector('.mdi-backup-restore').parentElement;
+        unmark_bad.classList.remove('hidden');
 
         if(response["movie_status"]){
             update_movie_status(imdbid, response["movie_status"]);
@@ -779,6 +784,46 @@ function _mark_bad(elem, guid, imdbid){
         $i.classList.remove("mdi-circle");
         $i.classList.remove("animated");
         $i.classList.add("mdi-cancel");
+    });
+}
+
+function unmark_bad(event, elem, guid, imdbid){
+    /* Unmark search result as Bad
+    guid: str absolute guid of download
+    imdbid: str imdb id# of movie
+    */
+    event.preventDefault();
+
+    var $i = elem.querySelector("i.mdi");
+
+    $i.classList.remove("mdi-backup-restore");
+    $i.classList.add("mdi-circle");
+    $i.classList.add("animated");
+
+    $.post(url_base + "/ajax/unmark_bad", {
+        "guid": guid,
+        "imdbid": imdbid
+    })
+    .done(function(response){
+        elem.classList.add('hidden');
+        var mark_bad = elem.parentElement.querySelector('.mdi-cancel').parentElement;
+        mark_bad.classList.remove('hidden');
+        if(response["movie_status"]){
+            update_movie_status(imdbid, response["movie_status"]);
+        }
+
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
+            update_release_status(guid, "Available");
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-backup-restore");
     });
 }
 

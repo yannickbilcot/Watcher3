@@ -1000,7 +1000,7 @@ class Manage(object):
         imdbid (str): imdb identification number    <optional - default None>
 
         If guid is in MARKEDRESULTS table, marks it as status.
-        If guid not in MARKEDRSULTS table, created entry. Requires imdbid.
+        If guid not in MARKEDRESULTS table, created entry. Requires imdbid.
 
         Returns bool
         '''
