@@ -561,18 +561,18 @@ class Metadata(object):
     @staticmethod
     def get_category_from_path(filepath):
         moverpath = core.CONFIG['Postprocessing']['moverpath']
-        if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+        if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
             return 'Default'
         for category, category_config in core.CONFIG['Categories'].items():
             moverpath = category_config['moverpath']
-            if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+            if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
                 return category
         return None
 
     @staticmethod
     def root_mover_path(path):
         path = os.path.join(path, '') # ensure path ends with /
-        return os.path.split(re.sub("{.+}.*$", '', path))[0]
+        return os.path.join(os.path.split(re.sub("{.+}.*$", '', path))[0], '')
 
     @staticmethod
     def convert_to_db(movie):
