@@ -50,7 +50,6 @@ function change_page_number(){
 
 window.addEventListener("DOMContentLoaded", function(){
     current_page = 1;
-    per_page = 50;
     var cookie = read_cookie();
     echo.init({
         offsetVertical: 100,
@@ -64,9 +63,7 @@ window.addEventListener("DOMContentLoaded", function(){
     movie_sort_direction = cookie["movie_sort_direction"] || "desc";
     movie_sort_key = cookie["movie_sort_key"] || "sort_title";
     var hide_finished_movies = cookie["hide_finished_movies"] || "False";
-    if(per_page !== cookie["per_page"]){
-        per_page = cookie["per_page"]
-    }
+    per_page = cookie["per_page"] || 50;
     if(movie_sort_key === "status_key"){
         movie_sort_key = "status";
     } else if(movie_sort_key === "title"){
