@@ -64,7 +64,9 @@ class Ajax(object):
         '''
 
         results = TheMovieDatabase.search(search_term)
-        if not results:
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
             logging.info('No Results found for {}'.format(search_term))
 
         return results
@@ -76,7 +78,13 @@ class Ajax(object):
 
         Returns list of dicts of movies
         '''
-        return TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        results = TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
+            logging.info('No Results found for {}'.format(cat))
+
+        return results
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -313,6 +321,36 @@ class Ajax(object):
             if not cancelled:
                 response['response'] = False
                 response['error'] = response.get('error', '') + _(' Could not remove download from client.')
+
+        return response
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def unmark_bad(self, guid, imdbid):
+        ''' Removes bad mark for guid in SEARCHRESULTS and MARKEDRESULTS
+        guid (str): guid of download to mark
+        imdbid (str): imdb id # of movie
+
+        Returns dict ajax-style response
+        '''
+
+        logging.info('Removing {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+        if not core.sql.delete('MARKEDRESULTS', 'guid', guid):
+            logging.info('Removing MARKEDRESULTS {} failed.'.format(guid.split('&')[0]))
+            return {'response': False, 'error': Errors.database_write}
+        else:
+            logging.info('Successfully removed {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+
+        sr = Manage.searchresults(guid, 'Available')
+        if sr:
+            response = {'response': True, 'message': _('Marked release as Available.')}
+        else:
+            response = {'response': False, 'error': Errors.database_write}
+
+        response['movie_status'] = Manage.movie_status(imdbid)
+        if not response['movie_status']:
+            response['error'] = (Errors.database_write)
+            response['response'] = False
 
         return response
 

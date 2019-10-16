@@ -5,7 +5,7 @@
     ${head}
     <link href="${url_base}/static/css/library/status.css?v=025" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=022" type="text/javascript"></script>
+    <script src="${url_base}/static/js/library/status.js?v=024" type="text/javascript"></script>
     <meta name="movie_count" content="${movie_count}" />
     <meta name="finished_count" content="${finished_count}" />
 </head>
@@ -343,8 +343,11 @@
                     <button class="btn btn-sm btn-secondary w-100" title="Download" onclick="manual_download(event, this, '{guid}', '{type}', '{imdbid}')">
                         <i class="mdi mdi-download"></i>
                     </button>
-                    <button class="btn btn-sm btn-secondary w-100" onclick="mark_bad(event, this, '{guid}', '{imdbid}', '{status}')" title="Mark release as Bad">
+                    <button class="btn btn-sm btn-secondary w-100 {mark_bad_hidden}" onclick="mark_bad(event, this, '{guid}', '{imdbid}', '{status}')" title="Mark release as Bad">
                         <i class="mdi mdi-cancel"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary w-100 {unmark_bad_hidden}" onclick="unmark_bad(event, this, '{guid}', '{imdbid}')" title="Unmark release as Bad">
+                        <i class="mdi mdi-backup-restore"></i>
                     </button>
                 </div>
             </div>

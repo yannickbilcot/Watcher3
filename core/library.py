@@ -561,18 +561,18 @@ class Metadata(object):
     @staticmethod
     def get_category_from_path(filepath):
         moverpath = core.CONFIG['Postprocessing']['moverpath']
-        if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+        if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
             return 'Default'
         for category, category_config in core.CONFIG['Categories'].items():
             moverpath = category_config['moverpath']
-            if moverpath and re.match(Metadata.root_mover_path(moverpath), filepath):
+            if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
                 return category
         return None
 
     @staticmethod
     def root_mover_path(path):
         path = os.path.join(path, '') # ensure path ends with /
-        return os.path.split(re.sub("{.+}.*$", '', path))[0]
+        return os.path.join(os.path.split(re.sub("{.+}.*$", '', path))[0], '')
 
     @staticmethod
     def convert_to_db(movie):
@@ -1000,7 +1000,7 @@ class Manage(object):
         imdbid (str): imdb identification number    <optional - default None>
 
         If guid is in MARKEDRESULTS table, marks it as status.
-        If guid not in MARKEDRSULTS table, created entry. Requires imdbid.
+        If guid not in MARKEDRESULTS table, created entry. Requires imdbid.
 
         Returns bool
         '''
@@ -1087,6 +1087,19 @@ class Manage(object):
         else:
             logging.error('Could not set {} to {}'.format(imdbid, new_status))
             return ''
+
+    @staticmethod
+    def add_status_to_search_movies(results):
+        tmdb_ids = [x.get('id') for x in results]
+        statuses = core.sql.get_movies_status('tmdbid', tmdb_ids)
+        for movie_status in statuses:
+            for movie in results:
+                # search from TMDB return id as int, but we saved as string in tmdbid
+                if str(movie['id']) == movie_status['tmdbid']:
+                    # we don't care about disabled in search result, show as finished
+                    movie['status'] = movie_status['status'] if movie_status['status'] != 'Disabled' else 'Finished'
+
+        return results
 
     @staticmethod
     def get_stats():
