@@ -1342,12 +1342,12 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def generate_stats(self):
+    def generate_stats(self, category=None):
         ''' Gets library stats for graphing page
 
         Returns dict of library stats
         '''
-        return Manage.get_stats()
+        return Manage.get_stats(category)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

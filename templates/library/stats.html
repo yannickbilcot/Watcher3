@@ -12,6 +12,17 @@
         ${navbar}
         <div class="container">
             <div class="row">
+                <div class="col-md-12 text-center">
+                    <select id="category" class="btn border btn-light">
+                        <option value="">All</option>
+                        <option value="Default">Default</option>
+                        %for category in categories:
+                        <option value="${category}">${category}</option>
+                        %endfor
+                    </select>
+                </div>
+            </div>
+            <div class="row">
                 <div id="chart_status" class="col-md-6 my-3">
                     <div class="card">
                         <div class="card-header">

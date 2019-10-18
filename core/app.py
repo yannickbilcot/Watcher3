@@ -151,7 +151,7 @@ class App(object):
         elif page == 'stats':
             App.stats_template = Template(filename='templates/library/stats.html', module_directory=core.MAKO_CACHE)
 
-            return App.stats_template.render(**self.defaults())
+            return App.stats_template.render(categories=core.CONFIG['Categories'].keys(), **self.defaults())
         else:
             return self.error_page_404()
 

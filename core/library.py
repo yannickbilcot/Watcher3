@@ -1102,7 +1102,7 @@ class Manage(object):
         return results
 
     @staticmethod
-    def get_stats():
+    def get_stats(category=None):
         ''' Gets stats from database for graphing
         Formats data for use with Morris graphing library
 
@@ -1126,15 +1126,16 @@ class Manage(object):
                 continue
             qualities[i] = 0
 
-        categories = {'Default': 0}
-        for i in core.CONFIG['Categories']:
-            categories[i] = 0
+        if not category:
+            categories = {'Default': 0}
+            for i in core.CONFIG['Categories']:
+                categories[i] = 0
 
         years = {}
         added_dates = {}
         scores = {}
 
-        movies = core.sql.get_user_movies()
+        movies = core.sql.get_user_movies(category = category)
 
         if not movies:
             return {'error', 'Unable to read database'}
@@ -1153,10 +1154,11 @@ class Manage(object):
                 else:
                     qualities[movie['quality']] += 1
 
-            if movie['category'] not in categories:
-                categories[movie['category']] = 1
-            else:
-                categories[movie['category']] += 1
+            if not category:
+                if movie['category'] not in categories:
+                    categories[movie['category']] = 1
+                else:
+                    categories[movie['category']] += 1
 
             if movie['year'] not in years:
                 years[movie['year']] = 1
@@ -1176,7 +1178,8 @@ class Manage(object):
 
         stats['status'] = [{'label': k, 'value': v} for k, v in status.items()]
         stats['qualities'] = [{'label': k, 'value': v} for k, v in qualities.items()]
-        stats['categories'] = [{'label': k, 'value': v} for k, v in categories.items()]
+        if not category:
+            stats['categories'] = [{'label': k, 'value': v} for k, v in categories.items()]
         stats['years'] = sorted([{'year': k, 'value': v} for k, v in years.items()], key=lambda k: k['year'])
         stats['added_dates'] = sorted([{'added_date': k, 'value': v} for k, v in added_dates.items() if v is not None], key=lambda k: k['added_date'])
         stats['scores'] = sorted([{'score': k, 'value': v} for k, v in scores.items()], key=lambda k: k['score'])

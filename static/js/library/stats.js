@@ -17,7 +17,24 @@ window.addEventListener("DOMContentLoaded", function(){
 
     var get_stats = $.get(url_base + "/ajax/generate_stats")
     .done(function(response){
-        render_charts(response)
+        render_charts(response);
+    });
+
+    /* category filter */
+    document.getElementById("category").addEventListener("change", function(event){
+        event.preventDefault();
+
+        var category = event.target.value, category_chart = $("#chart_categories");
+        $.get(url_base + "/ajax/generate_stats", {"category": category})
+        .done(function(response){
+            $(".chart").empty();
+            if(category){
+                category_chart.hide();
+            } else {
+                category_chart.show();
+            }
+            render_charts(response);
+        });
     });
 
     window.addEventListener("beforeunload", function(){
@@ -54,7 +71,7 @@ function render_charts(stats){
         colors: profile_colors,
         labelColor: label_color,
         labelSize: label_size
-    })
+    });
 
     Morris.Bar({
         element: document.querySelector("div#chart_years .chart"),
