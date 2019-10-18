@@ -136,7 +136,7 @@ window.addEventListener("DOMContentLoaded", function(){
         }
         badge.classList.add("badge-" + status_colors[status]);
     });
-    change_movie_count();
+    var movie_count = change_movie_count();
 
     /* Set sort ui elements off cookie */
     $movie_list.classList = "";
