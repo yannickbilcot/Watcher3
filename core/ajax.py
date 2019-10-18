@@ -43,14 +43,14 @@ class Ajax(object):
 
         limit: int number of movies to get                  <optional - default 50>
         offset: int list index postition to start slice     <optional - default 0>
-        hide_finished (bool): get finished/disabled movies or not
+        status (list): filter movies with these statuses only <optional>
 
-        hide_finished will be converted to bool if string is passed
-
-        Gets a 25-movie slice from library sorted by sort key
+        Gets a movies slice, length by limit, from library sorted by sort key
 
         Returns list of dicts of movies
         '''
+        if status and not isinstance(status, list):
+            status = [status]
         if status and 'Finished' in status:
             status.append('Disabled')
 
