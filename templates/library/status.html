@@ -5,7 +5,7 @@
     ${head}
     <link href="${url_base}/static/css/library/status.css?v=026" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=025" type="text/javascript"></script>
+    <script src="${url_base}/static/js/library/status.js?v=026" type="text/javascript"></script>
 </head>
 
 <body>
@@ -36,6 +36,12 @@
 
             <div class="col-md-4 col-sm-6 order-md-3">
                 <div class="btn-group">
+                    <select id="category" class="btn border btn-light">
+                        <option value="">All (${sum(categories_count.values())})</option>
+                        %for category, count in categories_count.items():
+                        <option value="${category}">${category} (${count})</option>
+                        %endfor
+                    </select>
                     <select id="movie_sort_key" class="btn btn-light border">
                         <option value="sort_title">${_('Title')}</option>
                         <option value="release_date">${_('Year')}</option>

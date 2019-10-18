@@ -55,8 +55,16 @@ function change_page_number(movie_count){
 }
 
 function change_movie_count(movie_count){
+    if(typeof movie_count === "undefined") {
+        movie_count = $.map(get_enabled_status_elements(), function(i){
+            return get_status_count(i);
+        }).reduce(function(x, y){
+            return x + y;
+        }, 0);
+    }
     cached_movies = Array(movie_count);
     change_page_number(movie_count);
+    return movie_count;
 }
 
 function get_status_count(elem){
@@ -128,12 +136,7 @@ window.addEventListener("DOMContentLoaded", function(){
         }
         badge.classList.add("badge-" + status_colors[status]);
     });
-    var movie_count = $.map(get_enabled_status_elements(), function(i){
-        return get_status_count(i);
-    }).reduce(function(x, y){
-        return x + y;
-    }, 0);
-    change_movie_count(movie_count);
+    change_movie_count();
 
     /* Set sort ui elements off cookie */
     $movie_list.classList = "";
@@ -213,6 +216,30 @@ window.addEventListener("DOMContentLoaded", function(){
             }
         });
 
+    });
+
+    /* category filter */
+    document.getElementById("category").addEventListener("change", function(event){
+        event.preventDefault();
+        if(loading_library){
+            return false;
+        }
+
+        showLoader();
+        var category = event.target.value;
+        $.get(url_base + "/ajax/library_counters", {"category": category})
+        .done(function(response){
+            each(document.querySelectorAll("#status-filters .badge"), function(elem){
+               var count = response[elem.querySelector(".c_box").getAttribute("id")] || 0;
+               elem.querySelector(".count").textContent = count;
+            });
+            change_movie_count();
+            load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
+        })
+        .fail(function(data){
+            notify_error(data);
+            hideLoader();
+        });
     });
 
     document.getElementById("status-filters").addEventListener("click", function(event){
@@ -306,18 +333,18 @@ function load_library(sort_key, sort_direction, page, per_page, pages){
                 "offset": offset,
                 "status": $.map(get_enabled_status_elements(), function(i){
                     return i.getAttribute("id");
-                })
+                }),
+                "category": document.getElementById("category").value
             }
         })
-            .done(function(response){
-                Array.prototype.splice.apply(cached_movies, [offset, response.length].concat(response));
-                _render_library(response);
-
-            })
-            .fail(notify_error)
-            .always(function(){
-                loading_library = false;
-            });
+        .done(function(response){
+            Array.prototype.splice.apply(cached_movies, [offset, response.length].concat(response));
+            _render_library(response);
+        })
+        .fail(notify_error)
+        .always(function(){
+            loading_library = false;
+        });
     }
     hideLoader();
 }
@@ -431,41 +458,41 @@ function open_info_modal(event, elem){
         "imdbid": movie["imdbid"],
         "quality": movie["quality"]
     })
-        .done(function(response){
-            if(response["response"] === true){
-                movie["table"] = _results_table(response["results"]);
-            } else {
-                movie["table"] = `<li class="search_result list-group-item">
+    .done(function(response){
+        if(response["response"] === true){
+            movie["table"] = _results_table(response["results"]);
+        } else {
+            movie["table"] = `<li class="search_result list-group-item">
                                   <span>Nothing found yet. Next search scheduled for ${response["next"]}.</span>
                               </li>`;
-            }
-            var modal = format_template(templates.info, movie);
+        }
+        var modal = format_template(templates.info, movie);
 
-            movie["title_escape"] = movie["title"].replace(/'/g, "\\'");
-            $movie_status_modal = $(modal);
+        movie["title_escape"] = movie["title"].replace(/'/g, "\\'");
+        $movie_status_modal = $(modal);
 
-            $movie_status_modal.data("movie", movie);
-            $movie_status_modal.find("select#movie_quality > option[value='" + movie["quality"] + "']").attr("selected", true);
-            $movie_status_modal.find("select#movie_category > option[value='" + movie["category"] + "']").attr("selected", true);
-            $status_select = $movie_status_modal.find("select#movie_status");
+        $movie_status_modal.data("movie", movie);
+        $movie_status_modal.find("select#movie_quality > option[value='" + movie["quality"] + "']").attr("selected", true);
+        $movie_status_modal.find("select#movie_category > option[value='" + movie["category"] + "']").attr("selected", true);
+        $status_select = $movie_status_modal.find("select#movie_status");
 
-            if(movie["status_select"] === "Disabled"){
-                $status_select.find("option[value='Disabled']").attr("selected", true);
-            } else {
-                $status_select.find("option[value='Automatic']").attr("selected", true);
-            }
+        if(movie["status_select"] === "Disabled"){
+            $status_select.find("option[value='Disabled']").attr("selected", true);
+        } else {
+            $status_select.find("option[value='Automatic']").attr("selected", true);
+        }
 
-            if(movie["status"] === "Finished" || movie["status"] === "Disabled"){
-                $movie_status_modal.find("span#finished_file_badge").removeClass("hidden");
-            }
+        if(movie["status"] === "Finished" || movie["status"] === "Disabled"){
+            $movie_status_modal.find("span#finished_file_badge").removeClass("hidden");
+        }
 
-            $movie_status_modal.modal("show");
-            $movie_status_modal.on("hidden.bs.modal", function(){
-                this.parentNode.removeChild(this);
-            });
+        $movie_status_modal.modal("show");
+        $movie_status_modal.on("hidden.bs.modal", function(){
+            this.parentNode.removeChild(this);
+        });
 
-        })
-        .fail(notify_error);
+    })
+    .fail(notify_error);
 }
 
 function _results_table(results){
@@ -509,29 +536,29 @@ function manual_search(event, button, imdbid){
     var table = "";
 
     $.post(url_base + "/ajax/search", {"imdbid": imdbid})
-        .done(function(response){
-            if(response["response"] === true && response["results"].length > 0){
-                $search_results_table.innerHTML = _results_table(response["results"]);
-            } else if(response["response"] === true && response["results"].length === 0){
-                table = `<div class="search_result list-group-item">
+    .done(function(response){
+        if(response["response"] === true && response["results"].length > 0){
+            $search_results_table.innerHTML = _results_table(response["results"]);
+        } else if(response["response"] === true && response["results"].length === 0){
+            table = `<div class="search_result list-group-item">
                          <span>Nothing found yet. Next search scheduled for ${response["next"]}.</span>
                      </div>`;
-                $search_results_table.innerHTML = table;
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-            if(response["movie_status"]){
-                update_movie_status(imdbid, response["movie_status"]);
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $search_results_table.style.maxHeight = orig_maxHeight;
-            $i.classList.remove("mdi-circle");
-            $i.classList.add("mdi-magnify");
-            $i.classList.remove("animated");
-            $search_results_table.style.overflowY = "scroll";
-        });
+            $search_results_table.innerHTML = table;
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+        if(response["movie_status"]){
+            update_movie_status(imdbid, response["movie_status"]);
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $search_results_table.style.maxHeight = orig_maxHeight;
+        $i.classList.remove("mdi-circle");
+        $i.classList.add("mdi-magnify");
+        $i.classList.remove("animated");
+        $search_results_table.style.overflowY = "scroll";
+    });
 }
 
 function update_metadata(event, elem, imdbid, tmdbid){
@@ -546,19 +573,19 @@ function update_metadata(event, elem, imdbid, tmdbid){
         "imdbid": imdbid,
         "tmdbid": tmdbid
     })
-        .done(function(response){
-            if(response["response"] === true){
-                $.notify({message: response["message"]});
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $i.classList.remove("mdi-circle");
-            $i.classList.remove("animated");
-            $i.classList.add("mdi-tag-text-outline");
-        });
+    .done(function(response){
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-tag-text-outline");
+    });
 }
 
 function remove_movie(event, elem, imdbid){
@@ -595,41 +622,41 @@ function _remove_movie(event, elem, imdbid){
 
     function __remove_from_library(imdbid){
         $.post(url_base + "/ajax/remove_movie", {"imdbid": imdbid})
-            .done(function(response){
-                if(response["response"] === true){
-                    $.notify({message: response["message"]});
-                    $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`).outerHTML = "";
-                    $movie_status_modal.modal("hide");
-                } else {
-                    $.notify({message: response["error"]}, {type: "danger"});
-                }
-
-                var index = cached_movies.map(function(e){
-                    return e.imdbid;
-                }).indexOf(imdbid);
-                cached_movies.splice(index, 1);
-
+        .done(function(response){
+            if(response["response"] === true){
+                $.notify({message: response["message"]});
+                $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`).outerHTML = "";
                 $movie_status_modal.modal("hide");
+            } else {
+                $.notify({message: response["error"]}, {type: "danger"});
+            }
 
-            })
-            .fail(notify_error);
+            var index = cached_movies.map(function(e){
+                return e.imdbid;
+            }).indexOf(imdbid);
+            cached_movies.splice(index, 1);
+
+            $movie_status_modal.modal("hide");
+
+        })
+        .fail(notify_error);
     }
 
     if(delete_file){
         $.post(url_base + "/ajax/delete_movie_file", {"imdbid": imdbid})
-            .done(function(response){
-                if(response["response"] === true){
-                    $.notify({message: response["message"]}, {type: "success"});
-                } else {
-                    $.notify({message: response["error"]}, {type: "danger"});
-                }
-            })
-            .fail(notify_error)
-            .always(function(){
-                $delete.modal("hide");
-                // Makes sure the file removal is done after file removal
-                __remove_from_library(imdbid);
-            });
+        .done(function(response){
+            if(response["response"] === true){
+                $.notify({message: response["message"]}, {type: "success"});
+            } else {
+                $.notify({message: response["error"]}, {type: "danger"});
+            }
+        })
+        .fail(notify_error)
+        .always(function(){
+            $delete.modal("hide");
+            // Makes sure the file removal is done after file removal
+            __remove_from_library(imdbid);
+        });
     } else {
         $delete.modal("hide");
         __remove_from_library(imdbid);
@@ -653,15 +680,15 @@ function update_movie_options(event, elem, imdbid){
         "filters": JSON.stringify(filters),
         "imdbid": imdbid
     })
-        .done(function(response){
-            if(response["response"]){
-                $.notify({message: response["message"]});
-                update_movie_status(imdbid, response["status"]);
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error);
+    .done(function(response){
+        if(response["response"]){
+            $.notify({message: response["message"]});
+            update_movie_status(imdbid, response["status"]);
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error);
 }
 
 function manual_download(event, elem, guid, kind, imdbid){
@@ -679,22 +706,22 @@ function manual_download(event, elem, guid, kind, imdbid){
         "guid": guid,
         "kind": kind
     })
-        .done(function(response){
-            if(response["response"] === true){
-                $.notify({message: response["message"]});
+    .done(function(response){
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
 
-                update_movie_status(imdbid, "Snatched");
-                update_release_status(guid, "Snatched");
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $i.classList.remove("mdi-circle");
-            $i.classList.remove("animated");
-            $i.classList.add("mdi-download");
-        });
+            update_movie_status(imdbid, "Snatched");
+            update_release_status(guid, "Snatched");
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-download");
+    });
 }
 
 function mark_bad(event, elem, guid, imdbid, status){
@@ -726,22 +753,22 @@ function mark_bad(event, elem, guid, imdbid, status){
 
 function delete_file_mark_bad(event, elem, guid, imdbid){
     $.post(url_base + "/ajax/delete_movie_file", {"imdbid": imdbid})
-        .done(function(response){
-            if(response["response"] === true){
-                $.notify({message: response["message"]}, {type: "success"});
-                $movie_status_modal.data("movie").finished_file = null;
-                $movie_status_modal.find("#finished_file_badge").addClass("hidden");
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $delete.modal("hide");
-            // Makes sure the release is mark bad after file removal
-            elem = document.querySelector(`li.search_result[data-guid="${guid}"] .mdi-cancel`).parentElement;
-            _mark_bad(elem, guid, imdbid);
-        });
+    .done(function(response){
+        if(response["response"] === true){
+            $.notify({message: response["message"]}, {type: "success"});
+            $movie_status_modal.data("movie").finished_file = null;
+            $movie_status_modal.find("#finished_file_badge").addClass("hidden");
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $delete.modal("hide");
+        // Makes sure the release is mark bad after file removal
+        elem = document.querySelector(`li.search_result[data-guid="${guid}"] .mdi-cancel`).parentElement;
+        _mark_bad(elem, guid, imdbid);
+    });
 }
 
 function _mark_bad(elem, guid, imdbid){
@@ -756,28 +783,28 @@ function _mark_bad(elem, guid, imdbid){
         "imdbid": imdbid,
         "cancel_download": true
     })
-        .done(function(response){
-            elem.classList.add("hidden");
-            var unmark_bad = elem.parentElement.querySelector(".mdi-backup-restore").parentElement;
-            unmark_bad.classList.remove("hidden");
+    .done(function(response){
+        elem.classList.add("hidden");
+        var unmark_bad = elem.parentElement.querySelector(".mdi-backup-restore").parentElement;
+        unmark_bad.classList.remove("hidden");
 
-            if(response["movie_status"]){
-                update_movie_status(imdbid, response["movie_status"]);
-            }
+        if(response["movie_status"]){
+            update_movie_status(imdbid, response["movie_status"]);
+        }
 
-            if(response["response"] === true){
-                $.notify({message: response["message"]});
-                update_release_status(guid, "Bad");
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $i.classList.remove("mdi-circle");
-            $i.classList.remove("animated");
-            $i.classList.add("mdi-cancel");
-        });
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
+            update_release_status(guid, "Bad");
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-cancel");
+    });
 }
 
 function unmark_bad(event, elem, guid, imdbid){
@@ -797,27 +824,27 @@ function unmark_bad(event, elem, guid, imdbid){
         "guid": guid,
         "imdbid": imdbid
     })
-        .done(function(response){
-            elem.classList.add("hidden");
-            var mark_bad = elem.parentElement.querySelector(".mdi-cancel").parentElement;
-            mark_bad.classList.remove("hidden");
-            if(response["movie_status"]){
-                update_movie_status(imdbid, response["movie_status"]);
-            }
+    .done(function(response){
+        elem.classList.add("hidden");
+        var mark_bad = elem.parentElement.querySelector(".mdi-cancel").parentElement;
+        mark_bad.classList.remove("hidden");
+        if(response["movie_status"]){
+            update_movie_status(imdbid, response["movie_status"]);
+        }
 
-            if(response["response"] === true){
-                $.notify({message: response["message"]});
-                update_release_status(guid, "Available");
-            } else {
-                $.notify({message: response["error"]}, {type: "danger"});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            $i.classList.remove("mdi-circle");
-            $i.classList.remove("animated");
-            $i.classList.add("mdi-backup-restore");
-        });
+        if(response["response"] === true){
+            $.notify({message: response["message"]});
+            update_release_status(guid, "Available");
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-backup-restore");
+    });
 }
 
 function update_movie_status(imdbid, status){

@@ -336,7 +336,7 @@ class SQL(object):
 
         return
 
-    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, status=None):
+    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, status=None, category=None):
         ''' Gets user's movie from database
         sort_key (str): key to sort by
         sort_direction (str): order to sort results [ASC, DESC]
@@ -352,7 +352,13 @@ class SQL(object):
 
         logging.debug('Retrieving list of user\'s movies.')
 
-        filters = 'WHERE status IN ("{}")'.format('", "'.join(status)) if status else ''
+        filters = []
+        if status:
+            filters.append('status IN ("{}")'.format('", "'.join(status)))
+        if category:
+            filters.append('category = "{}"'.format(category))
+        if filters:
+            filters = "WHERE {}".format(' AND '.join(filters))
 
         if sort_key == 'status':
             sort_key = '''CASE WHEN status = "Waiting" THEN 1
@@ -379,7 +385,7 @@ class SQL(object):
             logging.error('Unable to get list of user\'s movies.')
             return []
 
-    def get_library_count(self, group_col=None):
+    def get_library_count(self, group_col=None, col=None, val=None):
         ''' Gets count of rows in MOVIES
         Gets total count, grouped by col if group_col is present
 
@@ -388,10 +394,14 @@ class SQL(object):
 
         logging.debug('Getting count of library.')
 
+        filter = ''
+        if col and val:
+            filter = 'WHERE {} = "{}"'.format(col, val)
+
         if group_col:
-            query = 'SELECT {}, COUNT(1) FROM MOVIES GROUP BY {}'.format(group_col, group_col)
+            query = 'SELECT {}, COUNT(1) FROM MOVIES {} GROUP BY {}'.format(group_col, filter, group_col)
         else:
-            query = 'SELECT COUNT(1) FROM MOVIES'
+            query = 'SELECT COUNT(1) FROM MOVIES {}'.format(filter)
 
         result = self.execute([query])
         if result:

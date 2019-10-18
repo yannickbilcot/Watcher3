@@ -36,7 +36,7 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def library(self, sort_key, sort_direction, limit=50, offset=0, status=None):
+    def library(self, sort_key, sort_direction, limit=50, offset=0, status=None, category=None):
         ''' Get 50 movies from library
         sort_key (str): column name to sort by
         sort_direction (str): direction to sort [ASC, DESC]
@@ -44,6 +44,7 @@ class Ajax(object):
         limit: int number of movies to get                  <optional - default 50>
         offset: int list index postition to start slice     <optional - default 0>
         status (list): filter movies with these statuses only <optional>
+        category (str): filter movies with this category only <optional>
 
         Gets a movies slice, length by limit, from library sorted by sort key
 
@@ -54,7 +55,21 @@ class Ajax(object):
         if status and 'Finished' in status:
             status.append('Disabled')
 
-        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, status)
+        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, status, category)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def library_counters(self, category=None):
+        ''' Get movies counters group by status, filtered by category
+        category (str): Count movies with this category <optional>
+        '''
+
+        status_count = core.sql.get_library_count('status', 'category', category)
+        status_count['Finished'] = status_count.get('Finished', 0) + status_count.get('Disabled', 0)
+        if 'Disabled' in status_count:
+            del status_count['Disabled']
+
+        return status_count
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
