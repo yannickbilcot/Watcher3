@@ -33,7 +33,7 @@ span.score > i{
 }
 
 ul#movie_list {
-    margin: 0 0 1.5em 0;
+    margin: 1.5em 0 0 0;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
