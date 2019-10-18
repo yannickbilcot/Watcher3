@@ -1,4 +1,4 @@
-/* global each, _, echo, url_base, current_page, per_page, movie_sort_direction, movie_sort_key, $page_select, loading_library, $sort_direction_button, $movie_list, templates, status_colors, notify_error, $movie_status_modal, $status_filters */
+/* global each, _, echo, url_base, current_page, per_page, movie_sort_direction, movie_sort_key, $page_select, loading_library, $sort_direction_button, $movie_list, templates, status_colors, notify_error, $movie_status_modal */
 var exp_date = new Date();
 exp_date.setFullYear(exp_date.getFullYear() + 10);
 exp_date = exp_date.toUTCString();
@@ -127,7 +127,7 @@ window.addEventListener("DOMContentLoaded", function(){
         Available: "available",
         Waiting: "waiting",
     };
-    $status_filters = each(document.querySelectorAll("#status-filters .badge"), function(badge){
+    each(document.querySelectorAll("#status-filters .badge"), function(badge){
         var elem = badge.querySelector("i.mdi"), status = elem.getAttribute("id");
         if(cookie[status] === "False"){
             elem.classList.remove("mdi-checkbox-marked");
@@ -474,7 +474,7 @@ function open_info_modal(event, elem){
         $movie_status_modal.data("movie", movie);
         $movie_status_modal.find("select#movie_quality > option[value='" + movie["quality"] + "']").attr("selected", true);
         $movie_status_modal.find("select#movie_category > option[value='" + movie["category"] + "']").attr("selected", true);
-        $status_select = $movie_status_modal.find("select#movie_status");
+        var $status_select = $movie_status_modal.find("select#movie_status");
 
         if(movie["status_select"] === "Disabled"){
             $status_select.find("option[value='Disabled']").attr("selected", true);
