@@ -394,14 +394,14 @@ class SQL(object):
 
         logging.debug('Getting count of library.')
 
-        filter = ''
+        filters = ''
         if col and val:
-            filter = 'WHERE {} = "{}"'.format(col, val)
+            filters = 'WHERE {} = "{}"'.format(col, val)
 
         if group_col:
-            query = 'SELECT {}, COUNT(1) FROM MOVIES {} GROUP BY {}'.format(group_col, filter, group_col)
+            query = 'SELECT {}, COUNT(1) FROM MOVIES {} GROUP BY {}'.format(group_col, filters, group_col)
         else:
-            query = 'SELECT COUNT(1) FROM MOVIES {}'.format(filter)
+            query = 'SELECT COUNT(1) FROM MOVIES {}'.format(filters)
 
         result = self.execute([query])
         if result:
