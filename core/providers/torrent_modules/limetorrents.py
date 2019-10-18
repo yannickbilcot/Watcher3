@@ -12,10 +12,10 @@ def search(imdbid, term):
 
     logging.info('Performing backlog search on LimeTorrents for {}.'.format(imdbid))
 
-    url = 'https://www.limetorrents.cc/searchrss/{}'.format(term)
+    url = 'https://www.limetorrents.info/searchrss/{}'.format(term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.cc') is True:
+        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.info') is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -36,10 +36,10 @@ def get_rss():
 
     logging.info('Fetching latest RSS from ')
 
-    url = 'https://www.limetorrents.cc/rss/16/'
+    url = 'https://www.limetorrents.info/rss/16/'
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.cc') is True:
+        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.info') is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -59,13 +59,17 @@ def _parse(xml, imdbid):
     logging.info('Parsing LimeTorrents results.')
 
     try:
-        items = yahoo.data(fromstring(xml))['rss']['channel']['item']
+        rss = yahoo.data(fromstring(xml))['rss']['channel']
     except Exception as e:
         logging.error('Unexpected XML format from ', exc_info=True)
         return []
 
+    if 'item' not in rss:
+        logging.info("No result found in LimeTorrents")
+        return []
+
     results = []
-    for i in items:
+    for i in rss['item']:
         result = {}
         try:
             result['score'] = 0
