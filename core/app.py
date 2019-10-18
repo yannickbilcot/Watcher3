@@ -109,10 +109,13 @@ class App(object):
 
         if page == 'status':
 
-            mc, fc = core.sql.get_library_count()
+            status_count = core.sql.get_library_count('status')
+            status_count['Finished'] = status_count.get('Finished', 0) + status_count.get('Disabled', 0)
+            if 'Disabled' in status_count:
+                del status_count['Disabled']
 
             return App.status_template.render(profiles=core.CONFIG['Quality']['Profiles'].keys(), categories=core.CONFIG['Categories'].keys(),
-                                              movie_count=mc, finished_count=fc, **self.defaults())
+                                              status_count=status_count, **self.defaults())
         elif page == 'manage':
             movies = core.sql.get_user_movies()
             return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(),

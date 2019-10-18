@@ -231,3 +231,8 @@ ul#search_results_table li:nth-of-type(odd){
     opacity: .5;
 }
 
+#status-filters .badge {
+    padding: .4em;
+    font-size: 100%;
+    font-weight: normal;
+}

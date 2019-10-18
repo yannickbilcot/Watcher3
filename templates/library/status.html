@@ -3,11 +3,10 @@
 
 <head>
     ${head}
-    <link href="${url_base}/static/css/library/status.css?v=025" rel="stylesheet">
+    <link href="${url_base}/static/css/library/status.css?v=026" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=024" type="text/javascript"></script>
-    <meta name="movie_count" content="${movie_count}" />
-    <meta name="finished_count" content="${finished_count}" />
+    <script src="${url_base}/static/js/library/status.js?v=025" type="text/javascript"></script>
+    <meta name="movie_count" content="${sum(status_count.values())}" />
 </head>
 
 <body>
@@ -73,12 +72,16 @@
         </div>
     </div>
     <div class="">
+        <div id="status-filters" class="text-center">
+        %for status in ['Waiting', 'Wanted', 'Found', 'Snatched', 'Finished']:
+            <span class="badge">
+                <i id="${status}" class="mdi mdi-checkbox-marked c_box" value="True"></i>
+                ${_(status)} (<span class="count">${status_count.get(status, 0)}</span>)
+            </span>
+        %endfor
+        </div>
         <ul id="movie_list" class="">
         </ul>
-        <div class="text-center">
-            <i id="hide_finished_movies" class="mdi mdi-checkbox-blank-outline c_box" value="False"></i>
-            ${_('Hide Finished Movies')}
-        </div>
     </div>
     <div id="overlay"></div>
     <template id="template_movie">

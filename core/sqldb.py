@@ -336,13 +336,13 @@ class SQL(object):
 
         return
 
-    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, hide_finished=False):
+    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, status=None):
         ''' Gets user's movie from database
         sort_key (str): key to sort by
         sort_direction (str): order to sort results [ASC, DESC]
         limit (int): how many results to return
         offset (int): list index to start returning results
-        hide_finished (bool): return
+        status (list): list of statuses to include
 
         If limit is -1 all results are returned (still honors offset)
 
@@ -352,7 +352,7 @@ class SQL(object):
 
         logging.debug('Retrieving list of user\'s movies.')
 
-        filters = 'WHERE status NOT IN ("Finished", "Disabled")' if hide_finished else ''
+        filters = 'WHERE status IN ("{}")'.format('", "'.join(status)) if status else ''
 
         if sort_key == 'status':
             sort_key = '''CASE WHEN status = "Waiting" THEN 1
@@ -379,30 +379,29 @@ class SQL(object):
             logging.error('Unable to get list of user\'s movies.')
             return []
 
-    def get_library_count(self):
+    def get_library_count(self, group_col=None):
         ''' Gets count of rows in MOVIES
-        Gets total count and Finished count
+        Gets total count, grouped by col if group_col is present
 
-        Returns tuple (int, int)
+        Returns count, or dict if group_col is present
         '''
 
         logging.debug('Getting count of library.')
 
-        result = self.execute(['SELECT COUNT(1) FROM MOVIES'])
+        if group_col:
+            query = 'SELECT {}, COUNT(1) FROM MOVIES GROUP BY {}'.format(group_col, group_col)
+        else:
+            query = 'SELECT COUNT(1) FROM MOVIES'
+
+        result = self.execute([query])
         if result:
-            c = result.fetchone()[0]
+            if group_col:
+                return dict(result.fetchall())
+            else:
+                return result.fetchone()[0]
         else:
             logging.error('Unable to get count of user\'s movies.')
-            return (0, 0)
-
-        result = self.execute(['SELECT COUNT(1) FROM MOVIES WHERE status IN ("Finished", "Disabled")'])
-        if result:
-            f = result.fetchone()[0]
-        else:
-            logging.error('Unable to get count of user\'s movies.')
-            return (0, 0)
-
-        return (c, f)
+            return {} if group_col else 0
 
     def get_movie_details(self, idcol, idval):
         ''' Returns dict of single movie details from MOVIES.

@@ -36,7 +36,7 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def library(self, sort_key, sort_direction, limit=50, offset=0, hide_finished=False):
+    def library(self, sort_key, sort_direction, limit=50, offset=0, status=None):
         ''' Get 50 movies from library
         sort_key (str): column name to sort by
         sort_direction (str): direction to sort [ASC, DESC]
@@ -51,8 +51,10 @@ class Ajax(object):
 
         Returns list of dicts of movies
         '''
+        if status and 'Finished' in status:
+            status.append('Disabled')
 
-        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, hide_finished=True if hide_finished == 'True' else False)
+        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, status)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
