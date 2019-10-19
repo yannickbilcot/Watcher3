@@ -8,9 +8,9 @@ Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a
 <a href="https://kiwiirc.com/client/freenode.net/#watcher3"><img alt="IRC" src="https://img.shields.io/badge/Freenode-Online-Success.svg"/></a>
 <a href="https://discord.gg/wrHPyre"><img alt="Discord" src="https://img.shields.io/discord/620536178881331200?color=Green&label=discord&style=flat"/></a>
 <p align="center"><img alt="Codacy" src="https://api.codacy.com/project/badge/Grade/3392120a6afe40cc8dcfbb8b7e7b3713"/>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/barbequesauce/watcher3.svg"/></a>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/barbequesauce/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/ellnic/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/ellnic/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/ellnic/watcher3.svg"/></a>
     
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features. 
@@ -39,7 +39,7 @@ If you are not using Docker, Watcher requires Python 3. It is also recommended t
 
 Obtaining the files:
 
-    git clone https://github.com/barbequesauce/Watcher3.git
+    git clone https://github.com/ellnic/Watcher3.git
 
 Start Watcher using:
 
@@ -51,7 +51,7 @@ Open a browser and navigate to localhost:9090
 
 If you do not wish to use Git, follow these steps.
 
-1. Open your browser and go to https://github.com/barbequesauce/Watcher3
+1. Open your browser and go to https://github.com/ellnic/Watcher3
 2. Click on the green Clone or download button and click Download ZIP
 3. Once done downloading, extract the ZIP to the location in which you want Watcher installed
 4. Open a terminal and cd to the Watcher directory.
@@ -147,9 +147,8 @@ We now have an updated Docker container using an alpine 3.8 base, with a few ext
   -e UMASK_SET=022 \
   -e PGID=1000 -e PUID=1000 \
   -p 9090:9090 \
-  barbequesauce/watcher3
-``` 
-
+  ellnic/watcher3
+```
 
 If you wish to exec into the container to have a look around, use:
 
