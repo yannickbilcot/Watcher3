@@ -10,7 +10,7 @@ import logging
 
 logging = logging.getLogger(__name__)
 
-api_version = 2.3
+api_version = 2.4
 
 ''' API
 
@@ -50,6 +50,7 @@ mode=addmovie
         Accepts imdb and tmdb id #s
         Imdb id must include 'tt'
         Will add using Default quality profile unless specified otherwise
+        Will add using Default category unless specified otherwise
 
     Example:
         Request:
@@ -144,6 +145,7 @@ Major version changes can be expected to break api interactions
 2.1     Adjust addmovie() to pass origin argument. Adjust addmovie() to search tmdb for itself rather than in core.ajax()
 2.2     Update documentation for all methods
 2.3     Update dispatch method. Allow arbitrary filters in liststatus.
+2.4     Allow category argument in addmovie method
 '''
 
 
@@ -237,6 +239,7 @@ class API(object):
         origin = 'API' if origin.startswith('Mozilla/') else origin
 
         quality = params.get('quality') or core.config.default_profile()
+        category = params.get('category', 'Default')
 
         if params.get('imdbid'):
             imdbid = params['imdbid']
@@ -258,6 +261,7 @@ class API(object):
                 movie = movie[0]
 
         movie['quality'] = quality
+        movie['category'] = category
         movie['status'] = 'Waiting'
         movie['origin'] = origin
 
@@ -289,8 +293,9 @@ class API(object):
         '''
 
         cherrypy.response.headers['Content-Type'] = "image/jpeg"
+        err = None
         try:
-            with open(os.path.abspath(os.path.join(core.POSTERDIR, '{}.jpg'.format(params['imdbid']))), 'rb') as f:
+            with open(os.path.abspath(os.path.join(core.POSTER_DIR, '{}.jpg'.format(params['imdbid']))), 'rb') as f:
                 img = f.read()
             return img
         except KeyError as e:
@@ -300,8 +305,9 @@ class API(object):
         except Exception as e:
             err = {'response': False, 'error': str(e)}
         finally:
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return json.dumps(err).encode('utf-8')
+            if err:
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps(err).encode('utf-8')
 
     @api_json_out
     def version(self, *args):

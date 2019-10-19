@@ -30,6 +30,14 @@ ul#movies li{
     opacity: 0.6;
 }
 
+.card .add-movie-form{
+    display: none;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    z-index: 1;
+}
+
 button.show_details{
     padding: 0;
 }

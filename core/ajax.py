@@ -36,23 +36,40 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def library(self, sort_key, sort_direction, limit=50, offset=0, hide_finished=False):
+    def library(self, sort_key, sort_direction, limit=50, offset=0, status=None, category=None):
         ''' Get 50 movies from library
         sort_key (str): column name to sort by
         sort_direction (str): direction to sort [ASC, DESC]
 
         limit: int number of movies to get                  <optional - default 50>
         offset: int list index postition to start slice     <optional - default 0>
-        hide_finished (bool): get finished/disabled movies or not
+        status (list): filter movies with these statuses only <optional>
+        category (str): filter movies with this category only <optional>
 
-        hide_finished will be converted to bool if string is passed
-
-        Gets a 25-movie slice from library sorted by sort key
+        Gets a movies slice, length by limit, from library sorted by sort key
 
         Returns list of dicts of movies
         '''
+        if status and not isinstance(status, list):
+            status = [status]
+        if status and 'Finished' in status:
+            status.append('Disabled')
 
-        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, hide_finished=True if hide_finished == 'True' else False)
+        return core.sql.get_user_movies(sort_key, sort_direction.upper(), limit, offset, status, category)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def library_counters(self, category=None):
+        ''' Get movies counters group by status, filtered by category
+        category (str): Count movies with this category <optional>
+        '''
+
+        status_count = core.sql.get_library_count('status', 'category', category)
+        status_count['Finished'] = status_count.get('Finished', 0) + status_count.get('Disabled', 0)
+        if 'Disabled' in status_count:
+            del status_count['Disabled']
+
+        return status_count
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -64,7 +81,9 @@ class Ajax(object):
         '''
 
         results = TheMovieDatabase.search(search_term)
-        if not results:
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
             logging.info('No Results found for {}'.format(search_term))
 
         return results
@@ -76,7 +95,13 @@ class Ajax(object):
 
         Returns list of dicts of movies
         '''
-        return TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        results = TheMovieDatabase.get_category(cat, tmdbid)[:8]
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
+            logging.info('No Results found for {}'.format(cat))
+
+        return results
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -202,6 +227,7 @@ class Ajax(object):
         try:
             logging.debug('Finished file for {} is {}'.format(imdbid, f))
             os.unlink(f)
+            core.sql.update_multiple_values('MOVIES', {'finished_date': None, 'finished_score': None, 'finished_file': None}, 'imdbid', imdbid)
             return {'response': True, 'message': _('Deleted movie file {}.').format(f)}
         except Exception as e:
             logging.error('Unable to delete file {}'.format(f), exc_info=True)
@@ -312,6 +338,36 @@ class Ajax(object):
             if not cancelled:
                 response['response'] = False
                 response['error'] = response.get('error', '') + _(' Could not remove download from client.')
+
+        return response
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def unmark_bad(self, guid, imdbid):
+        ''' Removes bad mark for guid in SEARCHRESULTS and MARKEDRESULTS
+        guid (str): guid of download to mark
+        imdbid (str): imdb id # of movie
+
+        Returns dict ajax-style response
+        '''
+
+        logging.info('Removing {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+        if not core.sql.delete('MARKEDRESULTS', 'guid', guid):
+            logging.info('Removing MARKEDRESULTS {} failed.'.format(guid.split('&')[0]))
+            return {'response': False, 'error': Errors.database_write}
+        else:
+            logging.info('Successfully removed {} from MARKEDRESULTS.'.format(guid.split('&')[0]))
+
+        sr = Manage.searchresults(guid, 'Available')
+        if sr:
+            response = {'response': True, 'message': _('Marked release as Available.')}
+        else:
+            response = {'response': False, 'error': Errors.database_write}
+
+        response['movie_status'] = Manage.movie_status(imdbid)
+        if not response['movie_status']:
+            response['error'] = (Errors.database_write)
+            response['response'] = False
 
         return response
 
@@ -464,7 +520,7 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def update_movie_options(self, quality, status, filters, imdbid):
+    def update_movie_options(self, quality, category, status, filters, imdbid):
         ''' Updates quality settings for individual title
         quality (str): name of new quality
         status (str): management state ('automatic', 'disabled')
@@ -478,7 +534,7 @@ class Ajax(object):
 
         logging.info('Setting Quality and filters for {}.'.format(imdbid))
 
-        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'filters': filters}, 'imdbid', imdbid):
+        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'category': category, 'filters': filters}, 'imdbid', imdbid):
             return {'response': False, 'error': Errors.database_write}
 
         logging.info('Updating status to {} for {}.'.format(status, imdbid))
@@ -1197,6 +1253,29 @@ class Ajax(object):
     manager_change_quality._cp_config = {'response.stream': True, 'tools.gzip.on': False}
 
     @cherrypy.expose
+    def manager_change_category(self, movies, category):
+        ''' Bulk manager action to change movie category
+        movies (list): dicts of movies, must contain keys imdbid
+        category (str): category to set movies to
+
+        Yields dict ajax-style response
+        '''
+
+        movies = json.loads(movies)
+
+        logging.info('Setting category to {} for: {}'.format(category, ', '.join(i['imdbid'] for i in movies)))
+
+        for i, movie in enumerate(movies):
+            if not core.sql.update('MOVIES', 'category', category, 'imdbid', movie['imdbid']):
+                response = {'response': False, 'error': Errors.database_write, 'imdbid': movie['imdbid'], 'index': i + 1}
+            else:
+                response = {'response': True, 'index': i + 1}
+
+            yield json.dumps(response)
+
+    manager_change_category._cp_config = {'response.stream': True, 'tools.gzip.on': False}
+
+    @cherrypy.expose
     def manager_reset_movies(self, movies):
         ''' Bulk manager action to reset movies
         movies (list): dicts of movies, must contain key imdbid
@@ -1263,12 +1342,12 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def generate_stats(self):
+    def generate_stats(self, category=None):
         ''' Gets library stats for graphing page
 
         Returns dict of library stats
         '''
-        return Manage.get_stats()
+        return Manage.get_stats(category)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

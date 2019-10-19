@@ -4,12 +4,24 @@
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text">
-                        <i class="mdi mdi-checkbox-blank-outline c_box" value="${indexer[2]}"></i>
+                        <i class="mdi mdi-checkbox-blank-outline c_box" id="enabled" value="${indexer[2]}"></i>
                     </span>
                 </div>
                 <input type="text" data-id="url" class="form-control" placeholder="http://www.indexer.com/" value="${indexer[0]}">
                 <input type="text" data-id="api" class="form-control" placeholder="123456789abcdef" value="${indexer[1]}">
             </div>
+            %if len(indexer) > 3:
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="mdi mdi-checkbox-blank-outline c_box" id="no_year" value="${indexer[3]}"></i>
+                    </span>
+                </div>
+                <span class="input-group-item form-control">
+                    Search without year
+                </span>
+            </div>
+            %endif
         </td>
         <td>
             <button class="btn btn-outline-success" title="Test Indexer Connection" onclick="test_indexer(event, this)">
@@ -33,7 +45,7 @@
         <link href="${url_base}/static/css/settings/indexers.css?v=010" rel="stylesheet">
 
         <script src="${url_base}/static/js/settings/shared.js?v=012" type="text/javascript"></script>
-        <script src="${url_base}/static/js/settings/indexers.js?v=012" type="text/javascript"></script>
+        <script src="${url_base}/static/js/settings/indexers.js?v=013" type="text/javascript"></script>
 
     </head>
     <body>
@@ -208,8 +220,11 @@
             </button>
         </div>
 
-        <template id="new_indexer">
+        <template id="new_newznab">
             ${render_indexer(['', '', 'False'])}
+        </template>
+        <template id="new_torznab">
+            ${render_indexer(['', '', 'False', 'False'])}
         </template>
     </body>
 </html>

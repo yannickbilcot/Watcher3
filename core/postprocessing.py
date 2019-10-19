@@ -314,7 +314,12 @@ class Postprocessing(object):
                 if result:
                     logging.info('Found match for {} in releases.'.format(fname))
                 else:
-                    logging.info('Unable to find local release info by release name.')
+                    logging.info('Unable to find local release info by release name, trying fuzzy search.')
+                    result = core.sql.get_single_search_result('title', re.sub(r'[\[\]\(\)\-.:]', '_', fname), like=True)
+                    if result:
+                        logging.info('Found match for {} in releases.'.format(fname))
+                    else:
+                        logging.info('Unable to find local release info by release name.')
 
         # if we found it, get local movie info
         if result:
@@ -515,7 +520,9 @@ class Postprocessing(object):
 
         # set movie status and add finished date/score
         if data.get('imdbid'):
-            if not core.sql.row_exists('MOVIES', imdbid=data['imdbid']):
+            if core.sql.row_exists('MOVIES', imdbid=data['imdbid']):
+                data['category'] = core.sql.get_movie_details('imdbid', data['imdbid'])['category']
+            else:
                 logging.info('{} not found in library, adding now.'.format(data.get('title')))
                 data['status'] = 'Disabled'
                 Manage.add_movie(data)
@@ -784,7 +791,12 @@ class Postprocessing(object):
         config = core.CONFIG['Postprocessing']
         if config['recyclebinenabled']:
             recycle_bin = self.compile_path(config['recyclebindirectory'], data)
-        target_folder = os.path.normpath(self.compile_path(config['moverpath'], data))
+        category = data.get('category', None)
+        if category in core.CONFIG['Categories']:
+            moverpath = core.CONFIG['Categories'][category]['moverpath']
+        else:
+            moverpath = config['moverpath']
+        target_folder = os.path.normpath(self.compile_path(moverpath, data))
         target_folder = os.path.join(target_folder, '')
 
         # if the new folder doesn't exist, make it

@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import datetime
 import logging
@@ -321,6 +322,12 @@ class ImportCPLibrary(object):
                         movie['audiocodec'] = title_data.get('audio')
                         movie['videocodec'] = title_data.get('codec')
 
+                        for filepath in i.get('files', {}).get('movie', []):
+                            movie['category'] = Metadata.get_category_from_path(filepath)
+                            if movie['category']:
+                                movie['finished_file'] = filepath
+                                break
+
                         try:
                             movie['size'] = i.get('info', {}).get('size', 0) * 1024 * 1024
                         except Exception as e:
@@ -399,6 +406,7 @@ class Metadata(object):
             'releasegroup': None,
             'source': None,
             'quality': None,
+            'category': None,
             'path': filepath,
             'edition': []
         }
@@ -537,6 +545,7 @@ class Metadata(object):
             meta_data['year'] = str(meta_data['year'])
         meta_data['videocodec'] = meta_data.pop('codec', None)
         meta_data['audiocodec'] = meta_data.pop('audio', None)
+        meta_data['category'] = Metadata.get_category_from_path(filepath)
 
         qual = meta_data.pop('quality', '')
         for source, aliases in core.CONFIG['Quality']['Aliases'].items():
@@ -548,6 +557,22 @@ class Metadata(object):
         meta_data['releasegroup'] = meta_data.pop('group', None)
 
         return meta_data
+
+    @staticmethod
+    def get_category_from_path(filepath):
+        moverpath = core.CONFIG['Postprocessing']['moverpath']
+        if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
+            return 'Default'
+        for category, category_config in core.CONFIG['Categories'].items():
+            moverpath = category_config['moverpath']
+            if moverpath and filepath.startswith(Metadata.root_mover_path(moverpath)):
+                return category
+        return None
+
+    @staticmethod
+    def root_mover_path(path):
+        path = os.path.join(path, '') # ensure path ends with /
+        return os.path.join(os.path.split(re.sub("{.+}.*$", '', path))[0], '')
 
     @staticmethod
     def convert_to_db(movie):
@@ -608,6 +633,9 @@ class Metadata(object):
 
         if not movie.get('quality'):
             movie['quality'] = 'Default'
+
+        if not movie.get('category'):
+            movie['category'] = 'Default'
 
         movie['finished_file'] = movie.get('finished_file')
 
@@ -860,7 +888,10 @@ class Manage(object):
             response['error'] = _('{} already exists in library.').format(movie['title'])
             return response
 
+        if not movie.get('category', None) and movie.get('finished_file', None):
+            movie['category'] = Metadata.get_category_from_path((movie['finished_file']))
         movie.setdefault('quality', 'Default')
+        movie.setdefault('category', 'Default')
         movie.setdefault('status', 'Waiting')
         movie.setdefault('origin', 'Search')
 
@@ -969,7 +1000,7 @@ class Manage(object):
         imdbid (str): imdb identification number    <optional - default None>
 
         If guid is in MARKEDRESULTS table, marks it as status.
-        If guid not in MARKEDRSULTS table, created entry. Requires imdbid.
+        If guid not in MARKEDRESULTS table, created entry. Requires imdbid.
 
         Returns bool
         '''
@@ -1058,7 +1089,20 @@ class Manage(object):
             return ''
 
     @staticmethod
-    def get_stats():
+    def add_status_to_search_movies(results):
+        tmdb_ids = [x.get('id') for x in results]
+        statuses = core.sql.get_movies_status('tmdbid', tmdb_ids)
+        for movie_status in statuses:
+            for movie in results:
+                # search from TMDB return id as int, but we saved as string in tmdbid
+                if str(movie['id']) == movie_status['tmdbid']:
+                    # we don't care about disabled in search result, show as finished
+                    movie['status'] = movie_status['status'] if movie_status['status'] != 'Disabled' else 'Finished'
+
+        return results
+
+    @staticmethod
+    def get_stats(category=None):
         ''' Gets stats from database for graphing
         Formats data for use with Morris graphing library
 
@@ -1082,11 +1126,16 @@ class Manage(object):
                 continue
             qualities[i] = 0
 
+        if not category:
+            categories = {'Default': 0}
+            for i in core.CONFIG['Categories']:
+                categories[i] = 0
+
         years = {}
         added_dates = {}
         scores = {}
 
-        movies = core.sql.get_user_movies()
+        movies = core.sql.get_user_movies(category = category)
 
         if not movies:
             return {'error', 'Unable to read database'}
@@ -1104,6 +1153,12 @@ class Manage(object):
                     qualities[movie['quality']] = 1
                 else:
                     qualities[movie['quality']] += 1
+
+            if not category:
+                if movie['category'] not in categories:
+                    categories[movie['category']] = 1
+                else:
+                    categories[movie['category']] += 1
 
             if movie['year'] not in years:
                 years[movie['year']] = 1
@@ -1123,6 +1178,8 @@ class Manage(object):
 
         stats['status'] = [{'label': k, 'value': v} for k, v in status.items()]
         stats['qualities'] = [{'label': k, 'value': v} for k, v in qualities.items()]
+        if not category:
+            stats['categories'] = [{'label': k, 'value': v} for k, v in categories.items()]
         stats['years'] = sorted([{'year': k, 'value': v} for k, v in years.items()], key=lambda k: k['year'])
         stats['added_dates'] = sorted([{'added_date': k, 'value': v} for k, v in added_dates.items() if v is not None], key=lambda k: k['added_date'])
         stats['scores'] = sorted([{'score': k, 'value': v} for k, v in scores.items()], key=lambda k: k['score'])

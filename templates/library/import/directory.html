@@ -3,8 +3,8 @@
     <head>
         ${head}
         <link href="${url_base}/static/css/library/import/directory.css?v=010" rel="stylesheet">
-        <script src="${url_base}/static/js/library/import/shared.js?v=011" type="text/javascript"></script>
-        <script src="${url_base}/static/js/library/import/directory.js?v=011" type="text/javascript"></script>
+        <script src="${url_base}/static/js/library/import/shared.js?v=013" type="text/javascript"></script>
+        <script src="${url_base}/static/js/library/import/directory.js?v=012" type="text/javascript"></script>
     </head>
     <body>
         ${navbar}
@@ -82,13 +82,13 @@
                         ${_('Found Movies')}
                     </h3>
                     <div class="btn-group float-right mr-3 mb-3">
-                        <button class="btn btn-sm btn-light border" onclick="select_all('complete_movies')" title="Select All">
+                        <button class="btn btn-sm btn-light border" onclick="select_all(event, 'complete_movies')" title="Select All">
                             <i class="mdi mdi-checkbox-multiple-marked"></i>
                         </button>
-                        <button class="btn btn-sm btn-light border" onclick="select_none('complete_movies')" title="De-Select All">
+                        <button class="btn btn-sm btn-light border" onclick="select_none(event, 'complete_movies')" title="De-Select All">
                             <i class="mdi mdi-checkbox-multiple-blank-outline"></i>
                         </button>
-                        <button class="btn btn-sm btn-light border" onclick="select_inverse('complete_movies')" title="Invert Selection">
+                        <button class="btn btn-sm btn-light border" onclick="select_inverse(event, 'complete_movies')" title="Invert Selection">
                             <i class="mdi mdi-minus-box"></i>
                         </button>
                     </div>
@@ -113,13 +113,13 @@
                     </h3>
                     <span class="mx-3 d-inline-block">${_('The following movies are missing key information. Review and correct as needed.')}</span>
                     <div class="btn-group float-right mr-3 mb-3">
-                        <button class="btn btn-sm btn-light border" onclick="select_all('incomplete_movies')" title="Select All">
+                        <button class="btn btn-sm btn-light border" onclick="select_all(event, 'incomplete_movies')" title="Select All">
                             <i class="mdi mdi-checkbox-multiple-marked"></i>
                         </button>
-                        <button class="btn btn-sm btn-light border" onclick="select_none('incomplete_movies')" title="De-Select All">
+                        <button class="btn btn-sm btn-light border" onclick="select_none(event, 'incomplete_movies')" title="De-Select All">
                             <i class="mdi mdi-checkbox-multiple-blank-outline"></i>
                         </button>
-                        <button class="btn btn-sm btn-light border" onclick="select_inverse('incomplete_movies')" title="Invert Selection">
+                        <button class="btn btn-sm btn-light border" onclick="select_inverse(event, 'incomplete_movies')" title="Invert Selection">
                             <i class="mdi mdi-minus-box"></i>
                         </button>
                     </div>
@@ -198,6 +198,15 @@
                     %else:
                     <option value="${profile}">${profile}</option>
                     %endif
+                %endfor
+            </select>
+        </template>
+
+        <template id="category_select">
+            <select class="category_select btn btn-sm btn-light border">
+                <option value="Default">Default</option>
+                %for category in categories:
+                    <option value="${category}">${category}</option>
                 %endfor
             </select>
         </template>

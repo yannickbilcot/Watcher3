@@ -53,7 +53,9 @@ class NewzNabProvider(object):
             else:
                 response = Url.open(url).text
 
-            return self.parse_newznab_xml(response, imdbid=imdbid)
+            results = self.parse_newznab_xml(response, imdbid=imdbid)
+            logging.info('Found {} results from {}.'.format(len(results), url_base))
+            return results
         except (SystemExit, KeyboardInterrupt):
             raise
         except Exception as e:
@@ -94,7 +96,9 @@ class NewzNabProvider(object):
                 else:
                     response = Url.open(url).text
 
-                return self.parse_newznab_xml(response)
+                results = self.parse_newznab_xml(response)
+                logging.info('Found {} results from {}.'.format(len(results), url_base))
+                return results
             except (SystemExit, KeyboardInterrupt):
                 raise
             except Exception as e:
@@ -128,6 +132,7 @@ class NewzNabProvider(object):
                 items = [items]
         except Exception as e:
             logging.error('Unexpected XML format from NewzNab indexer.', exc_info=True)
+            logging.debug(feed)
             return []
 
         for item in items:
@@ -142,11 +147,14 @@ class NewzNabProvider(object):
                     if rt == qs == '':
                         guid = None
                     else:
-                        rt = rt + '?'
                         qsprs = urllib.parse.parse_qs(qs)
+                        params = []
+                        if 'xt' in qsprs:
+                            params.append('xt=' + qsprs.pop('xt')[0])
                         for k in qsprs:
-                            rt += '{}={}&'.format(k, urllib.parse.quote(qsprs[k][0]))
-                        guid = rt[:-1]
+                            for v in qsprs[k]:
+                                params.append('{}={}'.format(k, urllib.parse.quote(v)))
+                        guid = rt + '?' + '&'.join(params)
                 else:
                     guid = item.get('link')
 

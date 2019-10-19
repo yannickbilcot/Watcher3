@@ -1,16 +1,16 @@
+/* global url_base, notify_error, each */
 window.addEventListener("DOMContentLoaded", function(){
     template_config = document.querySelector("template#template_config").innerHTML;
 
 });
 
 function edit_plugin_conf(event, elem, folder, filename){
-    event.preventDefault()
-    var config_file;
+    event.preventDefault();
 
     $.post(url_base + "/ajax/get_plugin_conf", {"folder": folder, "conf": filename})
     .done(function(config_html){
         if(!config_html){
-            $.notify({message: _("Unable to read plugin config.")}, {type: "danger"})
+            $.notify({message: _("Unable to read plugin config.")}, {type: "danger"});
             return false
         }
 
@@ -18,13 +18,13 @@ function edit_plugin_conf(event, elem, folder, filename){
                                    "folder": folder,
                                    "filename": filename,
                                    "config": config_html
-                                   }
+                                   };
 
         $conf_modal = $(format_template(template_config, template_dictionary));
 
         $conf_modal.find("i.c_box").each(function(){
-            if (this.getAttribute("value") == "True" ){
-                this.classList.remove("mdi-checkbox-blank-outline")
+            if (this.getAttribute("value") === "True" ){
+                this.classList.remove("mdi-checkbox-blank-outline");
                 this.classList.add("mdi-checkbox-marked");
             }
         });
@@ -32,16 +32,11 @@ function edit_plugin_conf(event, elem, folder, filename){
         $conf_modal.modal('show');
 
     })
-    .fail(function(response){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
-
-    return
+    .fail(notify_error);
 }
 
 function save_plugin_conf(event, button){
-    event.preventDefault()
+    event.preventDefault();
     var config = {"Config Version": 2};
 
     $modal = $conf_modal[0];
@@ -76,7 +71,7 @@ function save_plugin_conf(event, button){
         }
         config[row.dataset.key] = p;
 
-    })
+    });
 
     var folder = $conf_modal.data("folder");
     var filename = $conf_modal.data("filename");
@@ -87,16 +82,13 @@ function save_plugin_conf(event, button){
                                                  "config": config
                                                  })
     .done(function(response){
-        if(response['response'] == true){
+        if(response['response'] === true){
             $.notify({message: response["message"]})
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
-        };
+        }
     })
-    .fail(function(data){
-        var err = data.status + ' ' + data.statusText
-        $.notify({message: err}, {type: "danger", delay: 0});
-    })
+    .fail(notify_error)
     .always(function(){
         icon.classList.remove('mdi-circle');
         icon.classList.add('mdi-content-save');
@@ -133,12 +125,12 @@ function _get_settings(){
         each(enabled_plugins.concat(disabled_plugins), function(name, index){
             settings[category][name].push(index);
 
-        })
+        });
     });
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
 
-    return {"Plugins": settings}
+    return {"Plugins": settings};
 }

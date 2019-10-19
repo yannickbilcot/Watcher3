@@ -4,13 +4,14 @@ import logging
 import time
 import os
 import shutil
+from core import config
 
 from core.helpers import Comparisons
 import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 9
+current_version = 11
 
 
 def proxy_to_dict(p):
@@ -70,7 +71,8 @@ class SQL(object):
                                  sqla.Column('media_release_date', sqla.TEXT),
                                  sqla.Column('origin', sqla.TEXT),
                                  sqla.Column('sort_title', sqla.TEXT),
-                                 sqla.Column('filters', sqla.TEXT)
+                                 sqla.Column('filters', sqla.TEXT),
+                                 sqla.Column('category', sqla.TEXT)
                                  )
         self.SEARCHRESULTS = sqla.Table('SEARCHRESULTS', self.metadata,
                                         sqla.Column('score', sqla.SMALLINT),
@@ -245,6 +247,30 @@ class SQL(object):
             logging.error('Unable to update database row.')
             return False
 
+    def update_all(self, TABLE, data):
+        ''' Updates single value in all rows on table.
+        TABLE (str): name of database table to write to
+        data (dict): key/value pairs to update in table
+
+        Writes VALUE into COLUMN
+
+        Returns Bool.
+        '''
+
+        logging.debug('Updating to {} in {}.'.format(data, TABLE))
+
+        columns = '{}=?'.format('=?,'.join(data.keys()))
+        sql = 'UPDATE {} SET {}'.format(TABLE, columns)
+        vals = list(data.values())
+
+        command = [sql, vals]
+
+        if self.execute(command):
+            return True
+        else:
+            logging.error('Unable to update database rows.')
+            return False
+
     def update_multiple_values(self, TABLE, data, idcol, idval):
         ''' Updates mulitple values in a single sql row
         TABLE (str): database table to access
@@ -310,13 +336,13 @@ class SQL(object):
 
         return
 
-    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, hide_finished=False):
+    def get_user_movies(self, sort_key='title', sort_direction='DESC', limit=-1, offset=0, status=None, category=None):
         ''' Gets user's movie from database
         sort_key (str): key to sort by
         sort_direction (str): order to sort results [ASC, DESC]
         limit (int): how many results to return
         offset (int): list index to start returning results
-        hide_finished (bool): return
+        status (list): list of statuses to include
 
         If limit is -1 all results are returned (still honors offset)
 
@@ -326,7 +352,13 @@ class SQL(object):
 
         logging.debug('Retrieving list of user\'s movies.')
 
-        filters = 'WHERE status NOT IN ("Finished", "Disabled")' if hide_finished else ''
+        filters = []
+        if status:
+            filters.append('status IN ("{}")'.format('", "'.join(status)))
+        if category:
+            filters.append('category = "{}"'.format(category))
+        if filters:
+            filters = "WHERE {}".format(' AND '.join(filters))
 
         if sort_key == 'status':
             sort_key = '''CASE WHEN status = "Waiting" THEN 1
@@ -353,30 +385,33 @@ class SQL(object):
             logging.error('Unable to get list of user\'s movies.')
             return []
 
-    def get_library_count(self):
+    def get_library_count(self, group_col=None, col=None, val=None):
         ''' Gets count of rows in MOVIES
-        Gets total count and Finished count
+        Gets total count, grouped by col if group_col is present
 
-        Returns tuple (int, int)
+        Returns count, or dict if group_col is present
         '''
 
         logging.debug('Getting count of library.')
 
-        result = self.execute(['SELECT COUNT(1) FROM MOVIES'])
+        filters = ''
+        if col and val:
+            filters = 'WHERE {} = "{}"'.format(col, val)
+
+        if group_col:
+            query = 'SELECT {}, COUNT(1) FROM MOVIES {} GROUP BY {}'.format(group_col, filters, group_col)
+        else:
+            query = 'SELECT COUNT(1) FROM MOVIES {}'.format(filters)
+
+        result = self.execute([query])
         if result:
-            c = result.fetchone()[0]
+            if group_col:
+                return dict(result.fetchall())
+            else:
+                return result.fetchone()[0]
         else:
             logging.error('Unable to get count of user\'s movies.')
-            return (0, 0)
-
-        result = self.execute(['SELECT COUNT(1) FROM MOVIES WHERE status IN ("Finished", "Disabled")'])
-        if result:
-            f = result.fetchone()[0]
-        else:
-            logging.error('Unable to get count of user\'s movies.')
-            return (0, 0)
-
-        return (c, f)
+            return {} if group_col else 0
 
     def get_movie_details(self, idcol, idval):
         ''' Returns dict of single movie details from MOVIES.
@@ -402,6 +437,28 @@ class SQL(object):
                 return {}
         else:
             return {}
+
+    def get_movies_status(self, idcol, idvals):
+        ''' Returns dict of single movie details from MOVIES.
+        idcol (str): identifying column
+        idvals (str): list with identifying values
+
+        Looks through MOVIES for idcol IN (idvals)
+
+        Returns list with dict of matches
+        '''
+
+        logging.debug('Retrieving status for movies {}.'.format(idvals))
+
+        command = ['SELECT {}, status FROM MOVIES WHERE {} IN ({})'.format(idcol, idcol, ', '.join(map(str, idvals)))]
+
+        result = self.execute(command)
+
+        if result:
+            return proxy_to_dict(result)
+        else:
+            logging.error('Unable to get status of requested movies.')
+            return []
 
     def get_search_results(self, imdbid, quality=None):
         ''' Gets all search results for a given movie
@@ -588,7 +645,7 @@ class SQL(object):
         else:
             return True
 
-    def get_single_search_result(self, idcol, idval):
+    def get_single_search_result(self, idcol, idval, like=False):
         ''' Gets single search result
         idcol (str): identifying column
         idval (str): identifying value
@@ -600,7 +657,8 @@ class SQL(object):
 
         logging.debug('Retrieving search result details for {}.'.format(idval.split('&')[0]))
 
-        command = ['SELECT * FROM SEARCHRESULTS WHERE {}="{}" ORDER BY score DESC, size DESC'.format(idcol, idval)]
+        operator = 'LIKE' if like else '='
+        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
 
         result = self.execute(command)
 
@@ -995,5 +1053,20 @@ class DatabaseUpdate(object):
         if values:
             core.sql.update_multiple_rows('MOVIES', values, 'imdbid')
         print()
+
+    @staticmethod
+    def update_10():
+        ''' Add category column to MOVIES '''
+        core.sql.update_tables()
+        core.sql.update_all('MOVIES', {'category': 'Default'})
+
+    @staticmethod
+    def update_11():
+        ''' Add category column to MOVIES '''
+        config.load()
+        for indexer in core.CONFIG['Indexers']['TorzNab'].values():
+            if len(indexer) == 3:
+                indexer.append(False)
+        config.write(core.CONFIG)
 
     # Adding a new method? Remember to update the current_version #

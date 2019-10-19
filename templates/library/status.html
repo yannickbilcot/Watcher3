@@ -3,15 +3,14 @@
 
 <head>
     ${head}
-    <link href="${url_base}/static/css/library/status.css?v=012" rel="stylesheet">
+    <link href="${url_base}/static/css/library/status.css?v=027" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=018" type="text/javascript"></script>
-    <meta name="movie_count" content="${movie_count}" />
-    <meta name="finished_count" content="${finished_count}" />
+    <script src="${url_base}/static/js/library/status.js?v=027" type="text/javascript"></script>
 </head>
 
 <body>
-    ${navbar}
+	<div class="loader"></div>
+	${navbar}
     <div class="container">
         <div id="toolbar" class='row'>
 
@@ -37,6 +36,12 @@
 
             <div class="col-md-4 col-sm-6 order-md-3">
                 <div class="btn-group">
+                    <select id="category" class="btn border btn-light">
+                        <option value="">All (${sum(categories_count.values())})</option>
+                        %for category, count in categories_count.items():
+                        <option value="${category}">${category} (${count})</option>
+                        %endfor
+                    </select>
                     <select id="movie_sort_key" class="btn btn-light border">
                         <option value="sort_title">${_('Title')}</option>
                         <option value="release_date">${_('Year')}</option>
@@ -72,12 +77,16 @@
         </div>
     </div>
     <div class="">
+        <div id="status-filters" class="text-center">
+        %for status in ['Waiting', 'Wanted', 'Found', 'Snatched', 'Finished']:
+            <span class="badge">
+                <i id="${status}" class="mdi mdi-checkbox-marked c_box" value="True"></i>
+                ${_(status)} (<span class="count">${status_count.get(status, 0)}</span>)
+            </span>
+        %endfor
+        </div>
         <ul id="movie_list" class="">
         </ul>
-        <div class="text-center">
-            <i id="hide_finished_movies" class="mdi mdi-checkbox-blank-outline c_box" value="False"></i>
-            ${_('Hide Finished Movies')}
-        </div>
     </div>
     <div id="overlay"></div>
     <template id="template_movie">
@@ -198,6 +207,20 @@
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
+                                                <i class="mdi mdi-library-books" title="${_('Category')}"></i>
+                                            </span>
+                                        </div>
+                                        <select id="movie_category" class="btn border btn-light border form-control">
+                                            <option value="Default">Default</option>
+                                            %for i in categories:
+                                            <option value="${i}">${i}</option>
+                                            %endfor
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
                                                 <i class="mdi mdi-label-outline" title="${_('Status')}"></i>
                                             </span>
                                         </div>
@@ -280,6 +303,33 @@
             </div>
         </div>
     </template>
+    <template id="template_delete_file">
+        <div class="modal fade" id="modal_delete">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            ${_('Remove File')}
+                        </h4>
+                        <button class="btn btn-light border btn-sm float-right" data-dismiss="modal">
+                            <i class="mdi mdi-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-12">
+                            ${_('Are you sure you want to remove <b>{finished_file}</b>?')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger float-right" onclick="delete_file_mark_bad(event, this, '{guid}', '{imdbid}')">
+                            <i class="mdi mdi-delete"></i>
+
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
     <template id="template_release">
         <li class="search_result list-group-item" data-guid="{guid}">
             <div class="title" title="{title}">
@@ -301,8 +351,11 @@
                     <button class="btn btn-sm btn-secondary w-100" title="Download" onclick="manual_download(event, this, '{guid}', '{type}', '{imdbid}')">
                         <i class="mdi mdi-download"></i>
                     </button>
-                    <button class="btn btn-sm btn-secondary w-100" onclick="mark_bad(event, this, '{guid}', '{imdbid}')" title="Mark release as Bad">
+                    <button class="btn btn-sm btn-secondary w-100 {mark_bad_hidden}" onclick="mark_bad(event, this, '{guid}', '{imdbid}', '{status}')" title="Mark release as Bad">
                         <i class="mdi mdi-cancel"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary w-100 {unmark_bad_hidden}" onclick="unmark_bad(event, this, '{guid}', '{imdbid}')" title="Unmark release as Bad">
+                        <i class="mdi mdi-backup-restore"></i>
                     </button>
                 </div>
             </div>

@@ -9,7 +9,7 @@ import logging
 logging = logging.getLogger(__name__)
 
 
-trackers = '&tr'.join(('udp://tracker.leechers-paradise.org:6969',
+trackers = '&tr='.join(('udp://tracker.leechers-paradise.org:6969',
                        'udp://zer0day.ch:1337',
                        'udp://tracker.coppersurfer.tk:6969',
                        'udp://public.popcorn-tracker.org:6969',
@@ -24,16 +24,17 @@ trackers = '&tr'.join(('udp://tracker.leechers-paradise.org:6969',
                        ))
 
 
-def magnet(hash_):
+def magnet(hash_, title):
     ''' Creates magnet link
     hash_ (str): base64 formatted torrent hash
+    title (str): name of the torrent
 
     Formats as magnet uri and adds trackers
 
     Returns str margnet uri
     '''
 
-    return 'magnet:?xt=urn:btih:{}&tr={}'.format(hash_, trackers)
+    return 'magnet:?xt=urn:btih:{}&dn={}&tr={}'.format(hash_, title, trackers)
 
 
 class Torrent(NewzNabProvider):
@@ -65,6 +66,7 @@ class Torrent(NewzNabProvider):
             if url_base[-1] != '/':
                 url_base = url_base + '/'
             apikey = indexer[1]
+            no_year = indexer[3]
 
             caps = core.sql.torznab_caps(url_base)
             if not caps:
@@ -79,6 +81,9 @@ class Torrent(NewzNabProvider):
             else:
                 logging.info('{} does not support imdbid search, using q={}'.format(url_base, term))
                 r = self.search_newznab(url_base, apikey, 'search', q=term, imdbid=imdbid)
+                if not r and no_year:
+                    logging.info('{} does not find anything, trying without year, using q={}'.format(url_base, title))
+                    r = self.search_newznab(url_base, apikey, 'search', q=title, imdbid=imdbid)
             for i in r:
                 results.append(i)
 

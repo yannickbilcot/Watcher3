@@ -6,11 +6,22 @@
         <link href="${url_base}/static/css/lib/morris.css?v=010" rel="stylesheet">
         <script type="text/javascript" src="${url_base}/static/js/lib/raphael.min.js?v=010"></script>
         <script type="text/javascript" src="${url_base}/static/js/lib/morris.min.js?v=010"></script>
-        <script type="text/javascript" src="${url_base}/static/js/library/stats.js?v=011"></script>
+        <script type="text/javascript" src="${url_base}/static/js/library/stats.js?v=012"></script>
     </head>
     <body>
         ${navbar}
         <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <select id="category" class="btn border btn-light">
+                        <option value="">All</option>
+                        <option value="Default">Default</option>
+                        %for category in categories:
+                        <option value="${category}">${category}</option>
+                        %endfor
+                    </select>
+                </div>
+            </div>
             <div class="row">
                 <div id="chart_status" class="col-md-6 my-3">
                     <div class="card">
@@ -25,6 +36,15 @@
                     <div class="card">
                         <div class="card-header">
                             ${_('Quality Profiles')}
+                        </div>
+                        <div class="chart">
+                        </div>
+                    </div>
+                </div>
+                <div id="chart_categories" class="col-md-6 my-3">
+                    <div class="card">
+                        <div class="card-header">
+                            ${_('Categories')}
                         </div>
                         <div class="chart">
                         </div>

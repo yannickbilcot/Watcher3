@@ -76,7 +76,7 @@ def _parse(movie, imdbid, title):
             result['imdbid'] = imdbid
             result['indexer'] = 'YTS'
             result['info_link'] = 'https://ag/movie/{}'.format(title.replace(' ', '-'))
-            result['torrentfile'] = core.providers.torrent.magnet(i['hash'])
+            result['torrentfile'] = core.providers.torrent.magnet(i['hash'], result['title'])
             result['guid'] = i['hash']
             result['type'] = 'magnet'
             result['downloadid'] = None
@@ -123,7 +123,7 @@ def _parse_rss(xml):
             result['indexer'] = 'YTS'
             result['info_link'] = i.find('link').text
             result['guid'] = i.find('enclosure').attrib['url'].split('/')[-1]
-            result['torrentfile'] = core.providers.torrent.magnet(result['guid'])
+            result['torrentfile'] = core.providers.torrent.magnet(result['guid'], result['title'])
             result['type'] = 'magnet'
             result['downloadid'] = None
             result['seeders'] = 5

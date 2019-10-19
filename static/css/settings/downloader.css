@@ -1,9 +1,12 @@
 div.card-body > div{
     overflow: hidden;
-    max-height: 0%;
-    transition: 0.6s;
+    max-height: 0;
+    transition: 0.6s cubic-bezier(0, 1, 0, 1);
 }
-
+div.card-body > div[data-enabled=True]{
+    max-height: 1000px;
+    transition: 0.6s ease;
+}
 
 div.card-body > div > div{
     margin-bottom: 1em;

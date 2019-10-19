@@ -1,5 +1,6 @@
 <%
     applied_profiles = {i['quality'] for i in movies}
+    applied_categories = {i['category'] for i in movies}
     status_colors = {'Finished': 'success', 'Snatched': 'primary', 'Found': 'warning', 'Available': 'available', 'Wanted': 'info', 'Waiting': 'waiting', 'Bad': 'danger'}
 %>
 
@@ -10,7 +11,7 @@
         <link href="${url_base}/static/css/library/manage.css?v=010" rel="stylesheet">
 
         <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-        <script src="${url_base}/static/js/library/manage.js?v=013" type="text/javascript"></script>
+        <script src="${url_base}/static/js/library/manage.js?v=016" type="text/javascript"></script>
     <body>
         ${navbar}
         <div class="container">
@@ -44,6 +45,12 @@
                                 %for i in applied_profiles:
                                 <a class="dropdown-item" href="#" onclick="select_attrib(event, this, 'quality', '${i}')">${i}</a>
                                 %endfor
+
+                                <div class="divider"></div>
+                                <h6 class="dropdown-header">${_('Category')}</h6>
+                                %for i in applied_categories:
+                                <a class="dropdown-item" href="#" onclick="select_attrib(event, this, 'category', '${i}')">${i}</a>
+                                %endfor
                             </div>
                         </div>
                     </div>
@@ -58,6 +65,9 @@
                         </a>
                         <button class="btn btn-secondary" onclick="show_modal(event, this, 'change_quality')">
                             <i class="mdi mdi-video" title="${_('Change Quality&nbsp;Profile')}"></i>
+                        </a>
+                        <button class="btn btn-secondary" onclick="show_modal(event, this, 'change_category')">
+                            <i class="mdi mdi-library-books" title="${_('Change Category')}"></i>
                         </a>
                         <button class="btn btn-secondary" onclick="show_modal(event, this, 'reset')">
                             <i class="mdi mdi-backup-restore" title="${_('Reset')}"></i>
@@ -75,13 +85,14 @@
                     _status = 'Finished' if movie['status'] == 'Disabled' else movie['status']
                     _poster = url_base + '/posters/' + movie['poster'] if movie.get('poster') else url_base + '/static/images/missing_poster.jpg'
                 %>
-                <li data-imdbid="${movie['imdbid']}" data-status="${_status}" data-quality="${movie['quality']}">
+                <li data-imdbid="${movie['imdbid']}" data-status="${_status}" data-quality="${movie['quality']}" data-category="${movie['category']}">
                     <div class="card">
                         <img data-echo="${_poster}" src="${url_base}/static/images/missing_poster.jpg" class="card-img-top">
                         <div class="card-body" data-imdbid="${movie['imdbid']}" data-tmdbid="${movie['tmdbid']}">
                             <i class="mdi mdi-checkbox-blank-outline c_box" value="False"></i>
                             <span class="badge badge-${status_colors[_status]} status">${_status}</span>
                             <span class="badge badge-dark quality">${movie['quality']}</span>
+                            <span class="badge badge-dark category">${movie['category']}</span>
                             <i class="mdi mdi-table-edit float-right" onclick="edit_movie(event, this)"></i>
                             <h6 class="card-title">
                                 ${movie['title']}
@@ -142,6 +153,16 @@
             <select class="form-control btn-light border mt-3 border" id="quality" value="">
                 <option value="" selected="selected">${_('Choose a Quality Profile')}</option>
                 %for i in profiles:
+                <option value="${i}">${i}</option>
+                %endfor
+            </select>
+        </template>
+
+        <template id="category_select">
+            <select class="form-control btn-light border mt-3 border" id="category" value="">
+                <option value="" selected="selected">${_('Choose a Category')}</option>
+                <option value="Default">Default</option>
+                %for i in categories:
                 <option value="${i}">${i}</option>
                 %endfor
             </select>

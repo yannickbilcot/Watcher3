@@ -246,7 +246,7 @@ class TheMovieDatabase(object):
                 return []
             url = 'https://api.themoviedb.org/3/movie/{}/similar?&language=en-US&page=1'.format(tmdbid)
         else:
-            url = 'https://api.themoviedb.org/3/movie/{}?api_key=APIKEY&language=en-US&page=1'.format(cat)
+            url = 'https://api.themoviedb.org/3/movie/{}?language=en-US&page=1'.format(cat)
 
         url += '&api_key={}'.format(_k(b'tmdb'))
 

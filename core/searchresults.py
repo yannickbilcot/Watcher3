@@ -1,5 +1,6 @@
 import logging
 import datetime
+import PTN
 
 from base64 import b16encode
 import core
@@ -50,9 +51,11 @@ def score(releases, imdbid=None, imported=False):
         movie_details = {'year': '\n'}
         filters = {'requiredwords': '', 'preferredwords': '', 'ignoredwords': ''}
         quality = import_quality()
+        category = {'requiredwords': '', 'preferredwords': '', 'ignoredwords': ''}
     else:
         movie_details = core.sql.get_movie_details('imdbid', imdbid)
         quality_profile = movie_details['quality']
+        category_name = movie_details['category']
         logging.debug('Scoring based on quality profile {}'.format(quality_profile))
         check_size = True
         year = movie_details.get('year')
@@ -62,13 +65,18 @@ def score(releases, imdbid=None, imported=False):
         else:
             quality = core.CONFIG['Quality']['Profiles'][core.config.default_profile()]
 
+        if category_name in core.CONFIG['Categories']:
+            category = core.CONFIG['Categories'][category_name]
+        else:
+            category = {'requiredwords': '', 'preferredwords': '', 'ignoredwords': ''}
+
         filters = json.loads(movie_details['filters'])
 
     sources = quality['Sources']
 
-    required_groups = [i.split('&') for i in (quality['requiredwords'] + ',' + filters['requiredwords']).lower().replace(' ', '').split(',') if i != '']
-    preferred_groups = [i.split('&') for i in (quality['preferredwords'] + ',' + filters['preferredwords']).lower().replace(' ', '').split(',') if i != '']
-    ignored_groups = [i.split('&') for i in (quality['ignoredwords'] + ',' + filters['ignoredwords']).lower().replace(' ', '').split(',') if i != '']
+    required_groups = words_to_list(quality['requiredwords']) + words_to_list(filters['requiredwords']) + words_to_list(category['requiredwords'])
+    preferred_groups = words_to_list(quality['preferredwords']) + words_to_list(filters['preferredwords']) + words_to_list(category['preferredwords'])
+    ignored_groups = words_to_list(quality['ignoredwords']) + words_to_list(filters['ignoredwords']) + words_to_list(category['ignoredwords'])
 
     # Begin scoring and filtering
     reset(releases)
@@ -102,6 +110,8 @@ def score(releases, imdbid=None, imported=False):
 
     return releases
 
+def words_to_list(words):
+    return [i.split('&') for i in words.lower().replace(' ', '').split(',') if i != '']
 
 def reset(releases):
     ''' Sets all result's scores to 0
@@ -320,23 +330,12 @@ def fuzzy_title(releases, titles, year='\n'):
     else:
         for result in releases:
             if result['type'] == 'import' and result not in keep:
-                logging.debug('{} is an Import, soring as a perfect match.'.format(result['title']))
+                logging.debug('{} is an Import, sorting as a perfect match.'.format(result['title']))
                 result['score'] += 20
                 keep.append(result)
                 continue
 
-            rel_title_ss = result['title'].split(year)[0]
-            if len(rel_title_ss) == len(result['title']):
-                int_year = int(year)
-                int_year += 1
-                year = str(int_year)
-                rel_title_ss = result['title'].split(year)[0]
-
-            if len(rel_title_ss) == len(result['title']):
-                int_year = int(year)
-                int_year -= 2
-                year = str(int_year)
-                rel_title_ss = result['title'].split(year)[0]
+            rel_title_ss = result.get('ptn', PTN.parse(result['title']))['title']
 
             logging.debug('Comparing release substring {} with titles {}.'.format(rel_title_ss, titles))
             matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
@@ -368,6 +367,10 @@ def _fuzzy_title(a, b):
 
     a = a.replace('&', 'and')
     b = b.replace('&', 'and')
+    a = a.replace('\'', '')
+    b = b.replace('\'', '')
+    a = a.replace(':', '')
+    b = b.replace(':', '')
 
     a_words = Url.normalize(a).split(' ')
     b_words = Url.normalize(b).split(' ')
