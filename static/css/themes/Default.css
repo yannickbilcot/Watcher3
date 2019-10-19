@@ -1725,7 +1725,7 @@ pre code {
 }
 
 .form-control:focus {
-	color: #272a31;
+	color: #EBEBEB;
 	background-color: ##e7e3d7;
 	border-color: #9acffa;
 	outline: 0;
@@ -1747,7 +1747,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 select.form-control:focus::-ms-value {
-	color: #272a31;
+	color: #EBEBEB;
 	background-color: #fff
 }
 
