@@ -291,7 +291,7 @@ function save_movie_details(event, button, tmdbid){
         data[input.dataset.id] = _parse_input(input);
     });
 
-    if(!date_format.test(data.release_date) || !date_format.test(data.media_release_date)){
+    if(data.release_date && !date_format.test(data.release_date) || data.media_release_date && !date_format.test(data.media_release_date)){
         $.notify({message: "Dates must match format YYYY-MM-DD"}, {type: "danger", delay: 0});
         return;
     }
