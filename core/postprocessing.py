@@ -197,6 +197,13 @@ class Postprocessing(object):
         elif data['mode'] == 'complete':
             logging.info('Post-processing as Complete.')
 
+            if 'task' not in data:
+                directory = core.CONFIG['Postprocessing']['Scanner']['directory']
+                if data['path'] == directory:
+                    core.sql.save_postprocessed_path(data['original_file'])
+                else:
+                    core.sql.save_postprocessed_path(data['path'])
+
             response = self.complete(data)
 
             response['data'].pop('backlog', '')
