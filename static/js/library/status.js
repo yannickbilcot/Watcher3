@@ -756,7 +756,11 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
     .done(function(response){
         if(response["response"] === true){
             var movie = $movie_status_modal.data("movie");
-            movie.finished_file = null;
+            movie = Object.assign(movie, {finished_file: null, finished_date: null, finished_score: null});
+            $movie_status_modal.data("movie", movie);
+            var $movie_li = $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`);
+            if ($movie_li) $movie_li.dataset.movie = JSON.stringify(movie);
+
             $.notify({message: response["message"]}, {type: "success"});
             $movie_status_modal.data("movie").finished_file = null;
             $movie_status_modal.find("#finished_file_badge").addClass("hidden");
@@ -865,10 +869,14 @@ function update_movie_status(imdbid, status){
         label.classList = `badge badge-${status_colors[status]} status`;
     }
 
-    var $status_label = $movie_list.querySelector(`li[data-imdbid="${imdbid}"] span.status`);
+    var $movie_li = $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`),
+        $status_label = $movie_li.querySelector("span.status");
     $status_label.classList.remove($status_label.innerText);
     $status_label.classList.add(status);
     $status_label.innerText = status;
+
+    var movie = JSON.parse($movie_li.dataset.movie);
+    $movie_li.dataset.movie = JSON.stringify(Object.assign(movie, {status: status}));
 }
 
 function update_release_status(guid, status){
