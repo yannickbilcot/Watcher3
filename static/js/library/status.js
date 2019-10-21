@@ -512,7 +512,7 @@ function _results_table(results){
 
         result["translated_status"] = _(result["status"]);
         result["status_color"] = status_colors[result["status"]];
-        result["guid"] = result["guid"].replace(/'/g, "\\'");
+        result["guid"] = result["guid"].replace(/'/g, "\\'").toLowerCase();
         result["mark_bad_hidden"] = result["status"] === "Bad" ? "hidden" : "";
         result["unmark_bad_hidden"] = result["status"] !== "Bad" ? "hidden" : "";
         rows += format_template(templates.release, result).outerHTML;
@@ -790,16 +790,17 @@ function _mark_bad(elem, guid, imdbid){
         "cancel_download": true
     })
     .done(function(response){
-        elem.classList.add("hidden");
-        var unmark_bad = elem.parentElement.querySelector(".mdi-backup-restore").parentElement;
-        unmark_bad.classList.remove("hidden");
-
         if(response["movie_status"]){
             update_movie_status(imdbid, response["movie_status"]);
         }
 
         if(response["response"] === true){
             $.notify({message: response["message"]});
+            $i.classList.add("mdi-cancel");
+            $movie_status_modal.find(`[data-guid="${guid}"]`).each(function() {
+               this.querySelector(".mdi-cancel").parentElement.classList.add("hidden");
+               this.querySelector(".mdi-backup-restore").parentElement.classList.remove("hidden");
+            });
             update_release_status(guid, "Bad");
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
@@ -885,13 +886,10 @@ function update_release_status(guid, status){
     status: str status to update label to
     */
 
-    var label = document.querySelector(`li.search_result[data-guid="${guid}"] span.status`);
-
-    if(label){
+    each(document.querySelectorAll(`li.search_result[data-guid="${guid}"] span.status`), function(label){
         label.textContent = status;
         label.classList = `badge badge-${status_colors[status]} status`;
-    }
-
+    });
 }
 
 function swap_settings(event){
