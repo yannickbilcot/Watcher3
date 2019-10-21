@@ -755,9 +755,14 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
     $.post(url_base + "/ajax/delete_movie_file", {"imdbid": imdbid})
     .done(function(response){
         if(response["response"] === true){
+            var movie = $movie_status_modal.data("movie");
+            movie.finished_file = null;
             $.notify({message: response["message"]}, {type: "success"});
             $movie_status_modal.data("movie").finished_file = null;
             $movie_status_modal.find("#finished_file_badge").addClass("hidden");
+            // Makes sure the release is mark bad after file removal
+            elem = document.querySelector(`li.search_result[data-guid="${guid}"] .mdi-cancel`).parentElement;
+            _mark_bad(elem, guid, imdbid);
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
         }
@@ -765,9 +770,6 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
     .fail(notify_error)
     .always(function(){
         $delete.modal("hide");
-        // Makes sure the release is mark bad after file removal
-        elem = document.querySelector(`li.search_result[data-guid="${guid}"] .mdi-cancel`).parentElement;
-        _mark_bad(elem, guid, imdbid);
     });
 }
 
