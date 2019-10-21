@@ -2355,7 +2355,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-search:focus, .btn-search.focus {
-	box-shadow: 0 0 0 .2rem rgba(76,175,80,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-search.disabled, .btn-search:disabled {
@@ -2365,7 +2365,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-search:not(:disabled):not(.disabled):active,.btn-search:not(:disabled):not(.disabled).active,.show>.btn-search.dropdown-toggle{color:#fff;background-color:#3d8b40;border-color:#39833c}.btn-search:not(:disabled):not(.disabled):active:focus,.btn-search:not(:disabled):not(.disabled).active:focus, .show>.btn-search.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(76,175,80,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-outline-primary {
