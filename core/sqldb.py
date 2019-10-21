@@ -681,7 +681,7 @@ class SQL(object):
         logging.debug('Retrieving search result details for {}.'.format(idval.split('&')[0]))
 
         operator = 'LIKE' if like else '='
-        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
+        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" COLLATE NOCASE ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
 
         result = self.execute(command)
 
