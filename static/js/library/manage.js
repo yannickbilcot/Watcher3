@@ -332,6 +332,8 @@ function _parse_input(input){
         var min = parseInt(input.min || 0);
         var val = Math.max(parseInt(input.value), min);
         return val || min;
+    } else if (input.value === ""){
+        return null;
     } else {
         return input.value;
     }
