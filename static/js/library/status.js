@@ -49,6 +49,8 @@ function change_page_number(movie_count){
         each(Array(pages), function(item, index){
             $page_select.innerHTML += `<option value="${index + 1}">${index + 1}</option>`;
         });
+        if(current_page > pages) current_page = pages;
+        $page_select.value = current_page;
     } else {
         $page_select.innerHTML = `<option value="">0</option>`;
     }
@@ -233,7 +235,7 @@ window.addEventListener("DOMContentLoaded", function(){
                var count = response[elem.querySelector(".c_box").getAttribute("id")] || 0;
                elem.querySelector(".count").textContent = count;
             });
-            change_movie_count();
+            movie_count = change_movie_count();
             load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
         })
         .fail(function(data){
@@ -259,8 +261,8 @@ window.addEventListener("DOMContentLoaded", function(){
                 set_cookie(event.target.getAttribute("id"), "False");
                 movie_count -= get_status_count(event.target) || 0;
             }
+            current_page = 1;
             change_movie_count(movie_count);
-            $page_select.value = 1;
             load_library(movie_sort_key, movie_sort_direction, 1, per_page, pages);
         }
     });
