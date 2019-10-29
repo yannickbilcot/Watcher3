@@ -43,6 +43,7 @@ def score(releases, imdbid=None, imported=False):
         return releases
 
     year = None
+    title = None
 
     if imported:
         logging.debug('Releases are of origin "Import", using custom default quality profile.')
@@ -59,6 +60,7 @@ def score(releases, imdbid=None, imported=False):
         logging.debug('Scoring based on quality profile {}'.format(quality_profile))
         check_size = True
         year = movie_details.get('year')
+        title = movie_details.get('title').lower()
 
         if quality_profile in core.CONFIG['Quality']['Profiles']:
             quality = core.CONFIG['Quality']['Profiles'][quality_profile]
@@ -81,6 +83,9 @@ def score(releases, imdbid=None, imported=False):
     # Begin scoring and filtering
     reset(releases)
     if ignored_groups and ignored_groups != ['']:
+        if title:
+            ignored_groups = [word_group for word_group in ignored_groups if not all(word in title for word in word_group)]
+            logging.debug('ignored groups not in movie title: {}'.format(ignored_groups))
         releases = remove_ignored(releases, ignored_groups)
 
     if required_groups and required_groups != ['']:
