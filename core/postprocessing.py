@@ -769,7 +769,12 @@ class Postprocessing(object):
         fname = os.path.splitext(file_name)[0]
 
         for i in os.listdir(path):
-            if os.path.splitext(i)[0] == fname:
+            name = os.path.splitext(i)[0]
+            no_lang_name = None
+            # check if filename ends with .<2-char-lang-code>
+            if re.search(r'\.[a-z]{2}$', name, re.I):
+                no_lang_name = os.path.splitext(name)[0]
+            if name == fname or no_lang_name == fname:
                 logging.info('Removing additional file {}'.format(i))
                 try:
                     os.remove(os.path.join(path, i))
@@ -899,18 +904,24 @@ class Postprocessing(object):
                 for name in filenames:
                     old_abs_path = os.path.join(root, name)
                     fname, ext = os.path.splitext(name)  # ('filename', '.ext')
+                    # check if filename ends with .<2-char-lang-code>
+                    if re.search(r'\.[a-z]{2}$', fname, re.I):
+                        fname, lang = os.path.splitext(fname)
+                        target_ext = lang + ext
+                    else:
+                        target_ext = ext
 
                     if config['renamerenabled']:
                         fname = compiled_name
 
-                    target_file = '{}{}'.format(os.path.join(target_folder, fname), ext)
+                    target_file = '{}{}'.format(os.path.join(target_folder, fname), target_ext)
 
                     if ext.replace('.', '') in keep_extensions:
                         append = 0
                         while os.path.isfile(target_file):
                             append += 1
                             new_filename = '{}({})'.format(fname, str(append))
-                            target_file = '{}{}'.format(os.path.join(target_folder, new_filename), ext)
+                            target_file = '{}{}'.format(os.path.join(target_folder, new_filename), target_ext)
                         try:
                             logging.info('Moving {} to {}'.format(old_abs_path, target_file))
                             shutil.copyfile(old_abs_path, target_file)
