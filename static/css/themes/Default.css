@@ -2117,7 +2117,7 @@ select.form-control-lg:not([size]):not([multiple]),.input-group-lg>select.form-c
 
 .btn:focus, .btn.focus {
 	outline: 0;
-	box-shadow: 0 0 0 .2rem rgba(33,150,243,0.25)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn.disabled, .btn:disabled {
@@ -2145,7 +2145,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-primary:focus, .btn-primary.focus {
-	box-shadow: 0 0 0 .2rem rgba(33,150,243,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-primary.disabled, .btn-primary:disabled {
@@ -2155,7 +2155,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-primary:not(:disabled):not(.disabled):active,.btn-primary:not(:disabled):not(.disabled).active,.show>.btn-primary.dropdown-toggle{color:#fff;background-color:#0c7cd5;border-color:#0b75c9}.btn-primary:not(:disabled):not(.disabled):active:focus,.btn-primary:not(:disabled):not(.disabled).active:focus, .show>.btn-primary.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(33,150,243,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-secondary {
@@ -2223,7 +2223,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-info:focus, .btn-info.focus {
-	box-shadow: 0 0 0 .2rem rgba(0,188,212,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-info.disabled, .btn-info:disabled {
@@ -2233,7 +2233,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-info:not(:disabled):not(.disabled):active,.btn-info:not(:disabled):not(.disabled).active,.show>.btn-info.dropdown-toggle{color:#fff;background-color:#A14800;border-color:#008394}.btn-info:not(:disabled):not(.disabled):active:focus,.btn-info:not(:disabled):not(.disabled).active:focus, .show>.btn-info.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(0,188,212,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-warning {
@@ -2329,7 +2329,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-dark:focus, .btn-dark.focus {
-	box-shadow: 0 0 0 .2rem rgba(235,235,235,0.5)
+	box-shadow: 0 0 0 .2rem rgba(39,42,49,0.5)
 }
 
 .btn-dark.disabled, .btn-dark:disabled {
@@ -2339,7 +2339,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-dark:not(:disabled):not(.disabled):active,.btn-dark:not(:disabled):not(.disabled).active,.show>.btn-dark.dropdown-toggle{color:#333336;background-color:#d2d2d2;border-color:#cbcbcb}.btn-dark:not(:disabled):not(.disabled):active:focus,.btn-dark:not(:disabled):not(.disabled).active:focus, .show>.btn-dark.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(235,235,235,0.5)
+	box-shadow: 0 0 0 .2rem rgba(39,42,49,0.5)
 }
 
 .btn-search {
@@ -2382,7 +2382,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-outline-primary:focus, .btn-outline-primary.focus {
-	box-shadow: 0 0 0 .2rem rgba(33,150,243,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-outline-primary.disabled, .btn-outline-primary:disabled {
@@ -2391,7 +2391,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-outline-primary:not(:disabled):not(.disabled):active,.btn-outline-primary:not(:disabled):not(.disabled).active,.show>.btn-outline-primary.dropdown-toggle{color:#fff;background-color:#F5861E;border-color:#F5861E}.btn-outline-primary:not(:disabled):not(.disabled):active:focus,.btn-outline-primary:not(:disabled):not(.disabled).active:focus, .show>.btn-outline-primary.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(33,150,243,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-outline-secondary {
@@ -2460,7 +2460,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-outline-info:focus, .btn-outline-info.focus {
-	box-shadow: 0 0 0 .2rem rgba(0,188,212,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-outline-info.disabled, .btn-outline-info:disabled {
@@ -2469,7 +2469,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-outline-info:not(:disabled):not(.disabled):active,.btn-outline-info:not(:disabled):not(.disabled).active,.show>.btn-outline-info.dropdown-toggle{color:#fff;background-color:#F7931E;border-color:#F7931E}.btn-outline-info:not(:disabled):not(.disabled):active:focus,.btn-outline-info:not(:disabled):not(.disabled).active:focus, .show>.btn-outline-info.dropdown-toggle:focus {
-	box-shadow: 0 0 0 .2rem rgba(0,188,212,0.5)
+	box-shadow: 0 0 0 .2rem rgba(54,57,66,0.5)
 }
 
 .btn-outline-warning {
