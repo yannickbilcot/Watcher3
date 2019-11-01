@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 11
+current_version = 12
 
 
 def proxy_to_dict(p):
@@ -109,6 +109,9 @@ class SQL(object):
                                  sqla.Column('name', sqla.TEXT, primary_key=True),
                                  sqla.Column('data', sqla.TEXT)
                                  )
+        self.POSTPROCESSED_PATHS = sqla.Table('POSTPROCESSED_PATHS', self.metadata,
+                                              sqla.Column('path', sqla.TEXT, primary_key=True)
+                                              )
 
         try:
             self.engine = sqla.create_engine(DB_NAME, echo=False, connect_args={'timeout': 30})
@@ -645,6 +648,26 @@ class SQL(object):
         else:
             return True
 
+    def save_postprocessed_path(self, path):
+        if not self.row_exists('POSTPROCESSED_PATHS', path=path):
+            self.write('POSTPROCESSED_PATHS', {'path': path})
+
+    def get_last_postprocessed_paths(self):
+        sql = 'SELECT path FROM {}'.format('POSTPROCESSED_PATHS')
+        result = self.execute([sql])
+        if result:
+            return [row[0] for row in result.fetchall()]
+        else:
+            logging.error('Unable to read database.')
+            return []
+
+    def delete_postprocessed_paths(self):
+        sql = 'DELETE FROM {}'.format('POSTPROCESSED_PATHS')
+        if self.execute([sql]):
+            return True
+        else:
+            return False
+
     def get_single_search_result(self, idcol, idval, like=False):
         ''' Gets single search result
         idcol (str): identifying column
@@ -658,7 +681,7 @@ class SQL(object):
         logging.debug('Retrieving search result details for {}.'.format(idval.split('&')[0]))
 
         operator = 'LIKE' if like else '='
-        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
+        command = ['SELECT * FROM SEARCHRESULTS WHERE {} {} "{}" COLLATE NOCASE ORDER BY score DESC, size DESC'.format(idcol, operator, idval)]
 
         result = self.execute(command)
 
@@ -1068,5 +1091,10 @@ class DatabaseUpdate(object):
             if len(indexer) == 3:
                 indexer.append(False)
         config.write(core.CONFIG)
+
+    @staticmethod
+    def update_12():
+        ''' Add table POSTPROCESSED_PATHS '''
+        core.sql.update_tables()
 
     # Adding a new method? Remember to update the current_version #

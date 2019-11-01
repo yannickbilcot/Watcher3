@@ -75,7 +75,7 @@ def _parse(movie, imdbid, title):
             result['title'] = '{}.Bluray.{}.YTS'.format(title, i['quality'])
             result['imdbid'] = imdbid
             result['indexer'] = 'YTS'
-            result['info_link'] = 'https://ag/movie/{}'.format(title.replace(' ', '-'))
+            result['info_link'] = 'https://yts.ag/movie/{}'.format(title.replace(' ', '-'))
             result['torrentfile'] = core.providers.torrent.magnet(i['hash'], result['title'])
             result['guid'] = i['hash']
             result['type'] = 'magnet'

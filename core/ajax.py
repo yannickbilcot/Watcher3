@@ -226,7 +226,8 @@ class Ajax(object):
 
         try:
             logging.debug('Finished file for {} is {}'.format(imdbid, f))
-            os.unlink(f)
+            if os.path.exists(f):
+                os.unlink(f)
             core.sql.update_multiple_values('MOVIES', {'finished_date': None, 'finished_score': None, 'finished_file': None}, 'imdbid', imdbid)
             return {'response': True, 'message': _('Deleted movie file {}.').format(f)}
         except Exception as e:

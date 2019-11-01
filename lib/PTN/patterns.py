@@ -9,10 +9,10 @@ patterns = [
     ('quality', ('((?:PPV\.)?[HP]DTV|(?:HD)?CAM|B[DR]Rip|(?:HD-?)?TS|'
                  '(?:PPV )?WEB-?DL(?: DVDRip)?|HDRip|DVDRip|DVDRIP|'
                  'CamRip|W[EB]BRip|BluRay|DvDScr|hdtv|telesync)')),
-    ('codec', '(xvid|[hx]\.?26[45])'),
+    ('codec', '(xvid|[hx]\.?26[45]|HEVC)'),
     ('audio', ('(MP3|DD5\.?1|Dual[\- ]Audio|LiNE|DTS|'
                'AAC[.-]LC|AAC(?:\.?2\.0)?|'
-               'AC3(?:\.5\.1)?)')),
+               '(?:E-?)?AC3(?:\.5\.1)?)')),
     ('group', '(- ?([^-]+(?:-={[^-]+-?$)?))$'),
     ('region', 'R[0-9]'),
     ('extended', '(EXTENDED(:?.CUT)?)'),

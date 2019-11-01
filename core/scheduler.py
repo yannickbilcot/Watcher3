@@ -77,6 +77,10 @@ class PostProcessingScan(object):
 
         minsize = core.CONFIG['Postprocessing']['Scanner']['minsize'] * 1048576
 
+        # paths processed with api requests since last task run
+        postprocessed_paths = core.sql.get_last_postprocessed_paths()
+        logging.debug('Paths already post processed: {}'.format(postprocessed_paths))
+
         files = []
         if conf['newfilesonly']:
             t = core.scheduler_plugin.record.get('PostProcessing Scan', {}).get('last_execution')
@@ -90,6 +94,8 @@ class PostProcessingScan(object):
 
             for i in os.listdir(d):
                 f = os.path.join(d, i)
+                if f in postprocessed_paths:
+                    continue
                 if os.path.isfile(f) and os.path.getmtime(f) > threshold and os.path.getsize(f) > minsize:
                     files.append(f)
                 elif os.path.isdir(f) and os.path.getmtime(f) > threshold:
@@ -124,10 +130,13 @@ class PostProcessingScan(object):
                  'mode': 'complete',
                  'path': i,
                  'guid': r.get('guid') or '',
-                 'downloadid': ''
+                 'downloadid': '',
+                 'task': True
                  }
 
             pp.default(**d)
+
+        core.sql.delete_postprocessed_paths()
 
 
 class AutoSearch(object):

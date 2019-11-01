@@ -120,8 +120,9 @@ class PTN(object):
         clean = [item.strip('-') for item in clean]
         if len(clean) != 0:
             group_pattern = clean[-1] + self.group_raw
+            ext_length = len(self.parts.get('container')) + 1 if 'container' in self.parts else 0
             if self.torrent['name'].find(group_pattern) == \
-                    len(self.torrent['name']) - len(group_pattern):
+                    len(self.torrent['name']) - len(group_pattern) - ext_length:
                 self._late('group', clean.pop() + self.group_raw)
 
             if 'map' in self.torrent.keys() and len(clean) != 0:
