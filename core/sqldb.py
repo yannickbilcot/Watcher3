@@ -652,7 +652,7 @@ class SQL(object):
         if not self.row_exists('POSTPROCESSED_PATHS', path=path):
             self.write('POSTPROCESSED_PATHS', {'path': path})
 
-    def get_last_postprocessed_paths(self):
+    def get_postprocessed_paths(self):
         sql = 'SELECT path FROM {}'.format('POSTPROCESSED_PATHS')
         result = self.execute([sql])
         if result:

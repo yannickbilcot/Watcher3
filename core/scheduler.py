@@ -35,6 +35,7 @@ def create_plugin():
     PostProcessingScan.create()
     TraktSync.create()
     FileScan.create()
+    PostprocessedPathsScan.create()
     core.scheduler_plugin.subscribe()
 
 
@@ -78,7 +79,7 @@ class PostProcessingScan(object):
         minsize = core.CONFIG['Postprocessing']['Scanner']['minsize'] * 1048576
 
         # paths processed with api requests since last task run
-        postprocessed_paths = core.sql.get_last_postprocessed_paths()
+        postprocessed_paths = core.sql.get_postprocessed_paths()
         logging.debug('Paths already post processed: {}'.format(postprocessed_paths))
 
         files = []
@@ -305,7 +306,7 @@ class TraktSync(object):
 
 
 class FileScan(object):
-    ''' Scheduled task to automatically sync selected Trakt lists '''
+    ''' Scheduled task to automatically clear missing finished files '''
 
     @staticmethod
     def create():
@@ -317,4 +318,29 @@ class FileScan(object):
         auto_start = core.CONFIG['System']['FileManagement']['scanmissingfiles']
 
         SchedulerPlugin.ScheduledTask(hr, min, interval, Manage.scanmissingfiles, auto_start=auto_start, name='Missing Files Scan')
+        return
+
+
+class PostprocessedPathsScan(object):
+    ''' Scheduled task to automatically clear deleted postprocessed paths from database '''
+
+    @staticmethod
+    def create():
+        interval = 60 * 60  # 1 hour
+
+        now = datetime.datetime.today()
+
+        hr = now.hour
+        min = now.minute
+
+        SchedulerPlugin.ScheduledTask(hr, min, interval, PostprocessedPathsScan.scan_paths, auto_start=True, name='Postprocessed Paths Scan')
+        return
+
+    @staticmethod
+    def scan_paths():
+        postprocessed_paths = core.sql.get_postprocessed_paths()
+        for path in postprocessed_paths:
+            if not os.path.exists(path):
+                core.sql.delete('POSTPROCESSED_PATHS', 'path', path)
+
         return
