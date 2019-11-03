@@ -84,7 +84,6 @@ def _parse(xml, imdbid):
             result['download_client'] = None
             result['seeders'] = int(i['seeders'])
 
-            logging.debug('Found result: {}'.format(result))
             results.append(result)
         except Exception as e:
             logging.error('Error parsing TorrentDownloads XML.', exc_info=True)
