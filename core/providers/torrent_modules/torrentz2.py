@@ -58,10 +58,15 @@ def _parse(xml, imdbid):
     logging.info('Parsing Torrentz2 results.')
 
     try:
-        items = yahoo.data(fromstring(xml))['rss']['channel']['item']
+        channel = yahoo.data(fromstring(xml))['rss']['channel']
+        items = channel['item'] if 'item' in channel else []
     except Exception as e:
         logging.error('Unexpected XML format from Torrentz2.', exc_info=True)
         return []
+
+    if isinstance(items, dict):
+        # fix for parsing rss with one item only
+        items = [items]
 
     results = []
     for i in items:
