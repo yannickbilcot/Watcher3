@@ -614,7 +614,7 @@ class Metadata(object):
         if not movie.get('tmdbid'):
             movie['tmdbid'] = movie.get('id')
 
-        if not isinstance(movie.get('alternative_titles'), str):
+        if movie.get('alternative_titles') and not isinstance(movie.get('alternative_titles'), str):
             a_t = []
             for i in movie.get('alternative_titles', {}).get('titles', []):
                 if i['iso_3166_1'] == 'US':
