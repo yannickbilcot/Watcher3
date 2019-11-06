@@ -288,48 +288,13 @@ function upload_restore_zip(event, button){
 }
 
 function execute_task(event, elem, name){
-    event.preventDefault();
-    var $this = $(elem);
-
-    if(elem.classList.contains("disabled")){
-        return;
-    }
     var $tr = elem.parentElement.parentElement;
-    var $btns = document.querySelectorAll("i.task_execute");
-
-    each($btns, function(b, i){
-        b.classList.add("disabled");
-    });
-    elem.classList.remove("mdi-play-circle");
-    elem.classList.add("mdi-circle");
-    elem.classList.add("animated");
-
-    $.post(url_base + "/ajax/manual_task_execute", {name: name})
-        .done(function(response){
-            var t = tasks[name];
-            t["last_execution"] = response["last_execution"];
-
-            $tr.innerHTML = _render_task_row(t);
-
-            if(response["response"] === true){
-                $.notify({message: response["message"]});
-                $.each(response["notifications"], function(i, notif){
-                    notif[1]["onClose"] = remove_notif;
-                    var n = $.notify(notif[0], notif[1]);
-                    n["$ele"].attr("data-index", notif[1]["index"]);
-                });
-            } else {
-                $.notify({message: response["error"]}, {type: "danger", delay: 0});
-            }
-        })
-        .fail(notify_error)
-        .always(function(){
-            elem.classList.remove("mdi-circle");
-            elem.classList.remove("animated");
-            elem.classList.add("mdi-play-circle");
-            each($btns, function(b, i){
-                b.classList.remove("disabled");
-            });
+    var $post = _execute_task(event, elem, name);
+    if($post){
+        $post.done(function(response){
+            var task = tasks[name];
+            task["last_execution"] = response["last_execution"];
+            $tr.innerHTML = _render_task_row(task);
         });
-
+    }
 }

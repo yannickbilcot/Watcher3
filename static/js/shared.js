@@ -88,6 +88,40 @@ function _start_update(event){
         .fail(notify_error);
 }
 
+function _execute_task(event, elem, name){
+    event.preventDefault();
+
+    if(elem.classList.contains("disabled")){
+        return;
+    }
+    elem.classList.add("disabled");
+
+    elem.classList.remove("mdi-play-circle");
+    elem.classList.add("mdi-circle");
+    elem.classList.add("animated");
+
+    return $.post(url_base + "/ajax/manual_task_execute", {name: name})
+        .done(function(response){
+            if(response["response"] === true){
+                $.notify({message: response["message"]});
+                $.each(response["notifications"], function(i, notif){
+                    notif[1]["onClose"] = remove_notif;
+                    var n = $.notify(notif[0], notif[1]);
+                    n["$ele"].attr("data-index", notif[1]["index"]);
+                });
+            } else {
+                $.notify({message: response["error"]}, {type: "danger", delay: 0});
+            }
+        })
+        .fail(notify_error)
+        .always(function(){
+            elem.classList.remove("mdi-circle");
+            elem.classList.remove("animated");
+            elem.classList.add("mdi-play-circle");
+            elem.classList.remove("disabled");
+        });
+}
+
 function _(s){
     /* Localization method
     s (str): string to look for in translation file
