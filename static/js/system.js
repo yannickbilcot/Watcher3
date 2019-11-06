@@ -1,8 +1,8 @@
 /* global url_base, notify_error, each, server_time, tasks */
 window.addEventListener("DOMContentLoaded", function(){
     var $tasks_table = document.querySelector("table#tasks > tbody");
-    server_time = document.querySelector('meta[name="server_time"]').content;
-    tasks = JSON.parse(document.querySelector('meta[name="tasks"]').content);
+    server_time = document.querySelector(`meta[name="server_time"]`).content;
+    tasks = JSON.parse(document.querySelector(`meta[name="tasks"]`).content);
 
     $button_begin_restore = document.querySelector("button#submit_restore_zip");
 
@@ -13,15 +13,15 @@ window.addEventListener("DOMContentLoaded", function(){
     $restore_modal = document.getElementById("modal_restore_backup");
     var restore_modal_html = $restore_modal.innerHTML;
 
-    $restore_modal.addEventListener('hidden.bs.modal', function(){
+    $restore_modal.addEventListener("hidden.bs.modal", function(){
         $restore_modal.innerHTML = restore_modal_html;
     });
 
-    each(document.querySelectorAll('input[type="time"]'), function(input){
+    each(document.querySelectorAll(`input[type="time"]`), function(input){
         var hr = input.dataset.hour.toString().padStart(2, 0);
         var min = input.dataset.minute.toString().padStart(2, 0);
-        input.value = hr + ':' + min;
-    })
+        input.value = hr + ":" + min;
+    });
 
 });
 
@@ -35,34 +35,34 @@ function _get_settings(){
     var required_fields = [];
 
     each(document.querySelectorAll("form[data-category='filemanagement'] i.c_box"), function(checkbox){
-        settings['FileManagement'][checkbox.id] = is_checked(checkbox);
+        settings["FileManagement"][checkbox.id] = is_checked(checkbox);
     });
 
-    if(settings['scanmissingfiles']){
+    if(settings["scanmissingfiles"]){
         required_fields.push("scanmissinghour", "scanmissingmin");
     }
 
-    each(document.querySelector("form[data-category='filemanagement']").querySelectorAll('input, select'), function(input){
-        if(input.value == "" && required_fields.includes(input.id)){
-            input.classList.add('border-danger');
+    each(document.querySelector("form[data-category='filemanagement']").querySelectorAll("input, select"), function(input){
+        if(input.value === "" && required_fields.includes(input.id)){
+            input.classList.add("border-danger");
             blanks = true;
-            return
-        } else if(input.id == 'scanmissingtime'){
+            return;
+        } else if(input.id == "scanmissingtime"){
             var [hour, min] = input.value.split(":").map(function(item){
                 return parseInt(item);
             });
-            settings['FileManagement']['scanmissinghour'] = hour;
-            settings['FileManagement']['scanmissingmin'] = min;
-            return
+            settings["FileManagement"]["scanmissinghour"] = hour;
+            settings["FileManagement"]["scanmissingmin"] = min;
+            return;
         }
 
-        settings['FileManagement'][input.id] = parse_input(input);
+        settings["FileManagement"][input.id] = parse_input(input);
     });
 
     if(blanks === true){
         return false;
     }
-    return {"System": settings}
+    return {"System": settings};
 }
 
 /* Delcaring some time vars */
@@ -90,24 +90,24 @@ function time_difference(now, time){
     diff = Math.abs(diff);
 
     if(diff < spmin){
-        t = diff + ' seconds';
+        t = diff + " seconds";
     } else if(diff < sphr){
-        t = Math.round(diff/spmin) + ' minutes';
-    } else if(diff < spd ){
-        t = Math.round(diff/sphr ) + ' hours';
+        t = Math.round(diff / spmin) + " minutes";
+    } else if(diff < spd){
+        t = Math.round(diff / sphr) + " hours";
     } else {
-        t = Math.round(diff/spd) + ' days';
+        t = Math.round(diff / spd) + " days";
     }
     return t + a;
 }
 
-function parseDate(date) {
-  const parsed = Date.parse(date);
-  if (!isNaN(parsed)) {
-    return parsed;
-  }
+function parseDate(date){
+    const parsed = Date.parse(date);
+    if(!isNaN(parsed)){
+        return parsed;
+    }
 
-  return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
+    return Date.parse(date.replace(/-/g, "/").replace(/[a-z]+/gi, " "));
 }
 
 function _render_task_row(task){
@@ -121,13 +121,13 @@ function _render_task_row(task){
 
     var next = le + task["interval"], enabled;
 
-    while(next < server_time){
+    while (next < server_time) {
         next += task["interval"];
     }
 
     if(task["enabled"]){
         next = time_difference(server_time, next);
-        enabled = "<i class='mdi mdi-check'></i>";
+        enabled = `<i class="mdi mdi-check"></i>`;
     } else {
         next = "--";
         enabled = "";
@@ -157,7 +157,7 @@ function interval_string(seconds){
     Returns string
     */
 
-    var times = ['seconds', 'minutes', 'hours'];
+    var times = ["seconds", "minutes", "hours"];
 
     if(seconds % 3600 === 0){
         return seconds / 3600 + " Hours";
@@ -187,36 +187,36 @@ function time_string(time){
     min = (min < 10 ? "0" : "") + min;
     sec = (sec < 10 ? "0" : "") + sec;
 
-    return `${year}-${month}-${day} ${hour}:${min}:${sec}`
+    return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
 }
 
 function create_backup(event, button){
     event.preventDefault();
-    var $btns = document.querySelectorAll('div#modal_create_backup button');
+    var $btns = document.querySelectorAll("div#modal_create_backup button");
     var $thinker = document.querySelector("div#modal_create_backup div.thinker_small");
 
     each($btns, function(button){
-        button.setAttribute('disabled', true);
+        button.setAttribute("disabled", true);
     });
 
     $thinker.style.maxHeight = "100%";
 
     $.post(url_base + "/ajax/create_backup", {})
-    .done(function(response){
-        if(response["response"] === true){
-            $.notify({message: response["message"]}, {delay: 0})
-        } else {
-            $.notify({message: `${response['error']}`}, {type: "danger", delay: 0})
-        }
-    })
-    .fail(notify_error)
-    .always(function(){
-        each($btns, function(button){
-            button.removeAttribute('disabled');
-        });
+        .done(function(response){
+            if(response["response"] === true){
+                $.notify({message: response["message"]}, {delay: 0});
+            } else {
+                $.notify({message: `${response["error"]}`}, {type: "danger", delay: 0});
+            }
+        })
+        .fail(notify_error)
+        .always(function(){
+            each($btns, function(button){
+                button.removeAttribute("disabled");
+            });
 
-        $thinker.style.maxHeight = "0%";
-    });
+            $thinker.style.maxHeight = "0%";
+        });
 }
 
 function _restore_zip_selected(input){
@@ -242,47 +242,47 @@ function upload_restore_zip(event, button){
 
     var $thinker = document.querySelector("div#modal_create_backup div.thinker_small");
 
-    button.setAttribute('disabled', true);
+    button.setAttribute("disabled", true);
 
     $($input).liteUploader({
         script: url_base + "/ajax/restore_backup",
     })
-    .on("lu:errors", function (e, errors) {
-        if(errors[0]["errors"][0]["type"] === "type"){
-            $.notify({message: _("Select a ZIP file.")}, {type: "warning"})
-        } else {
-            each(errors[0]['errors'], function(err){
-                $.notify({message: `Error: ${err["type"]}`}, {type: "warning"})
-            })
-        }
-    })
-    .on("lu:before", function(){
-        $modal_tc.style.maxHeight = '0%';
-        $restore_modal.querySelector("div.progress").style.maxHeight = '100%';
-        $title_text.innerText = _("Uploading Restore Zip.");
-        $thinker.style.maxHeight = '100%';
-    })
-    .on("lu:progress", function (e, state) {
-        $progress_bar.style.width = (state.percentage + "%");
-        if(state.percentage === 100){
-            $title_text.innerText = _("Restoring Backup.");
-        }
-    })
-    .on("lu:success", function (e, response) {
-        response = JSON.parse(response);
-        if(response["response"] === true){
-            $.notify({message: "Restore finished, restarting..."});
-            setTimeout(function(){
-                window.location = url_base + "/system/restart?e=false";
-            }, 1000);
-        } else {
-            $.notify({message: response["error"]}, {type: "warning"})
-        }
-    })
-    .on("lu:fail", function (e, data) {
-        var err = data.status + ' ' + data.statusText;
-        $.notify({message: err}, {type: "danger", delay: 0});
-    });
+        .on("lu:errors", function(e, errors){
+            if(errors[0]["errors"][0]["type"] === "type"){
+                $.notify({message: _("Select a ZIP file.")}, {type: "warning"});
+            } else {
+                each(errors[0]["errors"], function(err){
+                    $.notify({message: `Error: ${err["type"]}`}, {type: "warning"});
+                });
+            }
+        })
+        .on("lu:before", function(){
+            $modal_tc.style.maxHeight = "0%";
+            $restore_modal.querySelector("div.progress").style.maxHeight = "100%";
+            $title_text.innerText = _("Uploading Restore Zip.");
+            $thinker.style.maxHeight = "100%";
+        })
+        .on("lu:progress", function(e, state){
+            $progress_bar.style.width = (state.percentage + "%");
+            if(state.percentage === 100){
+                $title_text.innerText = _("Restoring Backup.");
+            }
+        })
+        .on("lu:success", function(e, response){
+            response = JSON.parse(response);
+            if(response["response"] === true){
+                $.notify({message: "Restore finished, restarting..."});
+                setTimeout(function(){
+                    window.location = url_base + "/system/restart?e=false";
+                }, 1000);
+            } else {
+                $.notify({message: response["error"]}, {type: "warning"});
+            }
+        })
+        .on("lu:fail", function(e, data){
+            var err = data.status + " " + data.statusText;
+            $.notify({message: err}, {type: "danger", delay: 0});
+        });
 
     $($input).data("liteUploader").startUpload();
 }
@@ -292,7 +292,7 @@ function execute_task(event, elem, name){
     var $this = $(elem);
 
     if(elem.classList.contains("disabled")){
-        return
+        return;
     }
     var $tr = elem.parentElement.parentElement;
     var $btns = document.querySelectorAll("i.task_execute");
@@ -305,31 +305,31 @@ function execute_task(event, elem, name){
     elem.classList.add("animated");
 
     $.post(url_base + "/ajax/manual_task_execute", {name: name})
-    .done(function(response){
-        var t = tasks[name];
-        t["last_execution"] = response["last_execution"];
+        .done(function(response){
+            var t = tasks[name];
+            t["last_execution"] = response["last_execution"];
 
-        $tr.innerHTML = _render_task_row(t);
+            $tr.innerHTML = _render_task_row(t);
 
-        if(response["response"] === true){
-            $.notify({message: response["message"]});
-            $.each(response["notifications"], function(i, notif){
-                notif[1]["onClose"] = remove_notif;
-                var n = $.notify(notif[0], notif[1]);
-                n["$ele"].attr("data-index", notif[1]["index"]);
+            if(response["response"] === true){
+                $.notify({message: response["message"]});
+                $.each(response["notifications"], function(i, notif){
+                    notif[1]["onClose"] = remove_notif;
+                    var n = $.notify(notif[0], notif[1]);
+                    n["$ele"].attr("data-index", notif[1]["index"]);
+                });
+            } else {
+                $.notify({message: response["error"]}, {type: "danger", delay: 0});
+            }
+        })
+        .fail(notify_error)
+        .always(function(){
+            elem.classList.remove("mdi-circle");
+            elem.classList.remove("animated");
+            elem.classList.add("mdi-play-circle");
+            each($btns, function(b, i){
+                b.classList.remove("disabled");
             });
-        } else {
-            $.notify({message: response["error"]}, {type: "danger", delay: 0})
-        }
-    })
-    .fail(notify_error)
-    .always(function(){
-        elem.classList.remove("mdi-circle");
-        elem.classList.remove("animated");
-        elem.classList.add("mdi-play-circle");
-        each($btns, function(b, i){
-            b.classList.remove("disabled");
         });
-    });
 
 }
