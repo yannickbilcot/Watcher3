@@ -140,6 +140,40 @@ def set_torrent_limits(downloadid):
     else:
         return True
 
+def get_torrents_status():
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['Transmission']
+
+    logging.info('Get torrents from transmissionrpc')
+
+    host = conf['host']
+    port = conf['port']
+    user = conf['user']
+    password = conf['pass']
+
+    try:
+        torrents = []
+
+        client = transmissionrpc.Client(host, port, user=user, password=password)
+
+        for torrent in client.get_torrents(arguments = ['id', 'hashString', 'isFinished', 'isStalled', 'status', 'percentDone', 'name']):
+            data = {'hash': torrent._fields['hashString'].value, 'status': torrent.status, 'name': torrent._get_name_string()}
+            if torrent.status == 'stopped' and torrent._fields['isFinished'].value:
+                data['status'] = 'finished'
+            elif torrent._fields['isStalled'].value and torrent._fields['percentDone'].value != 1:
+                data['status'] = 'stalled'
+            torrents.append(data)
+
+        return torrents
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        logging.error('Unable to list torrents from TransmissionRPC.', exc_info=True)
+        return []
+
 def cancel_download(downloadid):
     ''' Cancels download in client
     downloadid: int download id

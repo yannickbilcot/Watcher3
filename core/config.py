@@ -280,6 +280,24 @@ def restart_scheduler(diff):
             auto_start = core.CONFIG['System']['FileManagement']['scanmissingfiles']
             core.scheduler_plugin.task_list['Missing Files Scan'].reload(hr, min, interval, auto_start=auto_start)
 
+    if 'Downloader' in diff and 'Torrent' in diff['Downloader']:
+        auto_start = False
+        client = None
+        if core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            for name, config in core.CONFIG['Downloader']['Torrent'].items():
+                if config['enabled'] and config.get('removetorrents'):
+                    auto_start = True
+                    client = name
+                    break
+        if auto_start:
+            d = diff['Downloader']['Torrent'].get(client, {}).keys()
+            if any(i in d for i in ('enabled', 'removetorrents')):
+                hr = (now.hour + 1) % 24
+                min = now.minute
+                core.scheduler_plugin.task_list['Torrents Status Check'].reload(hr, min, 3600, auto_start=True)
+        else:
+            core.scheduler_plugin.task_list['Torrents Status Check'].reload(0, 0, 3600, auto_start=False)
+
 
 '''
 base_profile is used as the template quality profile if none is present.

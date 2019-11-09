@@ -7,7 +7,7 @@ import os
 import time
 import hashlib
 
-from core import searcher, postprocessing
+from core import searcher, postprocessing, downloaders
 from core.rss import imdb, popularmovies
 from lib.cherrypyscheduler import SchedulerPlugin
 from core import trakt
@@ -36,6 +36,7 @@ def create_plugin():
     TraktSync.create()
     FileScan.create()
     PostprocessedPathsScan.create()
+    FinishedTorrentsCheck.create()
     core.scheduler_plugin.subscribe()
 
 
@@ -343,4 +344,38 @@ class PostprocessedPathsScan(object):
             if not os.path.exists(path):
                 core.sql.delete('POSTPROCESSED_PATHS', 'path', path)
 
+        return
+
+class FinishedTorrentsCheck(object):
+    ''' Scheduled task to automatically delete finished torrents from downloader '''
+
+    @staticmethod
+    def create():
+        interval = 60 * 60  # 1 hour
+
+        now = datetime.datetime.today()
+
+        hr = now.hour
+        min = now.minute
+
+        auto_start = False
+        if core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            for config in core.CONFIG['Downloader']['Torrent'].values():
+                if config['enabled'] and config.get('removetorrents'):
+                    auto_start = True
+                    break
+
+        SchedulerPlugin.ScheduledTask(hr, min, interval, FinishedTorrentsCheck.check_torrents, auto_start=auto_start, name='Torrents Status Check')
+        return
+
+    @staticmethod
+    def check_torrents():
+        for client, config in core.CONFIG['Downloader']['Torrent'].items():
+            if config['enabled']:
+                downloader = getattr(downloaders, client)
+                for torrent in downloader.get_torrents_status():
+                    if torrent['status'] == 'finished':
+                        logging.debug('Check if we know finished torrent {} and is postprocessed ({})'.format(torrent['hash'], torrent['name']))
+                        if core.sql.row_exists('MARKEDRESULTS', guid=str(torrent['hash']), status='Finished'):
+                            downloader.cancel_download(torrent['hash'])
         return
