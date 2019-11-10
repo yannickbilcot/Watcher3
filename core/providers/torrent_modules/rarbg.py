@@ -147,7 +147,8 @@ def _parse(results, imdbid=None):
 
     for result in results:
         result['indexer'] = 'Rarbg'
-        result['info_link'] = result['info_page']
+        if result['info_page']:
+            result['info_link'] = result['info_page'] + '&app_id=Watcher'
         result['torrentfile'] = result['download']
         result['guid'] = result['download'].split('&')[0].split(':')[-1]
         result['type'] = 'magnet'
