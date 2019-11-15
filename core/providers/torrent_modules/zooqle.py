@@ -72,6 +72,7 @@ def _parse(xml, imdbid):
             result['freeleech'] = 0
             result['download_client'] = None
             result['seeders'] = int(i[10].text)
+            result['leechers'] = int(i[11].text)
 
             results.append(result)
         except Exception as e:
