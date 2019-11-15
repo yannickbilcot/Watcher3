@@ -141,7 +141,7 @@ def _parse(results, imdbid=None):
     '''
 
     logging.info('Parsing {} Rarbg results.'.format(len(results)))
-    item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
+    item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders', 'leechers')
 
     parsed_results = []
 
