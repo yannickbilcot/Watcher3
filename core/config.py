@@ -285,13 +285,13 @@ def restart_scheduler(diff):
         client = None
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             for name, config in core.CONFIG['Downloader']['Torrent'].items():
-                if config['enabled'] and config.get('removetorrents'):
+                if config['enabled'] and (config.get('removetorrents') or config.get('removestalledfor')):
                     auto_start = True
                     client = name
                     break
         if auto_start:
             d = diff['Downloader']['Torrent'].get(client, {}).keys()
-            if any(i in d for i in ('enabled', 'removetorrents')):
+            if any(i in d for i in ('enabled', 'removetorrents', 'removestalledfor')):
                 hr = (now.hour + 1) % 24
                 min = now.minute
                 core.scheduler_plugin.task_list['Torrents Status Check'].reload(hr, min, 3600, auto_start=True)

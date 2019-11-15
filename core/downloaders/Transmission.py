@@ -3,6 +3,7 @@ import logging
 from lib import transmissionrpc
 
 import core
+from datetime import datetime
 
 logging = logging.getLogger(__name__)
 
@@ -140,7 +141,7 @@ def set_torrent_limits(downloadid):
     else:
         return True
 
-def get_torrents_status():
+def get_torrents_status(stalled_for=None, progress={}):
     ''' Get torrents and calculate status
 
     Returns list
@@ -159,12 +160,16 @@ def get_torrents_status():
 
         client = transmissionrpc.Client(host, port, user=user, password=password)
 
-        for torrent in client.get_torrents(arguments = ['id', 'hashString', 'isFinished', 'isStalled', 'status', 'percentDone', 'name']):
-            data = {'hash': torrent._fields['hashString'].value, 'status': torrent.status, 'name': torrent._get_name_string()}
+        now = int(datetime.timestamp(datetime.now()))
+        fields = ['id', 'hashString', 'isFinished', 'isStalled', 'status', 'percentDone', 'name', 'downloadedEver']
+        for torrent in client.get_torrents(arguments=fields):
+            data = {'hash': torrent._fields['hashString'].value, 'status': torrent.status, 'name': torrent._get_name_string(), 'progress': torrent._fields['downloadedEver'].value}
             if torrent.status == 'stopped' and torrent._fields['isFinished'].value:
                 data['status'] = 'finished'
-            elif torrent._fields['isStalled'].value and torrent._fields['percentDone'].value != 1:
-                data['status'] = 'stalled'
+            elif torrent.status == 'downloading' and stalled_for and data['hash'] in progress:
+                torrent_progress = progress[data['hash']]
+                if data['progress'] == torrent_progress['progress'] and now > torrent_progress['time'] + stalled_for * 3600:
+                    data['status'] = 'stalled'
             torrents.append(data)
 
         return torrents

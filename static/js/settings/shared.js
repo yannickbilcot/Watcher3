@@ -104,12 +104,13 @@ function parse_input(input){
 
     if(input.type === "number"){
         var parse_func = /\./.test(input.step) ? parse_float : parse_integer;
-        if (input.min){
+        if(input.min){
+            if(input.dataset.allowBlank === "true" && input.value === "") return "";
             var min = parse_func(input.min || 0);
-            var val = Math.max(parse_func(input.value, 10), min);
+            var val = Math.max(parse_func(input.value), min);
             return val || min;
         } else {
-            return input.value ? parse_func(input.value, 10) : "";
+            return input.value ? parse_func(input.value) : "";
         }
     } else {
         return input.value;
@@ -134,8 +135,8 @@ function init_sortables($sortables = false){
         });
 
         $lis.sort(function(a, b){
-            var compa = parseInt($(a).data("sort"));
-            var compb = parseInt($(b).data("sort"));
+            var compa = parseInt($(a).data("sort"), 10);
+            var compb = parseInt($(b).data("sort"), 10);
             return (compa < compb) ? -1 : (compa > compb) ? 1 : 0;
         });
 

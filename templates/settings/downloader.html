@@ -422,7 +422,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label>${_('Remove Torrents')}</label>
+                            <label>${_('Remove Finished Torrents')}</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <button class="input-group-text">
@@ -436,11 +436,15 @@
                         </div>
                         <div class="col-md-6">
                             <label data-toggle="tooltip" title="${_('blank = client setting, -1 = unlimited')}">${_('Stop seeding after being idle for X hours')}</label>
-                            <input type="number" data-id="seedidlelimit" class="form-control" placeholder="2" value="${config['Torrent']['Transmission'].get('seedidlelimit', '')}">
+                            <input type="number" data-id="seedidlelimit" data-allow-blank="true" class="form-control" min="0" placeholder="2" value="${config['Torrent']['Transmission'].get('seedidlelimit', '')}">
                         </div>
                         <div class="col-md-6">
                             <label data-toggle="tooltip" title="${_('blank = client setting, -1 = unlimited')}">${_('Stop seeding when ratio X is reached')}</label>
-                            <input type="number" data-id="seedratiolimit" class="form-control" placeholder="1.0" step="0.1" value="${config['Torrent']['Transmission'].get('seedratiolimit', '')}">
+                            <input type="number" data-id="seedratiolimit" data-allow-blank="true" class="form-control" min="0" placeholder="1.0" step="0.1" value="${config['Torrent']['Transmission'].get('seedratiolimit', '')}">
+                        </div>
+                        <div class="col-md-6">
+                            <label data-toggle="tooltip" title="${_('blank = don\'t remove stalled torrents')}">${_('Remove torrents stalled for X hours')}</label>
+                            <input type="number" data-id="removestalledfor" data-allow-blank="true" class="form-control" min="1" placeholder="2" value="${config['Torrent']['Transmission'].get('removestalledfor', '')}">
                         </div>
                     </div>
                     <!-- QBITTORRENT -->

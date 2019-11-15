@@ -7,7 +7,7 @@ import os
 import time
 import hashlib
 
-from core import searcher, postprocessing, downloaders
+from core import searcher, postprocessing, downloaders, snatcher
 from core.rss import imdb, popularmovies
 from lib.cherrypyscheduler import SchedulerPlugin
 from core import trakt
@@ -361,7 +361,7 @@ class FinishedTorrentsCheck(object):
         auto_start = False
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             for config in core.CONFIG['Downloader']['Torrent'].values():
-                if config['enabled'] and config.get('removetorrents'):
+                if config['enabled'] and (config.get('removetorrents') or config.get('removestalledfor')):
                     auto_start = True
                     break
 
@@ -372,10 +372,44 @@ class FinishedTorrentsCheck(object):
     def check_torrents():
         for client, config in core.CONFIG['Downloader']['Torrent'].items():
             if config['enabled']:
+                progress = {}
+                now = int(datetime.datetime.timestamp(datetime.datetime.now()))
+                if config.get('removestalledfor'):
+                    progress = core.sql.get_download_progress()
+
                 downloader = getattr(downloaders, client)
-                for torrent in downloader.get_torrents_status():
-                    if torrent['status'] == 'finished':
-                        logging.debug('Check if we know finished torrent {} and is postprocessed ({})'.format(torrent['hash'], torrent['name']))
+                for torrent in downloader.get_torrents_status(stalled_for=config.get('removestalledfor'), progress=progress):
+                    progress_update = None
+
+                    if torrent['status'] == 'finished' and config.get('removetorrents'):
+                        logging.info('Check if we know finished torrent {} and is postprocessed ({})'.format(torrent['hash'], torrent['name']))
                         if core.sql.row_exists('MARKEDRESULTS', guid=str(torrent['hash']), status='Finished'):
                             downloader.cancel_download(torrent['hash'])
+
+                    if torrent['status'] == 'stalled':
+                        logging.info('Check if we know torrent {} and is snatched ({})'.format(torrent['hash'], torrent['name']))
+                        if core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):
+                            result = core.sql.get_single_search_result('downloadid', str(torrent['hash']))
+                            movie = core.sql.get_movie_details('imdbid', result['imdbid'])
+                            best_release = snatcher.get_best_release(movie, ignore_guid=result['guid'])
+                            # if top score is already downloading returns {}, stalled torrent will be deleted and nothing will be snatched
+                            if best_release is not None:
+                                logging.info('Torrent {} is stalled, download will be cancelled and marked as Bad'.format(torrent['hash']))
+                                # Manage.searchresults(result['guid'], 'Bad')
+                                # Manage.markedresults(result['guid'], 'Bad', imdbid=result['imdbid'])
+                                # downloader.cancel_download(torrent['hash'])
+                                if best_release:
+                                    logging.info("Snatch {} {}".format(best_release['guid'], best_release['title']))
+                                    # snatcher.download(best_release)
+
+                    elif config.get('removestalledfor'):
+                        if torrent['status'] == 'downloading':
+                            if torrent['hash'] not in progress or torrent['progress'] != progress[torrent['hash']]['progress']:
+                                progress_update = {'download_progress': torrent['progress'], 'download_time': now}
+                        elif torrent['hash'] in progress:
+                            progress_update = {'download_progress': None, 'download_time': None}
+
+                    if progress_update and core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):
+                        core.sql.update_multiple_values('SEARCHRESULTS', progress_update, 'downloadid', torrent['hash'])
+
         return

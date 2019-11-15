@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 12
+current_version = 13
 
 
 def proxy_to_dict(p):
@@ -90,7 +90,9 @@ class SQL(object):
                                         sqla.Column('type', sqla.TEXT),
                                         sqla.Column('downloadid', sqla.TEXT),
                                         sqla.Column('download_client', sqla.TEXT),
-                                        sqla.Column('freeleech', sqla.SMALLINT)
+                                        sqla.Column('freeleech', sqla.SMALLINT),
+                                        sqla.Column('download_progress', sqla.INT),
+                                        sqla.Column('download_time', sqla.TIMESTAMP)
                                         )
         self.MARKEDRESULTS = sqla.Table('MARKEDRESULTS', self.metadata,
                                         sqla.Column('imdbid', sqla.TEXT),
@@ -668,6 +670,17 @@ class SQL(object):
         else:
             return False
 
+    def get_download_progress(self):
+        results = {}
+
+        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND download_progress IS NOT NULL'
+        data = self.execute([sql, 'Snatched'])
+        if data:
+            for i in data.fetchall():
+                results[i['downloadid']] = {'progress': i['download_progress'], 'time': i['download_time']}
+
+        return results
+
     def get_single_search_result(self, idcol, idval, like=False):
         ''' Gets single search result
         idcol (str): identifying column
@@ -1085,7 +1098,7 @@ class DatabaseUpdate(object):
 
     @staticmethod
     def update_11():
-        ''' Add category column to MOVIES '''
+        ''' Add search with year option to indexers in config '''
         config.load()
         for indexer in core.CONFIG['Indexers']['TorzNab'].values():
             if len(indexer) == 3:
@@ -1095,6 +1108,11 @@ class DatabaseUpdate(object):
     @staticmethod
     def update_12():
         ''' Add table POSTPROCESSED_PATHS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_13():
+        ''' Add download_progress and download_time columns to SEARCHRESULTS '''
         core.sql.update_tables()
 
     # Adding a new method? Remember to update the current_version #
