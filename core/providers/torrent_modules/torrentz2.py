@@ -90,6 +90,7 @@ def _parse(xml, imdbid):
             result['type'] = 'magnet'
             result['downloadid'] = None
             result['seeders'] = int(desc[4])
+            result['leechers'] = int(desc[6])
             result['download_client'] = None
             result['freeleech'] = 0
 
