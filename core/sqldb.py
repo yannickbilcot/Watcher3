@@ -214,6 +214,11 @@ class SQL(object):
         if not LIST:
             return True
 
+        columns = self.SEARCHRESULTS.columns.keys()
+        for row in LIST:
+            for k in columns - row.keys():
+                row[k] = None
+
         logging.debug('Writing batch into SEARCHRESULTS.')
 
         INSERT = self.SEARCHRESULTS.insert()
