@@ -145,6 +145,10 @@ default status Available.
     for idx, result in enumerate(results):
         for old in active_old_results:
             if old['guid'] == result['guid']:
+                if 'seeders' in result:
+                    old['seeders'] = result['seeders']
+                if 'leechers' in result:
+                    old['leechers'] = result['leechers']
                 result.update(old)
                 results[idx] = result
 

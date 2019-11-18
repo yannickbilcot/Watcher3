@@ -164,7 +164,7 @@ def _parse(results, imdbid=None):
         result['download_client'] = None
         parsed_results.append(result)
 
-    logging.info('Found {} results from '.format(len(parsed_results)))
+    logging.info('Found {} results from rarbg'.format(len(parsed_results)))
     return parsed_results
 
 
