@@ -183,7 +183,7 @@ class NewzNabProvider(object):
                         result['type'] = 'magnet'
 
                     result['seeders'] = item['attr'].get('seeders', 0)
-                    result['leechers'] = item['attr'].get('leechers', 0)
+                    result['leechers'] = item['attr'].get('peers', 0)
 
                 results.append(result)
             except Exception as e:
