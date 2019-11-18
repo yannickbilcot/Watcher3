@@ -63,7 +63,9 @@ function format_template(t, d){
     // d: dict to substitue
     // Returns HTML node
     for (var p in d) {
-        t = t.replace(new RegExp("{" + p + "}", "g"), d[p] || "");
+        var val = d[p];
+        if(val === null || val === undefined) val = "";
+        t = t.replace(new RegExp("{" + p + "}", "g"), val);
     }
     return $.parseHTML(t.trim())[0];
 }
