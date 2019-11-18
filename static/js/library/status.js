@@ -517,7 +517,11 @@ function _results_table(results){
         result["guid"] = result["guid"].replace(/'/g, "\\'").toLowerCase();
         result["mark_bad_hidden"] = result["status"] === "Bad" ? "hidden" : "";
         result["unmark_bad_hidden"] = result["status"] !== "Bad" ? "hidden" : "";
-        rows += format_template(templates.release, result).outerHTML;
+        var row = format_template(templates.release, result);
+        if (result.seeders === null && result.leechers === null) {
+            $('.seeders-leechers', row).hide();
+        }
+        rows += row.outerHTML;
     });
 
     return rows;

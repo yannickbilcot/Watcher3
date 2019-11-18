@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 13
+current_version = 14
 
 
 def proxy_to_dict(p):
@@ -92,7 +92,9 @@ class SQL(object):
                                         sqla.Column('download_client', sqla.TEXT),
                                         sqla.Column('freeleech', sqla.SMALLINT),
                                         sqla.Column('download_progress', sqla.INT),
-                                        sqla.Column('download_time', sqla.TIMESTAMP)
+                                        sqla.Column('download_time', sqla.TIMESTAMP),
+                                        sqla.Column('seeders', sqla.SMALLINT),
+                                        sqla.Column('leechers', sqla.SMALLINT)
                                         )
         self.MARKEDRESULTS = sqla.Table('MARKEDRESULTS', self.metadata,
                                         sqla.Column('imdbid', sqla.TEXT),
@@ -1118,6 +1120,11 @@ class DatabaseUpdate(object):
     @staticmethod
     def update_13():
         ''' Add download_progress and download_time columns to SEARCHRESULTS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_14():
+        ''' Add seeders and leechers columns to SEARCHRESULTS '''
         core.sql.update_tables()
 
     # Adding a new method? Remember to update the current_version #
