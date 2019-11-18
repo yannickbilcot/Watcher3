@@ -395,12 +395,12 @@ class FinishedTorrentsCheck(object):
                             # if top score is already downloading returns {}, stalled torrent will be deleted and nothing will be snatched
                             if best_release is not None:
                                 logging.info('Torrent {} is stalled, download will be cancelled and marked as Bad'.format(torrent['hash']))
-                                # Manage.searchresults(result['guid'], 'Bad')
-                                # Manage.markedresults(result['guid'], 'Bad', imdbid=result['imdbid'])
-                                # downloader.cancel_download(torrent['hash'])
+                                Manage.searchresults(result['guid'], 'Bad')
+                                Manage.markedresults(result['guid'], 'Bad', imdbid=result['imdbid'])
+                                downloader.cancel_download(torrent['hash'])
                                 if best_release:
                                     logging.info("Snatch {} {}".format(best_release['guid'], best_release['title']))
-                                    # snatcher.download(best_release)
+                                    snatcher.download(best_release)
 
                     elif config.get('removestalledfor'):
                         if torrent['status'] == 'downloading':
