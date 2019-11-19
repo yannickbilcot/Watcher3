@@ -99,6 +99,10 @@ def score(releases, imdbid=None, imported=False):
             releases = seed_check(releases)
         if core.CONFIG['Search']['freeleechpoints'] > 0 or core.CONFIG['Search']['requirefreeleech']:
             releases = freeleech(releases)
+        if core.CONFIG['Search']['seederspoints'] and core.CONFIG['Search']['seedersthreshold']:
+            releases = threshold_score(releases, 'seeders', core.CONFIG['Search']['seederspoints'], core.CONFIG['Search']['seedersthreshold'])
+        if core.CONFIG['Search']['leecherspoints'] and core.CONFIG['Search']['leechersthreshold']:
+            releases = threshold_score(releases, 'leechers', core.CONFIG['Search']['leecherspoints'], core.CONFIG['Search']['leechersthreshold'])
 
     releases = score_sources(releases, sources, check_size=check_size)
 
@@ -264,9 +268,9 @@ def freeleech(releases):
     for release in releases[:]:
         if not release['type'] in ('magnet', 'torrent'):
             continue
-            if release['freeleech'] == 1:
-                if core.CONFIG['Search']['requirefreeleech']:
-                    continue
+        if release['freeleech'] == 1:
+            if core.CONFIG['Search']['requirefreeleech']:
+                continue
             logging.debug('Adding {} Freeleech points to {}.'.format(points, release['title']))
             release['score'] += points
         elif core.CONFIG['Search']['requirefreeleech']:
@@ -274,6 +278,26 @@ def freeleech(releases):
             releases.remove(release)
 
             logging.info('Keeping {} releases.'.format(len(releases)))
+
+    return releases
+
+
+def threshold_score(releases, attr, points, threshold):
+    ''' Adds points to releases if atrr is greater than threshold
+    releases (list[dict]): scene release metadata to score
+    attr (str): attr in release to check
+    points (int): points to add to score
+    threshold (int): value to compare attr against
+
+    Returns list[dict]
+    '''
+    logging.info('Comparing torrent {} with {}.'.format(attr, threshold))
+    for release in releases[:]:
+        try:
+            if attr in release and release[attr] > threshold:
+                release['score'] += points
+        except TypeError:
+            logging.warn('{} is not int ({})'.format(attr, release))
 
     return releases
 
