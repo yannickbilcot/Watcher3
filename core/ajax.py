@@ -120,7 +120,7 @@ class Ajax(object):
         Returns dict ajax-style response
         '''
 
-        results = core.sql.get_search_results(imdbid, quality=quality)
+        results = core.sql.get_search_results(imdbid, quality=quality, rejected=True)
 
         if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
             results = [res for res in results if res.get('type') != 'nzb']
@@ -255,7 +255,7 @@ class Ajax(object):
             status = core.sql.get_movie_details('imdbid', imdbid)['status']
 
             if success:
-                results = core.sql.get_search_results(imdbid, movie['quality'])
+                results = core.sql.get_search_results(imdbid, movie['quality'], rejected=True)
 
                 for i in results:
                     i['size'] = Conversions.human_file_size(i['size'])

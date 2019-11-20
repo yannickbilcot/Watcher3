@@ -57,7 +57,7 @@ function change_page_number(movie_count){
 }
 
 function change_movie_count(movie_count){
-    if(typeof movie_count === "undefined") {
+    if(typeof movie_count === "undefined"){
         movie_count = $.map(get_enabled_status_elements(), function(i){
             return get_status_count(i);
         }).reduce(function(x, y){
@@ -232,8 +232,8 @@ window.addEventListener("DOMContentLoaded", function(){
         $.get(url_base + "/ajax/library_counters", {"category": category})
         .done(function(response){
             each(document.querySelectorAll("#status-filters .badge"), function(elem){
-               var count = response[elem.querySelector(".c_box").getAttribute("id")] || 0;
-               elem.querySelector(".count").textContent = count;
+                var count = response[elem.querySelector(".c_box").getAttribute("id")] || 0;
+                elem.querySelector(".count").textContent = count;
             });
             movie_count = change_movie_count();
             load_library(movie_sort_key, movie_sort_direction, current_page, per_page, pages);
@@ -518,9 +518,10 @@ function _results_table(results){
         result["mark_bad_hidden"] = result["status"] === "Bad" ? "hidden" : "";
         result["unmark_bad_hidden"] = result["status"] !== "Bad" ? "hidden" : "";
         var row = format_template(templates.release, result);
-        if (result.seeders === null && result.leechers === null) {
-            $('.seeders-leechers', row).hide();
+        if(result.seeders === null && result.leechers === null){
+            $(".seeders-leechers", row).hide();
         }
+        if(result.reject_reason !== null) row.classList.add("rejected");
         rows += row.outerHTML;
     });
 
@@ -765,7 +766,7 @@ function delete_file_mark_bad(event, elem, guid, imdbid){
             movie = Object.assign(movie, {finished_file: null, finished_date: null, finished_score: null});
             $movie_status_modal.data("movie", movie);
             var $movie_li = $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`);
-            if ($movie_li) $movie_li.dataset.movie = JSON.stringify(movie);
+            if($movie_li) $movie_li.dataset.movie = JSON.stringify(movie);
 
             $.notify({message: response["message"]}, {type: "success"});
             $movie_status_modal.data("movie").finished_file = null;
@@ -803,9 +804,9 @@ function _mark_bad(elem, guid, imdbid){
         if(response["response"] === true){
             $.notify({message: response["message"]});
             $i.classList.add("mdi-cancel");
-            $movie_status_modal.find(`[data-guid="${guid}"]`).each(function() {
-               this.querySelector(".mdi-cancel").parentElement.classList.add("hidden");
-               this.querySelector(".mdi-backup-restore").parentElement.classList.remove("hidden");
+            $movie_status_modal.find(`[data-guid="${guid}"]`).each(function(){
+                this.querySelector(".mdi-cancel").parentElement.classList.add("hidden");
+                this.querySelector(".mdi-backup-restore").parentElement.classList.remove("hidden");
             });
             update_release_status(guid, "Bad");
         } else {
