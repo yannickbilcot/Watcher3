@@ -1064,7 +1064,8 @@ class Manage(object):
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             t += ['torrent', 'magnet']
 
-        cmd = 'SELECT DISTINCT status FROM SEARCHRESULTS WHERE imdbid="{}" AND type IN ("import", "{}")'.format(imdbid, '", "'.join(t))
+        cmd = 'SELECT DISTINCT status FROM SEARCHRESULTS WHERE imdbid="{}" AND (reject_reason IS NULL OR status <> "{}")' \
+              'AND type IN ("import", "{}")'.format(imdbid, 'Available', '", "'.join(t))
 
         try:
             result_status = [i['status'] for i in core.sql.execute([cmd]).fetchall()] or []

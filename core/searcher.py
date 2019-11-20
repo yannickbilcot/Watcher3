@@ -230,7 +230,7 @@ def rss_sync(movies):
             continue
 
         # Ignore results we've already stored
-        old_results = core.sql.get_search_results(imdbid)
+        old_results = core.sql.get_search_results(imdbid, rejected=True)
         new_results = []
         for res in results:
             guid = res['guid']

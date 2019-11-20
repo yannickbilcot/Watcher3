@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 14
+current_version = 15
 
 
 def proxy_to_dict(p):
@@ -94,7 +94,8 @@ class SQL(object):
                                         sqla.Column('download_progress', sqla.INT),
                                         sqla.Column('download_time', sqla.TIMESTAMP),
                                         sqla.Column('seeders', sqla.SMALLINT),
-                                        sqla.Column('leechers', sqla.SMALLINT)
+                                        sqla.Column('leechers', sqla.SMALLINT),
+                                        sqla.Column('reject_reason', sqla.TEXT)
                                         )
         self.MARKEDRESULTS = sqla.Table('MARKEDRESULTS', self.metadata,
                                         sqla.Column('imdbid', sqla.TEXT),
@@ -472,7 +473,7 @@ class SQL(object):
             logging.error('Unable to get status of requested movies.')
             return []
 
-    def get_search_results(self, imdbid, quality=None):
+    def get_search_results(self, imdbid, quality=None, rejected=False):
         ''' Gets all search results for a given movie
         imdbid (str): imdb id #
         quality (str): name of quality profile. Used to sort order <optional>
@@ -501,7 +502,12 @@ class SQL(object):
                     END {}
                 '''.format('ASC' if core.CONFIG['Search']['preferredsource'] == 'usenet' else 'DESC')
 
-        command = ['SELECT * FROM SEARCHRESULTS WHERE imdbid="{}" ORDER BY score DESC {}, size {}, freeleech DESC'.format(imdbid, sk, sort)]
+        if not rejected:
+            rejected_cond = 'AND reject_reason IS NULL'
+        else:
+            rejected_cond = ''
+
+        command = ['SELECT * FROM SEARCHRESULTS WHERE imdbid="{}" {} ORDER BY score DESC {}, size {}, freeleech DESC'.format(imdbid, rejected_cond, sk, sort)]
 
         results = self.execute(command)
 
@@ -1125,6 +1131,11 @@ class DatabaseUpdate(object):
     @staticmethod
     def update_14():
         ''' Add seeders and leechers columns to SEARCHRESULTS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_15():
+        ''' Add reject_reason column to SEARCHRESULTS '''
         core.sql.update_tables()
 
     # Adding a new method? Remember to update the current_version #
