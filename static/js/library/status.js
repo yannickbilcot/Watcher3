@@ -529,6 +529,8 @@ function _results_table(results){
 }
 
 function manual_search(event, button, imdbid){
+    event.preventDefault();
+
     var $i = button.querySelector("i.mdi");
 
     $i.classList.remove("mdi-magnify");
@@ -566,6 +568,11 @@ function manual_search(event, button, imdbid){
         $i.classList.remove("animated");
         $search_results_table.style.overflowY = "scroll";
     });
+}
+
+function toggle_results(event, button){
+    event.preventDefault();
+    $("#search_results_table li").toggle();
 }
 
 function update_metadata(event, elem, imdbid, tmdbid){

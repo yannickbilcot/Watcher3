@@ -169,13 +169,16 @@
                             <div class="col-md-4">
                                 <div id='movie_actions'>
                                     <div class="btn-group d-flex mb-4">
-                                        <button class="btn btn-secondary w-100" title="Force Backlog Search" onclick="manual_search(event, this, '{imdbid}')">
+                                        <button class="btn btn-secondary w-75" title="Force Backlog Search" onclick="manual_search(event, this, '{imdbid}')">
                                             <i class="mdi mdi-magnify"></i>
                                         </button>
-                                        <button class="btn btn-secondary w-100" title="Update Metadata" onclick="update_metadata(event, this, '{imdbid}', '{tmdbid}')">
+                                        <button class="btn btn-secondary w-75" title="Toggle Rejected and Accepted Results" onclick="toggle_results(event, this)">
+                                            <i class="mdi mdi-alert-circle"></i>
+                                        </button>
+                                        <button class="btn btn-secondary w-75" title="Update Metadata" onclick="update_metadata(event, this, '{imdbid}', '{tmdbid}')">
                                             <i class="mdi mdi-tag-text-outline"></i>
                                         </button>
-                                        <button class="btn btn-secondary w-100" title="Remove from Library" onclick="remove_movie(event, this, '{imdbid}')">
+                                        <button class="btn btn-secondary w-75" title="Remove from Library" onclick="remove_movie(event, this, '{imdbid}')">
                                             <i class="mdi mdi-delete"></i>
                                         </button>
                                     </div>
