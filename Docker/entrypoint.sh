@@ -24,4 +24,5 @@ APPID="${APP_UID:=0}:${APP_GID:=0}"
 chown -R ${APPID} /config /opt/watcher3
 
 # Exec the CMD as the app user
+cd /opt/watcher3
 exec su-exec ${APPID} "$@"
