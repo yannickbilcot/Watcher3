@@ -10,13 +10,13 @@ RUN rm -rf /tmp/* /var/tmp/* /opt/$APP_NAME/entrypoint.sh /opt/$APP_NAME/Docker
 
 WORKDIR /opt/watcher3
 
-VOLUME [/config]
-
-EXPOSE 9090
-
 COPY Docker/entrypoint.sh /
 
 RUN chmod +x /entrypoint.sh
+
+VOLUME ["/config"]
+
+EXPOSE 9090
 
 ENTRYPOINT ["/entrypoint.sh"]
 
