@@ -20,5 +20,5 @@ EXPOSE 9090
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["python3 watcher.py --userdata /config"]
+CMD ["watcher.py"]
 
