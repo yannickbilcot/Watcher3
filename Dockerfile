@@ -12,9 +12,9 @@ WORKDIR /opt/watcher3
 
 COPY Docker/entrypoint.sh /
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && mkdir /config
 
-VOLUME ["/config"]
+VOLUME /config
 
 EXPOSE 9090
 
