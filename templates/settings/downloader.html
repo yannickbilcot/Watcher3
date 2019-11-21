@@ -183,6 +183,23 @@
                                 </span>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <label>${_('Remove Finished Torrents')}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="input-group-text">
+                                        <i data-id="removetorrents" class="mdi mdi-checkbox-blank-outline c_box" value="${config['Torrent']['DelugeRPC'].get('removetorrents', False)}"></i>
+                                    </button>
+                                </div>
+                                <span class="input-group-item form-control">
+                                    ${_('Remove torrents when ratio is reached.')}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label data-toggle="tooltip" title="${_('blank = client setting')}">${_('Stop seeding when ratio X is reached')}</label>
+                            <input type="number" data-id="seedratiolimit" data-allow-blank="true" class="form-control" min="0" placeholder="1.0" step="0.1" value="${config['Torrent']['DelugeRPC'].get('seedratiolimit', '')}">
+                        </div>
                      </div>
                     <!-- DELUGE WEB -->
                     <div id="DelugeWeb" class="row" data-enabled="${config['Torrent']['DelugeWeb']['enabled']}">
@@ -222,6 +239,23 @@
                                     ${_('Add Torrents in Paused state.')}
                                 </span>
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>${_('Remove Finished Torrents')}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="input-group-text">
+                                        <i data-id="removetorrents" class="mdi mdi-checkbox-blank-outline c_box" value="${config['Torrent']['DelugeWeb'].get('removetorrents', False)}"></i>
+                                    </button>
+                                </div>
+                                <span class="input-group-item form-control">
+                                    ${_('Remove torrents when ratio is reached.')}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label data-toggle="tooltip" title="${_('blank = client setting, -1 = unlimited')}">${_('Stop seeding when ratio X is reached')}</label>
+                            <input type="number" data-id="seedratiolimit" data-allow-blank="true" class="form-control" placeholder="1.0" step="0.1" value="${config['Torrent']['DelugeWeb'].get('seedratiolimit', '')}">
                         </div>
                     </div>
                     <!-- PUT.IO -->
@@ -436,11 +470,11 @@
                         </div>
                         <div class="col-md-6">
                             <label data-toggle="tooltip" title="${_('blank = client setting, -1 = unlimited')}">${_('Stop seeding after being idle for X hours')}</label>
-                            <input type="number" data-id="seedidlelimit" data-allow-blank="true" class="form-control" min="0" placeholder="2" value="${config['Torrent']['Transmission'].get('seedidlelimit', '')}">
+                            <input type="number" data-id="seedidlelimit" data-allow-blank="true" class="form-control" placeholder="2" value="${config['Torrent']['Transmission'].get('seedidlelimit', '')}">
                         </div>
                         <div class="col-md-6">
                             <label data-toggle="tooltip" title="${_('blank = client setting, -1 = unlimited')}">${_('Stop seeding when ratio X is reached')}</label>
-                            <input type="number" data-id="seedratiolimit" data-allow-blank="true" class="form-control" min="0" placeholder="1.0" step="0.1" value="${config['Torrent']['Transmission'].get('seedratiolimit', '')}">
+                            <input type="number" data-id="seedratiolimit" data-allow-blank="true" class="form-control" placeholder="1.0" step="0.1" value="${config['Torrent']['Transmission'].get('seedratiolimit', '')}">
                         </div>
                         <div class="col-md-6">
                             <label data-toggle="tooltip" title="${_('blank = don\'t remove stalled torrents')}">${_('Remove torrents stalled for X hours')}</label>
