@@ -16,6 +16,8 @@ EXPOSE 9090
 
 COPY Docker/entrypoint.sh /
 
+RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["python3 /opt/$APP_NAME/watcher.py --userdata /config"]
