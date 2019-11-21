@@ -143,7 +143,7 @@ We now have an updated Docker container using an alpine 3.8 base, with a few ext
   -v /path/to/downloads/:/downloads \
   -v /path/to/movies/:/movies \
   -e UMASK_SET=022 \
-  -e PGID=1000 -e PUID=1000 \
+  -e APP_UID=1000 -e APP_GID=1000 \
   -p 9090:9090 \
   ellnic/watcher3
 ``` 
