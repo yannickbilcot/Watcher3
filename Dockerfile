@@ -1,6 +1,6 @@
 FROM alpine:3.8
 
-ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3"
+ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3" PATH=/opt/watcher3:$PATH
 
 RUN apk add --no-cache bash curl git nano vim ca-certificates python3 su-exec
 
@@ -20,5 +20,5 @@ EXPOSE 9090
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["python3 /opt/$APP_NAME/watcher.py --userdata /config"]
+CMD ["python3 watcher.py --userdata /config"]
 
