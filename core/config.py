@@ -285,13 +285,17 @@ def restart_scheduler(diff):
         client = None
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             for name, config in core.CONFIG['Downloader']['Torrent'].items():
-                if config['enabled'] and (config.get('removetorrents') or config.get('removestalledfor')):
+                ignore_remove_torrents = name == 'DelugeRPC' or name == 'DelugeWeb'
+                if config['enabled'] and (not ignore_remove_torrents and config.get('removetorrents') or config.get('removestalledfor')):
                     auto_start = True
                     client = name
                     break
         if auto_start:
             d = diff['Downloader']['Torrent'].get(client, {}).keys()
-            if any(i in d for i in ('enabled', 'removetorrents', 'removestalledfor')):
+            setting_keys = ['enabled', 'removestalledfor']
+            if client != 'DelugeRPC' and client != 'DelugeWeb':
+                setting_keys.append('removetorrents')
+            if any(i in d for i in setting_keys):
                 hr = (now.hour + 1) % 24
                 min = now.minute
                 core.scheduler_plugin.task_list['Torrents Status Check'].reload(hr, min, 3600, auto_start=True)

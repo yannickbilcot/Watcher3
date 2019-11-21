@@ -360,8 +360,9 @@ class FinishedTorrentsCheck(object):
 
         auto_start = False
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
-            for config in core.CONFIG['Downloader']['Torrent'].values():
-                if config['enabled'] and (config.get('removetorrents') or config.get('removestalledfor')):
+            for name, config in core.CONFIG['Downloader']['Torrent'].items():
+                ignore_remove_torrents = name == 'DelugeRPC' or name == 'DelugeWeb'
+                if config['enabled'] and (not ignore_remove_torrents and config.get('removetorrents') or config.get('removestalledfor')):
                     auto_start = True
                     break
 
