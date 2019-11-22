@@ -70,6 +70,8 @@ if __name__ == '__main__':
         core.DB_FILE = os.path.join(core.PROG_PATH, core.DB_FILE)
     if passed_args.conf:
         core.CONF_FILE = passed_args.conf
+        if not os.path.exists(os.path.dirname(core.CONF_FILE)):
+            os.makedirs(os.path.dirname(core.CONF_FILE))
     else:
         core.CONF_FILE = os.path.join(core.PROG_PATH, core.CONF_FILE)
     if passed_args.log:
