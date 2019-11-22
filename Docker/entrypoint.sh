@@ -2,19 +2,19 @@
 
 set -e
 
-# Check to see if the docker config folder contains hurricane/watcher3 names, and rename them.
+# Check to see if the docker config folder contains default names, and rename and organise them.
 
-OLD_CFG=/config/watcher.cfg
+OLD_CFG=/config/config.cfg
 if [ -f "$OLD_CFG" ]; then
-    echo "$OLD_CFG exists, renaming to config.cfg."
-    mv /config/watcher.cfg /config/config.cfg
+    echo "$OLD_CFG exists, renaming to watcher.cfg."
+    mv /config/config.cfg /config/watcher.cfg
 fi
 
-OLD_DB=/config/db/database.sqlite
+OLD_DB=/config/watcher.sqlite
 if [ -f "$OLD_DB" ]; then
-    echo "$OLD_DB exists, renaming to watcher.sqlite and moving to root of config folder."
-    mv /config/db/database.sqlite /config/watcher.sqlite
-    rmdir /config/db
+    echo "$OLD_DB exists, renaming to database.sqlite and moving into db folder."
+    mkdir /config/db
+    mv /config/watcher.sqlite /config/db/database.sqlite
 fi
 
 # Set user and group IDs if they were specified, else 0 (root)
