@@ -99,6 +99,10 @@ def score(releases, imdbid=None, imported=False):
             releases = seed_check(releases)
         if core.CONFIG['Search']['freeleechpoints'] > 0 or core.CONFIG['Search']['requirefreeleech']:
             releases = freeleech(releases)
+        if core.CONFIG['Search']['seederspoints'] and core.CONFIG['Search']['seedersthreshold']:
+            releases = threshold_score(releases, 'seeders', core.CONFIG['Search']['seederspoints'], core.CONFIG['Search']['seedersthreshold'])
+        if core.CONFIG['Search']['leecherspoints'] and core.CONFIG['Search']['leechersthreshold']:
+            releases = threshold_score(releases, 'leechers', core.CONFIG['Search']['leecherspoints'], core.CONFIG['Search']['leechersthreshold'])
 
     releases = score_sources(releases, sources, check_size=check_size)
 
@@ -119,18 +123,19 @@ def words_to_list(words):
     return [i.split('&') for i in words.lower().replace(' ', '').split(',') if i != '']
 
 def reset(releases):
-    ''' Sets all result's scores to 0
+    ''' Sets all result's scores to 0, and clear reject reason
     releases (dict): scene release metadata to score
 
     returns dict
     '''
-    logging.debug('Resetting release scores to 0.')
+    logging.debug('Resetting release scores to 0, and clear reject reasons.')
     for i, d in enumerate(releases):
         releases[i]['score'] = 0
+        releases[i]['reject_reason'] = None
 
 
 def remove_ignored(releases, group_list):
-    ''' Remove releases with ignored groups of 'words'
+    ''' Set reject_reason for releases with ignored groups of 'words'
     releases (list[dict]): scene release metadata to score and filter
     group_list (list[list[str]]): forbidden groups of words
 
@@ -143,64 +148,69 @@ def remove_ignored(releases, group_list):
     Returns list[dict]
     '''
 
-    keep = []
+    reject = 0
 
     logging.info('Filtering Ignored Words.')
     for r in releases:
-        if r['type'] == 'import' and r not in keep:
-            keep.append(r)
+        if r['reject_reason']:
+            reject += 1
             continue
-        cond = False
+        if r['type'] == 'import':
+            continue
         for word_group in group_list:
             if all(word in r['title'].lower() for word in word_group):
                 logging.debug('{} found in {}, removing from releases.'.format(word_group, r['title']))
-                cond = True
+                r['reject_reason'] = 'ignored words found ({})'.format(' '.join(word_group))
+                reject += 1
                 break
-        if cond is False and r not in keep:
-            keep.append(r)
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
 
-    return keep
+    return releases
 
 
 def keep_required(releases, group_list):
-    ''' Remove releases without required groups of 'words'
+    ''' Set reject_reason for releases without required groups of 'words'
     releases (list[dict]): scene release metadata to score and filter
     group_list (list[list[str]]): required groups of words
 
     group_list must be formatted as a list of lists ie:
         [['word1'], ['word2', 'word3']]
 
-    Iterates through releases and removes every entry that does not
+    Iterates through releases and rejects every entry that does not
         contain any group of words in group_list
 
     Returns list[dict]
     '''
 
-    keep = []
+    reject = 0
 
     logging.info('Filtering Required Words.')
     logging.debug('Required Words: {}'.format(str(group_list)))
     for r in releases:
-        if r['type'] == 'import' and r not in keep:
-            keep.append(r)
+        if r['reject_reason']:
+            reject += 1
             continue
+        if r['type'] == 'import':
+            continue
+        required_group = False
         for word_group in group_list:
-            if all(word in r['title'].lower() for word in word_group) and r not in keep:
+            if all(word in r['title'].lower() for word in word_group):
                 logging.debug('{} found in {}, keeping this search result.'.format(word_group, r['title']))
-                keep.append(r)
+                required_group = True
                 break
-            else:
-                continue
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
+        if not required_group:
+            r['reject_reason'] = 'required words missing'
+            reject += 1
 
-    return keep
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+
+    return releases
 
 
 def retention_check(releases):
-    ''' Remove releases older than 'retention' days
+    ''' Set reject_reason for releases older than 'retention' days
     releases (list[dict]): scene release metadata to score and filter
     retention (int): days of retention limit
 
@@ -213,24 +223,25 @@ def retention_check(releases):
     today = datetime.datetime.today()
 
     logging.info('Checking retention [threshold = {} days].'.format(core.CONFIG['Search']['retention']))
-    keep = []
+    reject = 0
     for result in releases:
+        if result['reject_reason']:
+            reject += 1
+            continue
         if result['type'] == 'nzb':
             pubdate = datetime.datetime.strptime(result['pubdate'], '%d %b %Y')
             age = (today - pubdate).days
-            if age < core.CONFIG['Search']['retention']:
-                keep.append(result)
-            else:
+            if age >= core.CONFIG['Search']['retention']:
                 logging.debug('{} published {} days ago, removing search result.'.format(result['title'], age))
-        else:
-            keep.append(result)
+                result['reject_reason'] = 'older than retention ({})'.format(core.CONFIG['Search']['retention'])
+                reject += 1
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
-    return keep
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+    return releases
 
 
 def seed_check(releases):
-    ''' Remove any torrents with fewer than 'seeds' seeders
+    ''' Set reject_reason for any torrents with fewer than 'seeds' seeders
     releases (list[dict]): scene release metadata to score and filter
 
     Gets required seeds from core.CONFIG
@@ -239,18 +250,19 @@ def seed_check(releases):
     '''
 
     logging.info('Checking torrent seeds.')
-    keep = []
+    reject = 0
     for result in releases:
+        if result['reject_reason']:
+            reject += 1
+            continue
         if result['type'] in ('torrent', 'magnet'):
-            if int(result['seeders']) >= core.CONFIG['Search']['mintorrentseeds']:
-                keep.append(result)
-            else:
+            if int(result['seeders']) < core.CONFIG['Search']['mintorrentseeds']:
                 logging.debug('{} has {} seeds, removing search result.'.format(result['title'], result['seeders']))
-        else:
-            keep.append(result)
+                result['reject_reason'] = 'not enough seeds ({})'.format(core.CONFIG['Search']['mintorrentseeds'])
+                reject += 1
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
-    return keep
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+    return releases
 
 
 def freeleech(releases):
@@ -261,19 +273,43 @@ def freeleech(releases):
     '''
     logging.info('Checking torrent Freeleech info.')
     points = core.CONFIG['Search']['freeleechpoints']
+    reject = 0
     for release in releases[:]:
+        if release['reject_reason']:
+            reject += 1
+            continue
         if not release['type'] in ('magnet', 'torrent'):
             continue
-            if release['freeleech'] == 1:
-                if core.CONFIG['Search']['requirefreeleech']:
-                    continue
+        if release['freeleech'] == 1:
+            if core.CONFIG['Search']['requirefreeleech']:
+                continue
             logging.debug('Adding {} Freeleech points to {}.'.format(points, release['title']))
             release['score'] += points
         elif core.CONFIG['Search']['requirefreeleech']:
-            logging.debug('{} is not Freeleech, removing search result.'.format(release['title']))
-            releases.remove(release)
+            logging.debug('{} is not Freeleech, rejecting search result.'.format(release['title']))
+            release['reject_reason'] = 'freeleech required'
+            reject += 1
 
-            logging.info('Keeping {} releases.'.format(len(releases)))
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+    return releases
+
+
+def threshold_score(releases, attr, points, threshold):
+    ''' Adds points to releases if attr is greater than threshold
+    releases (list[dict]): scene release metadata to score
+    attr (str): attr in release to check
+    points (int): points to add to score
+    threshold (int): value to compare attr against
+
+    Returns list[dict]
+    '''
+    logging.info('Comparing torrent {} with {}.'.format(attr, threshold))
+    for release in releases[:]:
+        try:
+            if attr in release and release[attr] > threshold:
+                release['score'] += points
+        except TypeError:
+            logging.warn('{} is not int ({})'.format(attr, release))
 
     return releases
 
@@ -326,18 +362,22 @@ def fuzzy_title(releases, titles, year='\n'):
 
     logging.info('Checking title match.')
 
-    keep = []
+    reject = 0
     if titles == [] or titles == [None]:
         logging.debug('No titles available to compare, scoring all as perfect match.')
         for result in releases:
+            if result['reject_reason']:
+                reject += 1
+                continue
             result['score'] += 20
-            keep.append(result)
     else:
         for result in releases:
-            if result['type'] == 'import' and result not in keep:
+            if result['reject_reason']:
+                reject += 1
+                continue
+            if result['type'] == 'import':
                 logging.debug('{} is an Import, sorting as a perfect match.'.format(result['title']))
                 result['score'] += 20
-                keep.append(result)
                 continue
 
             rel_title_ss = result.get('ptn', PTN.parse(result['title']))['title']
@@ -346,12 +386,13 @@ def fuzzy_title(releases, titles, year='\n'):
             matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
             if any(match > 70 for match in matches):
                 result['score'] += int(max(matches) / 5)
-                keep.append(result)
             else:
                 logging.debug('{} best title match was {}%, removing search result.'.format(result['title'], max(matches)))
+                result['reject_reason'] = 'mismatch title (best match was {}%)'.format(max(matches))
+                reject += 1
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
-    return keep
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+    return releases
 
 
 def _fuzzy_title(a, b):
@@ -395,7 +436,7 @@ def score_sources(releases, sources, check_size=True):
     ''' Score releases based on quality/source preferences
     releases (list[dict]): scene release metadata to score and filter
     sources (dict): sources from user config
-    check_size (bool): whether or not to filter based on size
+    check_size (bool): whether or not to set reject reason based on size
 
     Iterates through releases and removes any entry that does not
         fit into quality criteria (source-resoution, filesize)
@@ -409,15 +450,18 @@ def score_sources(releases, sources, check_size=True):
 
     sizes = core.CONFIG['Quality']['Sources']
 
-    keep = []
+    reject = 0
     for result in releases:
+        if result['reject_reason']:
+            reject += 1
+            continue
         result_res = result['resolution']
         logging.debug('Scoring and filtering {} based on resolution {}.'.format(result['title'], result_res))
         size = result['size'] / 1000000
-        if result['type'] == 'import' and result['resolution'] not in sources:
-            keep.append(result)
+        if result['type'] == 'import' and result_res not in sources:
             continue
 
+        accepted = False
         for k, v in sources.items():
             if v[0] is False and result['type'] != 'import':
                 continue
@@ -434,15 +478,20 @@ def score_sources(releases, sources, check_size=True):
 
                 if result['type'] != 'import' and not (min_size < size < max_size):
                     logging.debug('Removing {}, size {} not in range {}-{}.'.format(result['title'], size, min_size, max_size))
+                    result['reject_reason'] = 'size {} not in range {}-{}'.format(size, min_size, max_size)
+                    reject += 1
                     break
 
                 result['score'] += abs(priority - score_range) * 40
-                keep.append(result)
-            else:
-                continue
+                accepted = True
+                break
 
-    logging.info('Keeping {} releases.'.format(len(keep)))
-    return keep
+        if not accepted and not result['reject_reason']:
+            result['reject_reason'] = 'source not accepted ({})'.format(result_res)
+            reject += 1
+
+    logging.info('Keeping {} releases.'.format(len(releases) - reject))
+    return releases
 
 
 def import_quality():

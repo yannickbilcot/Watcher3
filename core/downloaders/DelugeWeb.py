@@ -82,6 +82,14 @@ def add_torrent(data):
     torrent['options']['add_paused'] = conf['addpaused']
     torrent['options']['download_location'] = download_dir
     torrent['options']['priority'] = priority_keys[conf['priority']]
+    ratio_limit = conf.get('seedratiolimit', '')
+    if ratio_limit != '':
+        torrent['options']['stop_at_ratio'] = True
+        torrent['options']['stop_ratio'] = ratio_limit
+    elif ratio_limit == -1:
+        torrent['options']['stop_at_ratio'] = False
+    if conf.get('removetorrents'):
+        torrent['options']['remove_at_ratio'] = True
 
     command = {'method': 'web.add_torrents',
                'params': [[torrent]],

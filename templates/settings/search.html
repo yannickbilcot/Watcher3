@@ -129,6 +129,52 @@
                 </div>
 
                 <div class="col-md-6">
+                    <label>${_('Require Freeleech')}</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i id="requirefreeleech" class="mdi mdi-checkbox-blank-outline c_box" value="${config['requirefreeleech']}"></i>
+                            </span>
+                        </div>
+                        <span class="input-group-item form-control">
+                            ${_('Require torrents to be Freeleech')}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label>${_('Add [X] Points to Torrents with more than [Y] Seeds')}</label>
+                    <div class="input-group">
+                        <input type="number" id="seederspoints" class="form-control" min="0" placeholder="5" value="${config['seederspoints']}" data-allow-blank="true">
+                        <div class="input-group-append">
+                            <span class="input-group-text">${_('Points')}</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+	                    <input type="number" id="seedersthreshold" class="form-control" min="0" placeholder="5" value="${config['seedersthreshold']}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">${_('Seeds')}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label>${_('Add [X] Points to Torrents with more than [Y] Leechers')}</label>
+                    <div class="input-group">
+                        <input type="number" id="leecherspoints" class="form-control" min="0" placeholder="2" value="${config['leecherspoints']}" data-allow-blank="true">
+                        <div class="input-group-append">
+                            <span class="input-group-text">${_('Points')}</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+	                    <input type="number" id="leechersthreshold" class="form-control" min="0" placeholder="25" value="${config['leechersthreshold']}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">${_('Leechers')}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
                     <label>${_('Usenet Server Retention')}</label>
                     <div class="input-group">
                         <input type="number" id="retention" class="form-control" min="0" placeholder="1500" value="${config['retention']}">
@@ -139,20 +185,6 @@
                         </div>
                     </div>
                 </div>
-
-                 <div class="col-md-6">
-	                  <label>${_('Require Freeleech')}</label>
-	                  <div class="input-group">
-	                      <div class="input-group-prepend">
-	                          <span class="input-group-text">
-	                              <i id="requirefreeleech" class="mdi mdi-checkbox-blank-outline c_box" value="${config['requirefreeleech']}"></i>
-	                          </span>
-	                      </div>
-	                      <span class="input-group-item form-control">
-	                          ${_('Require torrents to be Freeleech')}
-	                      </span>
-	                  </div>
-	                </div>
 	
                 <hr>
 

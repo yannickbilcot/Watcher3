@@ -141,13 +141,14 @@ def _parse(results, imdbid=None):
     '''
 
     logging.info('Parsing {} Rarbg results.'.format(len(results)))
-    item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders')
+    item_keep = ('size', 'pubdate', 'title', 'indexer', 'info_link', 'guid', 'torrentfile', 'resolution', 'type', 'seeders', 'leechers')
 
     parsed_results = []
 
     for result in results:
         result['indexer'] = 'Rarbg'
-        result['info_link'] = result['info_page']
+        if result['info_page']:
+            result['info_link'] = result['info_page'] + '&app_id=Watcher'
         result['torrentfile'] = result['download']
         result['guid'] = result['download'].split('&')[0].split(':')[-1]
         result['type'] = 'magnet'
@@ -163,7 +164,7 @@ def _parse(results, imdbid=None):
         result['download_client'] = None
         parsed_results.append(result)
 
-    logging.info('Found {} results from '.format(len(parsed_results)))
+    logging.info('Found {} results from rarbg'.format(len(parsed_results)))
     return parsed_results
 
 

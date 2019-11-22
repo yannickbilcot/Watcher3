@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 12
+current_version = 15
 
 
 def proxy_to_dict(p):
@@ -90,7 +90,12 @@ class SQL(object):
                                         sqla.Column('type', sqla.TEXT),
                                         sqla.Column('downloadid', sqla.TEXT),
                                         sqla.Column('download_client', sqla.TEXT),
-                                        sqla.Column('freeleech', sqla.SMALLINT)
+                                        sqla.Column('freeleech', sqla.SMALLINT),
+                                        sqla.Column('download_progress', sqla.INT),
+                                        sqla.Column('download_time', sqla.TIMESTAMP),
+                                        sqla.Column('seeders', sqla.SMALLINT),
+                                        sqla.Column('leechers', sqla.SMALLINT),
+                                        sqla.Column('reject_reason', sqla.TEXT)
                                         )
         self.MARKEDRESULTS = sqla.Table('MARKEDRESULTS', self.metadata,
                                         sqla.Column('imdbid', sqla.TEXT),
@@ -211,6 +216,11 @@ class SQL(object):
 
         if not LIST:
             return True
+
+        columns = self.SEARCHRESULTS.columns.keys()
+        for row in LIST:
+            for k in columns - row.keys():
+                row[k] = None
 
         logging.debug('Writing batch into SEARCHRESULTS.')
 
@@ -463,7 +473,7 @@ class SQL(object):
             logging.error('Unable to get status of requested movies.')
             return []
 
-    def get_search_results(self, imdbid, quality=None):
+    def get_search_results(self, imdbid, quality=None, rejected=False):
         ''' Gets all search results for a given movie
         imdbid (str): imdb id #
         quality (str): name of quality profile. Used to sort order <optional>
@@ -492,7 +502,12 @@ class SQL(object):
                     END {}
                 '''.format('ASC' if core.CONFIG['Search']['preferredsource'] == 'usenet' else 'DESC')
 
-        command = ['SELECT * FROM SEARCHRESULTS WHERE imdbid="{}" ORDER BY score DESC {}, size {}, freeleech DESC'.format(imdbid, sk, sort)]
+        if not rejected:
+            rejected_cond = 'AND reject_reason IS NULL'
+        else:
+            rejected_cond = ''
+
+        command = ['SELECT * FROM SEARCHRESULTS WHERE imdbid="{}" {} ORDER BY score DESC {}, size {}, freeleech DESC'.format(imdbid, rejected_cond, sk, sort)]
 
         results = self.execute(command)
 
@@ -652,7 +667,7 @@ class SQL(object):
         if not self.row_exists('POSTPROCESSED_PATHS', path=path):
             self.write('POSTPROCESSED_PATHS', {'path': path})
 
-    def get_last_postprocessed_paths(self):
+    def get_postprocessed_paths(self):
         sql = 'SELECT path FROM {}'.format('POSTPROCESSED_PATHS')
         result = self.execute([sql])
         if result:
@@ -667,6 +682,17 @@ class SQL(object):
             return True
         else:
             return False
+
+    def get_download_progress(self):
+        results = {}
+
+        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND download_progress IS NOT NULL'
+        data = self.execute([sql, 'Snatched'])
+        if data:
+            for i in data.fetchall():
+                results[i['downloadid']] = {'progress': i['download_progress'], 'time': i['download_time']}
+
+        return results
 
     def get_single_search_result(self, idcol, idval, like=False):
         ''' Gets single search result
@@ -1085,7 +1111,7 @@ class DatabaseUpdate(object):
 
     @staticmethod
     def update_11():
-        ''' Add category column to MOVIES '''
+        ''' Add search with year option to indexers in config '''
         config.load()
         for indexer in core.CONFIG['Indexers']['TorzNab'].values():
             if len(indexer) == 3:
@@ -1095,6 +1121,21 @@ class DatabaseUpdate(object):
     @staticmethod
     def update_12():
         ''' Add table POSTPROCESSED_PATHS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_13():
+        ''' Add download_progress and download_time columns to SEARCHRESULTS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_14():
+        ''' Add seeders and leechers columns to SEARCHRESULTS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_15():
+        ''' Add reject_reason column to SEARCHRESULTS '''
         core.sql.update_tables()
 
     # Adding a new method? Remember to update the current_version #

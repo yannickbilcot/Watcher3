@@ -72,7 +72,7 @@ def _parse(xml, imdbid):
             result['size'] = int(i['size'])
             result['status'] = 'Available'
             result['pubdate'] = None
-            result['title'] = i['title']
+            result['title'] = i['title']['content'] if isinstance(i['title'], dict) else i['title']
             result['imdbid'] = imdbid
             result['indexer'] = 'TorrentDownloads'
             result['info_link'] = 'http://www.torrentdownloads.me{}'.format(i['link'])
@@ -83,6 +83,7 @@ def _parse(xml, imdbid):
             result['freeleech'] = 0
             result['download_client'] = None
             result['seeders'] = int(i['seeders'])
+            result['leechers'] = int(i['leechers'])
 
             results.append(result)
         except Exception as e:

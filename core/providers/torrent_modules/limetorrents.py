@@ -3,6 +3,7 @@ from xml.etree.cElementTree import fromstring
 from xmljson import yahoo
 import logging
 from core.helpers import Url
+import re
 
 logging = logging.getLogger(__name__)
 
@@ -87,13 +88,21 @@ def _parse(xml, imdbid):
             result['freeleech'] = 0
             result['download_client'] = None
 
-            s = i['description'].split('Seeds: ')[1]
-            seed_str = ''
-            while s[0].isdigit():
-                seed_str += s[0]
-                s = s[1:]
+            # use 2 regular exprssions
+            # search has Seeds: X , Leechers Y
+            # rss has Seeds: X<br />Leechers: Y<br />
+            desc = i['description']
+            matches = re.findall("Seeds:? *([0-9]+)", desc)
+            if matches:
+                result['seeders'] = int(matches[0])
+            else:
+                result['seeders'] = 0
 
-            result['seeders'] = int(seed_str)
+            matches = re.findall("Leechers:? *([0-9]+)", desc)
+            if matches:
+                result['leechers'] = int(matches[0])
+            else:
+                result['leechers'] = 0
 
             results.append(result)
         except Exception as e:

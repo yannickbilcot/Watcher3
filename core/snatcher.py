@@ -76,7 +76,7 @@ def grab_all():
     logging.info('######### Automatic search/snatch complete #########')
 
 
-def get_best_release(movie, minscore=0):
+def get_best_release(movie, minscore=0, ignore_guid=None):
     ''' Grabs the best scoring result that isn't 'Bad'
     movie (dict): movie info from local db
     minscore (int): minimum acceptable score for best release   <optional - default 0>
@@ -105,6 +105,8 @@ def get_best_release(movie, minscore=0):
 
     # Filter out any results we don't want to grab
     search_results = [i for i in search_results if i['type'] != 'import']
+    if ignore_guid:
+        search_results = [i for i in search_results if i['guid'] != ignore_guid]
     if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
         search_results = [i for i in search_results if i['type'] != 'nzb']
     if not core.CONFIG['Downloader']['Sources']['torrentenabled']:

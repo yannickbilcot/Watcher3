@@ -220,6 +220,10 @@ ul#search_results_table li:nth-of-type(odd){
     background-color:rgba(0,0,0,.05)
 }
 
+ul#search_results_table li.rejected{
+    display: none;
+}
+
 .loader {
 	position: fixed;
     left: 0px;
