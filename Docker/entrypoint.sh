@@ -14,7 +14,7 @@ if [ -f "$OLD_CFG" ]; then
         if [ -f /config/watcher.cfg ]; then
             echo "We seem to have successfully moved and renamed the old config, backing up original and tidying up."
                 if [ -z /config/backups ]; then
-                su-exec $APPIDmkdir /config/backups
+                su-exec $APPID mkdir /config/backups
                 fi
             su-exec $APPID cp /config/config.cfg /config/backups/config.cfg
             rm /config/config.cfg
