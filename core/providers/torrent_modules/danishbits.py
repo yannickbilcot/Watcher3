@@ -64,13 +64,14 @@ def _parse(results, imdbid=None):
         parsed_result['type'] = 'torrent'
         parsed_result['pubdate'] = result['publish_date']
         parsed_result['seeders'] = result['seeders']
+        parsed_result['leechers'] = result['leechers']
         parsed_result['size'] = result['size'] * 1000000
 
         parsed_result['imdbid'] = result['imdb_id']
         parsed_result['status'] = 'Available'
         parsed_result['score'] = 0
         parsed_result['downloadid'] = None
-        parsed_result['freeleech'] = True
+        parsed_result['freeleech'] = result.get('freeleech')
         parsed_result['download_client'] = None
         parsed_result['title'] = result['release_name']
         parsed_results.append(parsed_result)

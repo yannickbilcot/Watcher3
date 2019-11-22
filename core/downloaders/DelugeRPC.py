@@ -85,6 +85,14 @@ def add_torrent(torrent):
     options['add_paused'] = conf['addpaused']
     options['download_location'] = download_path
     options['priority'] = priority_keys[conf['priority']]
+    ratio_limit = conf.get('seedratiolimit', '')
+    if ratio_limit != '':
+        options['stop_at_ratio'] = True
+        options['stop_ratio'] = ratio_limit
+    elif ratio_limit == -1:
+        torrent['options']['stop_at_ratio'] = False
+    if conf.get('removetorrents'):
+        options['remove_at_ratio'] = True
 
     if torrent['type'] == 'magnet':
         try:

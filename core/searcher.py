@@ -145,6 +145,10 @@ default status Available.
     for idx, result in enumerate(results):
         for old in active_old_results:
             if old['guid'] == result['guid']:
+                if 'seeders' in result:
+                    old['seeders'] = result['seeders']
+                if 'leechers' in result:
+                    old['leechers'] = result['leechers']
                 result.update(old)
                 results[idx] = result
 
@@ -226,7 +230,7 @@ def rss_sync(movies):
             continue
 
         # Ignore results we've already stored
-        old_results = core.sql.get_search_results(imdbid)
+        old_results = core.sql.get_search_results(imdbid, rejected=True)
         new_results = []
         for res in results:
             guid = res['guid']

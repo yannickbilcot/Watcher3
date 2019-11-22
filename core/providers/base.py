@@ -182,7 +182,8 @@ class NewzNabProvider(object):
                         result['guid'] = result['guid'].split('&')[0].split(':')[-1]
                         result['type'] = 'magnet'
 
-                    result['seeders'] = item['attr'].get('seeders', 0)
+                    result['seeders'] = int(item['attr'].get('seeders', 0))
+                    result['leechers'] = int(item['attr'].get('peers', 0))
 
                 results.append(result)
             except Exception as e:

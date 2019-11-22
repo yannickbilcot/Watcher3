@@ -614,7 +614,7 @@ class Metadata(object):
         if not movie.get('tmdbid'):
             movie['tmdbid'] = movie.get('id')
 
-        if not isinstance(movie.get('alternative_titles'), str):
+        if movie.get('alternative_titles') and not isinstance(movie.get('alternative_titles'), str):
             a_t = []
             for i in movie.get('alternative_titles', {}).get('titles', []):
                 if i['iso_3166_1'] == 'US':
@@ -1064,7 +1064,8 @@ class Manage(object):
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             t += ['torrent', 'magnet']
 
-        cmd = 'SELECT DISTINCT status FROM SEARCHRESULTS WHERE imdbid="{}" AND type IN ("import", "{}")'.format(imdbid, '", "'.join(t))
+        cmd = 'SELECT DISTINCT status FROM SEARCHRESULTS WHERE imdbid="{}" AND (reject_reason IS NULL OR status <> "{}")' \
+              'AND type IN ("import", "{}")'.format(imdbid, 'Available', '", "'.join(t))
 
         try:
             result_status = [i['status'] for i in core.sql.execute([cmd]).fetchall()] or []

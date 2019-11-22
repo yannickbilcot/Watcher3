@@ -83,6 +83,7 @@ def _parse(movie, imdbid, title):
             result['freeleech'] = 0
             result['download_client'] = None
             result['seeders'] = i['seeds']
+            result['leechers'] = i['peers']
 
             results.append(result)
         except Exception as e:
@@ -127,6 +128,7 @@ def _parse_rss(xml):
             result['type'] = 'magnet'
             result['downloadid'] = None
             result['seeders'] = 5
+            result['leechers'] = 0
             result['download_client'] = None
             result['freeleech'] = 0
 

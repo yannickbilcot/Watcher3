@@ -3,6 +3,7 @@ import logging
 from lib import transmissionrpc
 
 import core
+from datetime import datetime
 
 logging = logging.getLogger(__name__)
 
@@ -59,7 +60,6 @@ def add_torrent(data):
 
     url = data['torrentfile']
     paused = conf['addpaused']
-    bandwidthPriority = conf['priority']
     category = conf['category']
 
     priority_keys = {
@@ -76,12 +76,12 @@ def add_torrent(data):
     if category:
         d_components.append(category)
 
-    download_dir = None
     download_dir = '/'.join(d_components)
 
     try:
         download = client.add_torrent(url, paused=paused, bandwidthPriority=bandwidthPriority, download_dir=download_dir, timeout=30)
         downloadid = download.hashString
+        set_torrent_limits(download.id)
         logging.info('Torrent sent to TransmissionRPC - downloadid {}'.format(downloadid))
         return {'response': True, 'downloadid': downloadid}
     except (SystemExit, KeyboardInterrupt):
@@ -90,6 +90,94 @@ def add_torrent(data):
         logging.error('Unable to send torrent to TransmissionRPC.', exc_info=True)
         return {'response': False, 'error': str(e)}
 
+def set_torrent_limits(downloadid):
+    ''' Set seedIdleLimit, seedIdleMode, seedRatioLimit and seedRatioMode
+    according to transmission settings
+
+    downloadid: int download id
+
+    Returns bool
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['Transmission']
+    idle_limit = conf.get('seedidlelimit', '')
+    ratio_limit = conf.get('seedratiolimit', '')
+
+    args = {}
+    if idle_limit == -1:
+        args['seedIdleMode'] = 2
+        idle_limit_desc = 'unlimited'
+    elif idle_limit == '':
+        idle_limit_desc = 'global setting'
+    else:
+        args['seedIdleMode'] = 1
+        args['seedIdleLimit'] = idle_limit_desc = int(idle_limit * 60)
+
+    if ratio_limit == -1:
+        args['seedRatioMode'] = 2
+        ratio_limit_desc = 'unlimited'
+    elif ratio_limit == '':
+        ratio_limit_desc = 'global setting'
+    else:
+        args['seedRatioMode'] = 1
+        args['seedRatioLimit'] = ratio_limit_desc = ratio_limit
+
+    logging.info('Setting idle limit to {} and ratio limit to {} for torrent #{}'.format(idle_limit_desc, ratio_limit_desc, downloadid))
+
+    if args:
+        host = conf['host']
+        port = conf['port']
+        user = conf['user']
+        password = conf['pass']
+
+        try:
+            client = transmissionrpc.Client(host, port, user=user, password=password)
+            client.change_torrent(downloadid, **args)
+            return True
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception as e:
+            logging.error('Unable to change torrent #{} in TransmissionRPC.'.format(downloadid), exc_info=True)
+            return False
+    else:
+        return True
+
+def get_torrents_status(stalled_for=None, progress={}):
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['Transmission']
+
+    logging.info('Get torrents from transmissionrpc')
+
+    host = conf['host']
+    port = conf['port']
+    user = conf['user']
+    password = conf['pass']
+
+    try:
+        torrents = []
+
+        client = transmissionrpc.Client(host, port, user=user, password=password)
+
+        now = int(datetime.timestamp(datetime.now()))
+        fields = ['id', 'hashString', 'isFinished', 'isStalled', 'status', 'percentDone', 'name', 'downloadedEver']
+        for torrent in client.get_torrents(arguments=fields):
+            data = {'hash': torrent._fields['hashString'].value, 'status': torrent.status, 'name': torrent._get_name_string(), 'progress': torrent._fields['downloadedEver'].value}
+            if torrent.status == 'stopped' and torrent._fields['isFinished'].value:
+                data['status'] = 'finished'
+            elif torrent.status == 'downloading' and stalled_for and data['hash'] in progress:
+                torrent_progress = progress[data['hash']]
+                if data['progress'] == torrent_progress['progress'] and now > torrent_progress['time'] + stalled_for * 3600:
+                    data['status'] = 'stalled'
+            torrents.append(data)
+
+        return torrents
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        logging.error('Unable to list torrents from TransmissionRPC.', exc_info=True)
+        return []
 
 def cancel_download(downloadid):
     ''' Cancels download in client

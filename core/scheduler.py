@@ -7,7 +7,7 @@ import os
 import time
 import hashlib
 
-from core import searcher, postprocessing
+from core import searcher, postprocessing, downloaders, snatcher
 from core.rss import imdb, popularmovies
 from lib.cherrypyscheduler import SchedulerPlugin
 from core import trakt
@@ -35,6 +35,8 @@ def create_plugin():
     PostProcessingScan.create()
     TraktSync.create()
     FileScan.create()
+    PostprocessedPathsScan.create()
+    FinishedTorrentsCheck.create()
     core.scheduler_plugin.subscribe()
 
 
@@ -78,7 +80,7 @@ class PostProcessingScan(object):
         minsize = core.CONFIG['Postprocessing']['Scanner']['minsize'] * 1048576
 
         # paths processed with api requests since last task run
-        postprocessed_paths = core.sql.get_last_postprocessed_paths()
+        postprocessed_paths = core.sql.get_postprocessed_paths()
         logging.debug('Paths already post processed: {}'.format(postprocessed_paths))
 
         files = []
@@ -305,7 +307,7 @@ class TraktSync(object):
 
 
 class FileScan(object):
-    ''' Scheduled task to automatically sync selected Trakt lists '''
+    ''' Scheduled task to automatically clear missing finished files '''
 
     @staticmethod
     def create():
@@ -317,4 +319,98 @@ class FileScan(object):
         auto_start = core.CONFIG['System']['FileManagement']['scanmissingfiles']
 
         SchedulerPlugin.ScheduledTask(hr, min, interval, Manage.scanmissingfiles, auto_start=auto_start, name='Missing Files Scan')
+        return
+
+
+class PostprocessedPathsScan(object):
+    ''' Scheduled task to automatically clear deleted postprocessed paths from database '''
+
+    @staticmethod
+    def create():
+        interval = 60 * 60  # 1 hour
+
+        now = datetime.datetime.today()
+
+        hr = now.hour
+        min = now.minute
+
+        SchedulerPlugin.ScheduledTask(hr, min, interval, PostprocessedPathsScan.scan_paths, auto_start=True, name='Postprocessed Paths Scan')
+        return
+
+    @staticmethod
+    def scan_paths():
+        postprocessed_paths = core.sql.get_postprocessed_paths()
+        for path in postprocessed_paths:
+            if not os.path.exists(path):
+                core.sql.delete('POSTPROCESSED_PATHS', 'path', path)
+
+        return
+
+class FinishedTorrentsCheck(object):
+    ''' Scheduled task to automatically delete finished torrents from downloader '''
+
+    @staticmethod
+    def create():
+        interval = 60 * 60  # 1 hour
+
+        now = datetime.datetime.today()
+
+        hr = now.hour
+        min = now.minute
+
+        auto_start = False
+        if core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            for name, config in core.CONFIG['Downloader']['Torrent'].items():
+                ignore_remove_torrents = name == 'DelugeRPC' or name == 'DelugeWeb'
+                if config['enabled'] and (not ignore_remove_torrents and config.get('removetorrents') or config.get('removestalledfor')):
+                    auto_start = True
+                    break
+
+        SchedulerPlugin.ScheduledTask(hr, min, interval, FinishedTorrentsCheck.check_torrents, auto_start=auto_start, name='Torrents Status Check')
+        return
+
+    @staticmethod
+    def check_torrents():
+        for client, config in core.CONFIG['Downloader']['Torrent'].items():
+            if config['enabled']:
+                progress = {}
+                now = int(datetime.datetime.timestamp(datetime.datetime.now()))
+                if config.get('removestalledfor'):
+                    progress = core.sql.get_download_progress()
+
+                downloader = getattr(downloaders, client)
+                for torrent in downloader.get_torrents_status(stalled_for=config.get('removestalledfor'), progress=progress):
+                    progress_update = None
+
+                    if torrent['status'] == 'finished' and config.get('removetorrents'):
+                        logging.info('Check if we know finished torrent {} and is postprocessed ({})'.format(torrent['hash'], torrent['name']))
+                        if core.sql.row_exists('MARKEDRESULTS', guid=str(torrent['hash']), status='Finished'):
+                            downloader.cancel_download(torrent['hash'])
+
+                    if torrent['status'] == 'stalled':
+                        logging.info('Check if we know torrent {} and is snatched ({})'.format(torrent['hash'], torrent['name']))
+                        if core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):
+                            result = core.sql.get_single_search_result('downloadid', str(torrent['hash']))
+                            movie = core.sql.get_movie_details('imdbid', result['imdbid'])
+                            best_release = snatcher.get_best_release(movie, ignore_guid=result['guid'])
+                            # if top score is already downloading returns {}, stalled torrent will be deleted and nothing will be snatched
+                            if best_release is not None:
+                                logging.info('Torrent {} is stalled, download will be cancelled and marked as Bad'.format(torrent['hash']))
+                                Manage.searchresults(result['guid'], 'Bad')
+                                Manage.markedresults(result['guid'], 'Bad', imdbid=result['imdbid'])
+                                downloader.cancel_download(torrent['hash'])
+                                if best_release:
+                                    logging.info("Snatch {} {}".format(best_release['guid'], best_release['title']))
+                                    snatcher.download(best_release)
+
+                    elif config.get('removestalledfor'):
+                        if torrent['status'] == 'downloading':
+                            if torrent['hash'] not in progress or torrent['progress'] != progress[torrent['hash']]['progress']:
+                                progress_update = {'download_progress': torrent['progress'], 'download_time': now}
+                        elif torrent['hash'] in progress:
+                            progress_update = {'download_progress': None, 'download_time': None}
+
+                    if progress_update and core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):
+                        core.sql.update_multiple_values('SEARCHRESULTS', progress_update, 'downloadid', torrent['hash'])
+
         return
