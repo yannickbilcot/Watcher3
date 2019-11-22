@@ -15,12 +15,12 @@ if [ -f "$OLD_CFG" ]; then
     echo "$OLD_CFG exists, renaming to watcher.cfg."
     cp /config/config.cfg /config/watcher.cfg
         if [-f "/config/watcher.cfg" ]; then
-        echo "We seem to have successfully moved and renamed the old config, backing up original and tidying up."
-            if [-z "/config/backups" ]; then
-            mkdir /config/backups
-            fi
-        cp /config/config.cfg /config/backups/config.cfg
-        rm /config/config.cfg
+            echo "We seem to have successfully moved and renamed the old config, backing up original and tidying up."
+                if [-z "/config/backups" ]; then
+                mkdir /config/backups
+                fi
+            cp /config/config.cfg /config/backups/config.cfg
+            rm /config/config.cfg
         fi
 fi
 
@@ -34,8 +34,8 @@ if [ -f "$OLD_DB" ]; then
                 if [-z "/config/backups" ]; then
                 mkdir /config/backups
                 fi
-        cp /config/watcher.sqlite /config/backups/watcher.sqlite
-        rm /config/watcher.sqlite
+            cp /config/watcher.sqlite /config/backups/watcher.sqlite
+            rm /config/watcher.sqlite
         fi   
 fi
 
