@@ -16,8 +16,9 @@ if [ -f "$OLD_CFG" ]; then
     su-exec $APPID cp /config/config.cfg /config/watcher.cfg
         if [ -f /config/watcher.cfg ]; then
             echo "We seem to have successfully moved and renamed the old config, backing up original and tidying up."
-                if [ -z /config/backups ]; then
-                    su-exec $APPID mkdir /config/backups
+                if [ -d /config/backups ]; then
+                    echo "Backups folder exists."
+                        else su-exec $APPID mkdir /config/backups
                 fi
             su-exec $APPID cp /config/config.cfg /config/backups/config.cfg
             rm /config/config.cfg
@@ -31,8 +32,9 @@ if [ -f "$OLD_DB" ]; then
     su-exec $APPID cp /config/watcher.sqlite /config/db/database.sqlite
         if [ -f /config/db/database.sqlite ]; then
             echo "We seem to have successfully moved and renamed the old db, backing up original and tidying up."
-                if [ -z /config/backups ]; then
-                    su-exec $APPID mkdir /config/backups
+                if [ -d /config/backups ]; then
+                    echo "Backups folder exists."
+                        else su-exec $APPID mkdir /config/backups
                 fi
             su-exec $APPID cp /config/watcher.sqlite /config/backups/watcher.sqlite
             rm /config/watcher.sqlite
