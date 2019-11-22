@@ -41,4 +41,4 @@ chown -R $APPID /config /opt/watcher3 && chmod 775 /config /opt/watcher3
 
 # Exec the CMD as the app user
 cd /opt/watcher3
-exec su-exec $APPID python3 "$@" --userdata /config --posters /config/posters --plugins /config/plugins
+exec su-exec $APPID python3 "$@" --conf /config/watcher.cfg --db /config/db/database.sqlite --log /config/logs --posters /config/posters --plugins /config/plugins
