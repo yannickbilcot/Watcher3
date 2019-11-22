@@ -2,6 +2,12 @@
 
 set -e
 
+# Set user and group IDs if they were specified, else 0 (root)
+APPID="${APP_UID:=0}:${APP_GID:=0}"
+
+# Change ownership of config and app dirs
+chown -R $APPID /config /opt/watcher3
+
 # Check to see if the docker config folder contains default names, and rename and organise them.
 
 OLD_CFG=/config/config.cfg
@@ -16,12 +22,6 @@ if [ -f "$OLD_DB" ]; then
     mkdir /config/db
     mv /config/watcher.sqlite /config/db/database.sqlite
 fi
-
-# Set user and group IDs if they were specified, else 0 (root)
-APPID="${APP_UID:=0}:${APP_GID:=0}"
-
-# Change ownership of config and app dirs
-chown -R $APPID /config /opt/watcher3
 
 # Exec the CMD as the app user
 cd /opt/watcher3
