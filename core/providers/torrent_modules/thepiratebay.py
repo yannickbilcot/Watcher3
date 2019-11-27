@@ -91,7 +91,7 @@ def _parse(html, imdbid):
             result['downloadid'] = None
             result['download_client'] = None
             result['seeders'] = int(i[5].text)
-            result['leechers'] = int(i[5].text)
+            result['leechers'] = int(i[6].text)
             result['freeleech'] = 0
 
             results.append(result)
