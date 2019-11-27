@@ -155,4 +155,4 @@ If you wish to exec into the container to have a look around, use:
 
 ``` docker exec -it watcher3 /bin/bash```
 
-You may also wish to checkout ellnic's docker: https://hub.docker.com/r/ellnic/watcher3
+You may also wish to checkout ellnic's repo: https://github.com/ellnic/Watcher3
