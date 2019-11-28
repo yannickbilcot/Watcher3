@@ -17,7 +17,10 @@ of recording.
 
 # PTN
 ## patterns.py
-+ 30	Add pattern for special edition tags
+* 24    Fix parsing website
++ 26    Add other languages
++ 31	Add pattern for special edition tags
+* 12,15 Improve parsing of HEVC and EAC3 codecs
 ## parse.py
 + 83-84	Clean punctuation in edition list
 + 123   Get ext_length in torrent name
