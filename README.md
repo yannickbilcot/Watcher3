@@ -4,6 +4,8 @@
 
 Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB or Torrent to your download client. Watcher also has basic post-processing capabilities such as renaming and moving.
 
+### PLEASE NOTE: This repo (and my docker that auto builds from it) may often break. I tinker with it a lot and often make mistakes ;) If you're happy to beta test, by all means use this. If you want a saner, more stable release, use barbequesauce/watcher3 (git and docker). Any worthwhile changes will be PR'd to barbequesauce eventually.
+
 <p align="center"><a href="https://gitter.im/barbequesauce-Watcher3/development"><img alt="Gitter" src="https://img.shields.io/gitter/room/ellnic/watcher3.svg"/></a>
 <a href="https://kiwiirc.com/client/freenode.net/#watcher3"><img alt="IRC" src="https://img.shields.io/badge/Freenode-Online-Success.svg"/></a>
 <a href="https://discord.gg/wrHPyre"><img alt="Discord" src="https://img.shields.io/discord/620536178881331200?color=Green&label=discord&style=flat"/></a>
@@ -23,10 +25,15 @@ You may also wish to subscribe to the subreddit /r/watcher, but at this time the
 
 Refer to the wiki for more information about post-processing, start scripts, and other features. https://github.com/barbequesauce/Watcher3/wiki
 
-## Recent Highlights - Needs updating
+## Recent Highlights (docker)
 
-Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container. You can now select items per page in the library and the vanishing library bug is fixed. The docker container now runs with the newly added --posters flag so that the poster meta is stored in /config and is not lost on container update.
- 
+Docker now checks for 'standard' config and db names of /config/config.cfg and /config/watcher.sqlite and renames and organises them to /config/watcher.cfg and /config/db/database.sqlite. Originals are placed in /configs/backups. This is useful if you previously ran using python and have literally dumped your config files from the userdata folder into your docker config folder.
+
+
+## Recent Highlights (code)
+
+-- NEEDS UPDATING
+
 ## Installation
 
 We have several options to choose from:

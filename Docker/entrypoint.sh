@@ -35,6 +35,8 @@ if [ -f "$OLD_DB" ]; then
         fi   
 fi
 
+su-exec $APPID mkdir /config/plugins
+
 # Change ownership of config and app dirs
 chown -R $APPID /config /opt/watcher3 && chmod 775 /config /opt/watcher3
 

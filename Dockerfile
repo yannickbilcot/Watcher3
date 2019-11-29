@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.10.3
 
 ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3" PATH="/opt/watcher3:$PATH"
 
