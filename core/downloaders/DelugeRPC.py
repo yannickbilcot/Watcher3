@@ -202,4 +202,4 @@ def get_torrents_status(stalled_for=None, progress={}):
         return torrents
     except Exception as e:
         logging.error('Unable to list torrents from DelugeRPC.', exc_info=True)
-        return False
+        return []

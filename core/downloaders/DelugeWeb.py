@@ -288,3 +288,41 @@ def cancel_download(downloadid):
     except Exception as e:
         logging.error('delugeweb get_download_dir', exc_info=True)
         return {'response': False, 'error': str(e)}
+
+def get_torrents_status(stalled_for=None, progress={}):
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
+
+    logging.info('Get torrents from DelugeRPC')
+
+    host = conf['host']
+    port = conf['port']
+    url = '{}:{}/json'.format(host, port)
+
+    if cookie is None:
+        _login(url, conf['pass'])
+
+    fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
+    command = {'method': 'core.get_torrents_status',
+               'params': [{}, fields],
+               'id': command_id
+               }
+    command_id += 1
+
+    post_data = json.dumps(command)
+
+    headers['cookie'] = cookie
+
+    try:
+        torrents = []
+        response = Url.open(url, post_data=post_data, headers=headers)
+        response = json.loads(response.text)
+        for id, torrent in response.items():
+            logging.info(torrent)
+        return torrents
+    except Exception as e:
+        logging.error('Unable to list torrents from DelugeWeb', exc_info=True)
+        return []
