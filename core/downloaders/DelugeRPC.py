@@ -175,3 +175,31 @@ def _set_label(torrent, label, client):
         return False
 
     return True
+
+def get_torrents_status(stalled_for=None, progress={}):
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
+
+    logging.info('Get torrents from DelugeRPC')
+
+    host = conf['host']
+    port = conf['port']
+    user = conf['user']
+    password = conf['pass']
+
+    client = DelugeRPCClient(host, port, user, password)
+
+    try:
+        client.connect()
+
+        torrents = []
+        fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
+        for id, torrent in client.call('core.get_torrents_status', {}, fields).items():
+            logging.info(torrent)
+        return torrents
+    except Exception as e:
+        logging.error('Unable to list torrents from DelugeRPC.', exc_info=True)
+        return False
