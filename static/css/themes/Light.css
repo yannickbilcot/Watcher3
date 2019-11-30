@@ -1624,9 +1624,9 @@ pre code {
 }
 
 .table .thead-light th {
-	color: #33363f;
-	background-color: #f1efe8;
-	border-color: #dee2e6
+	color: #666666;
+	background-color: #f1ece7;
+	border-color: #e5e2de
 }
 
 .table-dark {
@@ -1712,7 +1712,7 @@ pre code {
 	padding: .375rem .75rem;
 	font-size: .9375rem;
 	line-height: 1.5;
-	color: #808080;
+	color: #84807a;
 	background-color: #F4F4F4;
 	background-clip: padding-box;
 	border: 1px solid #ced4da;
@@ -1739,7 +1739,7 @@ pre code {
 }
 
 .form-control:disabled, .form-control[readonly] {
-    color: #e7e7e7;
+    color: #aea9a0;
 	background-color: #f1efe8;
 	opacity: 1
 }
