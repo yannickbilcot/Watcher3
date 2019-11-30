@@ -88,7 +88,7 @@ def sync_rss():
             feed = re.sub(r'xmlns=".*?"', r'', feed)
             root = ET.fromstring(feed)
         except Exception as e:
-            logging.error('Trakt rss request.', exc_info=True)
+            logging.error('Trakt rss request:\n{}'.format(feed), exc_info=True)
             continue
 
         d = root.find('updated').text[:19]

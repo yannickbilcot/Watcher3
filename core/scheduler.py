@@ -403,7 +403,7 @@ class FinishedTorrentsCheck(object):
                                     logging.info("Snatch {} {}".format(best_release['guid'], best_release['title']))
                                     snatcher.download(best_release)
 
-                    elif config.get('removestalledfor'):
+                    elif config.get('removestalledfor') and 'progress' in torrent:
                         if torrent['status'] == 'downloading':
                             if torrent['hash'] not in progress or torrent['progress'] != progress[torrent['hash']]['progress']:
                                 progress_update = {'download_progress': torrent['progress'], 'download_time': now}
