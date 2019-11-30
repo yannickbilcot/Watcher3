@@ -134,7 +134,7 @@ Restore Watcher.
 
 ## Docker:
 
-We now have an updated Docker container using an alpine 3.8 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
+Our docker uses an Alpine 3.10 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
 
 1. Pull the container:
 
@@ -159,4 +159,6 @@ If you wish to exec into the container to have a look around, use:
 
 ``` docker exec -it watcher3 /bin/bash```
 
-You may also wish to checkout ellnic's repo: https://github.com/ellnic/Watcher3
+
+
+You may also wish to checkout ellnic's repo: https://github.com/ellnic/Watcher3 [this is considered unstable at times please see warning in readme]
