@@ -135,7 +135,7 @@ Restore Watcher.
 
 ## Docker:
 
-We now have an updated Docker container using an alpine 3.8 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
+Our docker uses an Alpine 3.10 base, with a few extra things like nano and vim for on the fly edits without stopping the container.
 
 1. Pull the container:
 
