@@ -25,7 +25,11 @@ Refer to the wiki for more information about post-processing, start scripts, and
 
 You may also wish to checkout ellnic's repo, which may (or may not) have certain downstream changes before they are pulled. https://github.com/ellnic/Watcher3 Please do not submit PR's there, submit them to barbequesauce.
 
-## Recent Highlights - Needs updating
+## Recent Highlights (docker)
+
+Docker now checks for 'standard' config and db names of /config/config.cfg and /config/watcher.sqlite and renames and organises them to /config/watcher.cfg and /config/db/database.sqlite. Originals are placed in /configs/backups. This is useful if you previously ran using python and have literally dumped your config files from the userdata folder into your docker config folder.
+
+## Recent Highlights (Code) - Needs updating
 
 Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container. You can now select items per page in the library and the vanishing library bug is fixed. The docker container now runs with the newly added --posters flag so that the poster meta is stored in /config and is not lost on container update.
  
@@ -145,7 +149,7 @@ We now have an updated Docker container using an alpine 3.8 base, with a few ext
   -v /path/to/downloads/:/downloads \
   -v /path/to/movies/:/movies \
   -e UMASK_SET=022 \
-  -e PGID=1000 -e PUID=1000 \
+  -e APP_GID=1000 -e APP_UID=1000 \
   -p 9090:9090 \
   barbequesauce/watcher3
 ``` 
