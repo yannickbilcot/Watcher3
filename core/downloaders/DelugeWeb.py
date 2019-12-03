@@ -3,6 +3,7 @@ import json
 import re
 import core
 from core.helpers import Torrent, Url
+from datetime import datetime
 
 cookie = None
 command_id = 0
@@ -288,3 +289,61 @@ def cancel_download(downloadid):
     except Exception as e:
         logging.error('delugeweb get_download_dir', exc_info=True)
         return {'response': False, 'error': str(e)}
+
+def get_torrents_status(stalled_for=None, progress={}):
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    global command_id
+    conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
+
+    logging.info('Get torrents from DelugeRPC')
+
+    host = conf['host']
+    port = conf['port']
+    url = '{}:{}/json'.format(host, port)
+
+    if cookie is None:
+        _login(url, conf['pass'])
+
+    fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
+    command = {'method': 'core.get_torrents_status',
+               'params': [{}, fields],
+               'id': command_id
+               }
+    command_id += 1
+
+    post_data = json.dumps(command)
+
+    headers['cookie'] = cookie
+
+    try:
+        torrents = []
+        now = int(datetime.timestamp(datetime.now()))
+        response = Url.open(url, post_data=post_data, headers=headers)
+        response = json.loads(response.text)
+        for id, torrent in response.items():
+            logging.info(torrent)
+            data = {'hash': torrent['hash'], 'status': torrent['state'].lower(), 'name': torrent['name']}
+            if data['status'] == 'downloading' and stalled_for:
+                if 'last_seen_complete' in torrent and 'time_since_download' in torrent:
+                    if now > torrent['last_seen_complete'] + stalled_for * 3600 and \
+                            now > torrent['time_since_download'] + stalled_for * 3600:
+                        #data['status'] = 'stalled'
+                        logging.info('torrent {} detected as stalled'.format(data['name']))
+                elif data['hash'] in progress:
+                    data['progress'] = torrent['total_payload_download']
+                    torrent_progress = progress[data['hash']]
+                    if data['progress'] == torrent_progress['progress'] and \
+                            now > torrent_progress['time'] + stalled_for * 3600:
+                        #data['status'] = 'stalled'
+                        logging.info('torrent {} detected as stalled'.format(data['name']))
+
+            logging.info(data)
+            torrents.append(data)
+
+        return torrents
+    except Exception as e:
+        logging.error('Unable to list torrents from DelugeWeb', exc_info=True)
+        return []

@@ -16,7 +16,12 @@ if [ -f "$OLD_CFG" ]; then
     su-exec $APPID cp /config/config.cfg /config/watcher.cfg
         if [ -f /config/watcher.cfg ]; then
             echo "We seem to have successfully moved and renamed the old config, backing up original and tidying up."
-            su-exec $APPID mkdir /config/backups
+            # Check if backups dir exists, and create if it does not.
+            BACKUP_DIR=/config/backups
+            if [ -d "$BACKUP_DIR" ]; then
+                echo "$BACKUP_DIR exists, continuing..."
+                else su-exec $APPID mkdir /config/backups
+            fi
             su-exec $APPID cp /config/config.cfg /config/backups/config.cfg
             rm /config/config.cfg
         fi
@@ -29,13 +34,25 @@ if [ -f "$OLD_DB" ]; then
     su-exec $APPID cp /config/watcher.sqlite /config/db/database.sqlite
         if [ -f /config/db/database.sqlite ]; then
             echo "We seem to have successfully moved and renamed the old db, backing up original and tidying up."
-            su-exec $APPID mkdir /config/backups
+            # Check if backups dir exists, and create if it does not
+            BACKUP_DIR=/config/backups
+            if [ -d "$BACKUP_DIR" ]; then
+                echo "$BACKUP_DIR exists, continuing..."
+                else su-exec $APPID mkdir /config/backups
+            fi
             su-exec $APPID cp /config/watcher.sqlite /config/backups/watcher.sqlite
             rm /config/watcher.sqlite
         fi   
 fi
 
-su-exec $APPID mkdir /config/plugins
+# Check for plugins directory and create if it does not exist.
+PLUG_DIR=/config/plugins
+if [ -d "$PLUG_DIR" ]; then
+    echo "$PLUG_DIR exists, continuing..."
+    else su-exec $APPID mkdir /config/plugins
+fi
+
+
 
 # Change ownership of config and app dirs
 chown -R $APPID /config /opt/watcher3 && chmod 775 /config /opt/watcher3

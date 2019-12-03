@@ -71,7 +71,9 @@ def _parse(xml, imdbid):
     results = []
     for i in items:
         result = {}
-        try:
+        try:                                                              
+            if not i['title']:                                            
+                continue
             desc = i['description'].split(' ')
             hash_ = desc[-1]
 

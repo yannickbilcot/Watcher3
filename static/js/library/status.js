@@ -724,6 +724,8 @@ function manual_download(event, elem, guid, kind, imdbid){
         if(response["response"] === true){
             $.notify({message: response["message"]});
 
+            elem.parentElement.querySelector(".mdi-backup-restore").parentElement.classList.add("hidden");
+            elem.parentElement.querySelector(".mdi-cancel").parentElement.classList.remove("hidden");
             update_movie_status(imdbid, "Snatched");
             update_release_status(guid, "Snatched");
         } else {

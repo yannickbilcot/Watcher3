@@ -2,6 +2,7 @@ import logging
 import re
 
 from lib.deluge_client import DelugeRPCClient
+from datetime import datetime
 
 import core
 
@@ -175,3 +176,50 @@ def _set_label(torrent, label, client):
         return False
 
     return True
+
+def get_torrents_status(stalled_for=None, progress={}):
+    ''' Get torrents and calculate status
+
+    Returns list
+    '''
+    conf = core.CONFIG['Downloader']['Torrent']['DelugeRPC']
+
+    logging.info('Get torrents from DelugeRPC')
+
+    host = conf['host']
+    port = conf['port']
+    user = conf['user']
+    password = conf['pass']
+
+    client = DelugeRPCClient(host, port, user, password)
+
+    try:
+        client.connect()
+
+        torrents = []
+        now = int(datetime.timestamp(datetime.now()))
+        fields = ['hash', 'state', 'name', 'last_seen_complete', 'time_since_download', 'total_payload_download']
+        for id, torrent in client.call('core.get_torrents_status', {}, fields).items():
+            logging.info(torrent)
+            data = {'hash': torrent[b'hash'].decode(), 'status': torrent[b'state'].lower().decode(), 'name': torrent[b'name'].decode()}
+            if data['status'] == 'downloading' and stalled_for:
+                if b'last_seen_complete' in torrent and b'time_since_download' in torrent:
+                    if now > torrent['last_seen_complete'] + stalled_for * 3600 and \
+                            now > torrent['time_since_download'] + stalled_for * 3600:
+                        #data['status'] = 'stalled'
+                        logging.info('torrent {} detected as stalled'.format(data['name']))
+                elif data['hash'] in progress:
+                    data['progress'] = torrent[b'total_payload_download']
+                    torrent_progress = progress[data['hash']]
+                    if data['progress'] == torrent_progress['progress'] and \
+                            now > torrent_progress['time'] + stalled_for * 3600:
+                        #data['status'] = 'stalled'
+                        logging.info('torrent {} detected as stalled'.format(data['name']))
+
+            logging.info(data)
+            torrents.append(data)
+
+        return torrents
+    except Exception as e:
+        logging.error('Unable to list torrents from DelugeRPC.', exc_info=True)
+        return []
