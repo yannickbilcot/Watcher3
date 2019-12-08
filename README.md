@@ -18,12 +18,9 @@ Watcher is a work in progress and plans to add more features in the future, but 
 #### Note that as the owner of the original project seems to be inactive, this repository has been established in an attempt to move the project forward, taking in both pending PRs from the original project and PRs applied to other forks.
 
 Watcher may change frequently, so we strongly suggest that you come by and say hello on Freenode (#watcher3) or via Gitter.
-
-You may also wish to subscribe to the subreddit /r/watcher, but at this time there is little activity there. It was for the original project, and most the current developement talk is happening via IRC and Gitter. We now also have [Discord](https://discord.gg/wrHPyre)
+We also have [Discord](https://discord.gg/wrHPyre)
 
 Refer to the wiki for more information about post-processing, start scripts, and other features. https://github.com/barbequesauce/Watcher3/wiki
-
-You may also wish to checkout ellnic's repo, which may (or may not) have certain downstream changes before they are pulled. https://github.com/ellnic/Watcher3 Please do not submit PR's there, submit them to barbequesauce.
 
 ## Recent Highlights (docker)
 
