@@ -323,7 +323,7 @@ def get_torrents_status(stalled_for=None, progress={}):
         now = int(datetime.timestamp(datetime.now()))
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
-        for id, torrent in response.items():
+        for id, torrent in response.get('result', {}).items():
             # deluge return empty hash for every requested hash, even when it's missing
             if not torrent:
                 continue
