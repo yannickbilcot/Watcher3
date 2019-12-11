@@ -324,8 +324,8 @@ def get_torrents_status(stalled_for=None, progress={}):
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
         for id, torrent in response.items():
-            # deluge return empty hash if torrent is not in requested hashes list
-            if 'hash' not in torrent:
+            # deluge return empty hash for every requested hash, even when it's missing
+            if not torrent:
                 continue
             logging.info(torrent)
             data = {'hash': torrent['hash'], 'status': torrent['state'].lower(), 'name': torrent['name']}

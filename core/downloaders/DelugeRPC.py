@@ -200,8 +200,8 @@ def get_torrents_status(stalled_for=None, progress={}):
         now = int(datetime.timestamp(datetime.now()))
         fields = ['hash', 'state', 'name', 'last_seen_complete', 'time_since_download', 'total_payload_download']
         for id, torrent in client.call('core.get_torrents_status', {'id': list(progress.keys())}, fields).items():
-            # deluge return empty hash if torrent is not in requested hashes list
-            if 'hash' not in torrent:
+            # deluge return empty hash for every requested hash, even when it's missing
+            if not torrent:
                 continue
             logging.info(torrent)
             data = {'hash': torrent[b'hash'].decode(), 'status': torrent[b'state'].lower().decode(), 'name': torrent[b'name'].decode()}
