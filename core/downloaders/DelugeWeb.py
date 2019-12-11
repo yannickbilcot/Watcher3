@@ -309,7 +309,7 @@ def get_torrents_status(stalled_for=None, progress={}):
 
     fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
     command = {'method': 'core.get_torrents_status',
-               'params': [{}, fields],
+               'params': [{'id': list(progress.keys())}, fields],
                'id': command_id
                }
     command_id += 1
@@ -324,6 +324,9 @@ def get_torrents_status(stalled_for=None, progress={}):
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
         for id, torrent in response.items():
+            # deluge return empty hash if torrent is not in requested hashes list
+            if 'hash' not in torrent:
+                continue
             logging.info(torrent)
             data = {'hash': torrent['hash'], 'status': torrent['state'].lower(), 'name': torrent['name']}
             if data['status'] == 'downloading' and stalled_for:

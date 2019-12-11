@@ -375,7 +375,7 @@ class FinishedTorrentsCheck(object):
             if config['enabled']:
                 progress = {}
                 now = int(datetime.datetime.timestamp(datetime.datetime.now()))
-                if config.get('removestalledfor'):
+                if config.get('removestalledfor') or client in ('DelugeRPC', 'DelugeWeb'): # temp check until removestalledfor is added to deluge
                     progress = core.sql.get_download_progress()
 
                 downloader = getattr(downloaders, client)
@@ -389,7 +389,7 @@ class FinishedTorrentsCheck(object):
 
                     if torrent['status'] == 'stalled':
                         logging.info('Check if we know torrent {} and is snatched ({})'.format(torrent['hash'], torrent['name']))
-                        if core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):
+                        if torrent['hash'] in progress:
                             result = core.sql.get_single_search_result('downloadid', str(torrent['hash']))
                             movie = core.sql.get_movie_details('imdbid', result['imdbid'])
                             best_release = snatcher.get_best_release(movie, ignore_guid=result['guid'])
@@ -403,11 +403,11 @@ class FinishedTorrentsCheck(object):
                                     logging.info("Snatch {} {}".format(best_release['guid'], best_release['title']))
                                     snatcher.download(best_release)
 
-                    elif config.get('removestalledfor') and 'progress' in torrent:
+                    elif config.get('removestalledfor') and 'progress' in torrent and torrent['hash'] in progress:
                         if torrent['status'] == 'downloading':
-                            if torrent['hash'] not in progress or torrent['progress'] != progress[torrent['hash']]['progress']:
+                            if progress[torrent['hash']]['progress'] is None or torrent['progress'] != progress[torrent['hash']]['progress']:
                                 progress_update = {'download_progress': torrent['progress'], 'download_time': now}
-                        elif torrent['hash'] in progress:
+                        elif progress[torrent['hash']]['progress']:
                             progress_update = {'download_progress': None, 'download_time': None}
 
                     if progress_update and core.sql.row_exists('SEARCHRESULTS', downloadid=str(torrent['hash']), status='Snatched'):

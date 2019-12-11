@@ -686,7 +686,7 @@ class SQL(object):
     def get_download_progress(self):
         results = {}
 
-        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND download_progress IS NOT NULL'
+        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND downloadid IS NOT NULL'
         data = self.execute([sql, 'Snatched'])
         if data:
             for i in data.fetchall():
