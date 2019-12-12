@@ -683,11 +683,11 @@ class SQL(object):
         else:
             return False
 
-    def get_download_progress(self):
+    def get_download_progress(self, client):
         results = {}
 
-        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND download_progress IS NOT NULL'
-        data = self.execute([sql, 'Snatched'])
+        sql = 'SELECT DISTINCT downloadid, download_progress, download_time FROM SEARCHRESULTS WHERE status = ? AND downloadid IS NOT NULL AND download_client = ?'
+        data = self.execute([sql, 'Snatched', client])
         if data:
             for i in data.fetchall():
                 results[i['downloadid']] = {'progress': i['download_progress'], 'time': i['download_time']}
