@@ -2,7 +2,7 @@ ul.nav.nav-pills{
     justify-content: space-evenly;
 }
 
-ul#movie_list {
+ul#movies {
   max-width: 100%;
   width: 100%;
   justify-content: flex-start;
