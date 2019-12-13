@@ -6,7 +6,7 @@ ul#movies{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     margin: 0;
     max-height: 0%;
     overflow: hidden;
