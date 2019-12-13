@@ -2,12 +2,18 @@ ul.nav.nav-pills{
     justify-content: space-evenly;
 }
 
-ul#movies{
-    margin: 0;
-    max-height: 0%;
-    overflow: hidden;
-    transition: 0.6s;
-    padding-bottom: 4em;
+ul#movie_list {
+  max-width: 100%;
+  width: 100%;
+  justify-content: flex-start;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0;
+  overflow: hidden;
+  transition: 0.6s;
+  padding-bottom: 4em;
+  text-align: center;
 }
 
 ul#movies li{
@@ -71,7 +77,7 @@ img.poster{
 preload-icon {
     display: none;
 }
-	
+
 preload-icon.loading {
     align-items: center;
     display: flex;
@@ -82,12 +88,12 @@ preload-icon.loading {
     top: 0;
     width: 100%;
 }
-	
+
 preload-icon > .mdi {
     font-size: 3em;
     width: initial;
 }
-	
+
 iframe#trailer.unavailable {
     background: url("../images/trailer_unavailable.png") no-repeat 50% 50%;
 }
