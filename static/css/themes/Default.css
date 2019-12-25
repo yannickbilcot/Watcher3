@@ -517,6 +517,12 @@ pre code {
   margin-left: auto
 }
 
+/* Fix accidental markup where row and alignment are mistakenly in the same div */
+.container.row {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (min-width: 576px) {
   .container {
     max-width: 540px
