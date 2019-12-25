@@ -517,6 +517,15 @@ pre code {
   margin-left: auto
 }
 
+@media (max-width: 1010px) {
+  .container,
+  ul#movie_list,
+  #status-filters {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
 /* Fix accidental markup where row and alignment are mistakenly in the same div */
 .container.row {
   margin-left: auto;
