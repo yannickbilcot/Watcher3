@@ -201,7 +201,7 @@ hr {
 
 /* General movie poster list styles */
 ul#movie_list {
-  max-width: 825px;
+  max-width: 960px;
   width: 100%;
   margin-top: 1.5em;
   margin-bottom: 0;
@@ -211,4 +211,32 @@ ul#movie_list {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+}
+
+ul#movies li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
+    text-align: center;
+}
+
+ul#movie_list li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
+    text-align: center;
+}
+
+@media (max-width: 820px) {
+    ul#movie_list li {
+        width: calc(25% - 15px);
+    }
+}
+
+@media (max-width: 560px) {
+    ul#movie_list li {
+        width: calc(50% - 15px);
+    }
+}
+
+ul#movie_list {
+    max-width: 960px;
 }

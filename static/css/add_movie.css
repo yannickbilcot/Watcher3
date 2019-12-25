@@ -16,10 +16,32 @@ ul#movies {
   text-align: center;
 }
 
-ul#movies li{
-    width: 10em;
-    margin: 1em 0.5em;
+ul#movies li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
     text-align: center;
+}
+
+ul#movie_list li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
+    text-align: center;
+}
+
+@media (max-width: 820px) {
+    ul#movie_list li {
+        width: calc(25% - 15px);
+    }
+}
+
+@media (max-width: 560px) {
+    ul#movie_list li {
+        width: calc(50% - 15px);
+    }
+}
+
+ul#movie_list {
+    max-width: 960px;
 }
 
 .card-body{

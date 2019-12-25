@@ -7,6 +7,7 @@ core/version
 core/rss/imdb
 db/*
 core/cp_plugins/tasks.json
+.editorconfig
 
 # Compiled
 *.pyc
