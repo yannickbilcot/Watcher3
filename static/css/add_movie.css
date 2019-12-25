@@ -1,5 +1,11 @@
-ul.nav.nav-pills{
-    justify-content: space-evenly;
+ul.nav.nav-pills {
+    justify-content: space-between;
+}
+
+ul.nav.nav-pills li {
+    flex: 1;
+    text-align: center;
+    margin-bottom: 0;
 }
 
 ul#movies {

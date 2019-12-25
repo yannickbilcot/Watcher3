@@ -45,6 +45,7 @@ nav.navbar {
 
 nav.navbar img {
   height: 3em;
+  margin-left: 0;
 }
 
 nav.navbar .nav-link {
