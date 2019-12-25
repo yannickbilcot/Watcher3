@@ -60,7 +60,7 @@ span.score > i {
 
 ul#movie_list li {
     width: calc(20% - 15px);
-    margin: 1em 0.5em 0;
+    margin: 0 15px 15px 0;
     text-align: center;
 }
 
@@ -77,7 +77,8 @@ ul#movie_list li {
 }
 
 ul#movie_list {
-    max-width: 960px;
+    max-width: 975px;
+    transform: translate(7.5px);
 }
 
 .card-img-top {
