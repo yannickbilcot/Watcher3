@@ -613,6 +613,21 @@ function remove_movie(event, elem, imdbid){
     if(!movie["finished_file"]){
         $delete.find("div#delete_file").hide();
     }
+    $delete.find("i.c_box").each(function(){
+        this.addEventListener("click", function(event){
+            // turn on;
+            if(event.target.getAttribute("value") === "False"){
+                event.target.setAttribute("value", "True");
+                event.target.classList.remove("mdi-checkbox-blank-outline");
+                event.target.classList.add("mdi-checkbox-marked");
+            // turn off;
+            } else if(event.target.getAttribute("value") === "True"){
+                event.target.setAttribute("value", "False");
+                event.target.classList.remove("mdi-checkbox-marked");
+                event.target.classList.add("mdi-checkbox-blank-outline");
+            }
+        });
+    });
 
     $delete.modal("show");
     $movie_status_modal.css("opacity", 0);
