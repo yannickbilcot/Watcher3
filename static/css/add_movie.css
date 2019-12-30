@@ -8,6 +8,20 @@ ul.nav.nav-pills li {
     margin-bottom: 0;
 }
 
+@media (max-width: 820px) {
+   ul.nav.nav-pills li {
+        width: calc(25% - 15px);
+        flex: auto;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 560px) {
+    ul.nav.nav-pills li {
+        width: calc(50% - 15px);
+    }
+}
+
 ul#movies {
   max-width: 100%;
   width: 100%;
