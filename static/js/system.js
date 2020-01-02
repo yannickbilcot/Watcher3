@@ -290,7 +290,7 @@ function upload_restore_zip(event, button){
 
 function execute_task(event, elem, name){
     var $tr = elem.parentElement.parentElement;
-    var $post = _execute_task(event, elem, name);
+    var $post = alt_execute_task(event, elem, name);
     if($post){
         $post.done(function(response){
             var task = tasks[name];
