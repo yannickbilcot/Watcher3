@@ -124,6 +124,29 @@ function _execute_task(event, elem, name){
         });
 }
 
+function alt_execute_task(event, elem, name){
+    event.preventDefault();
+
+    if(elem.classList.contains("disabled")){
+        return;
+    }
+
+    return $.post(url_base + "/ajax/manual_task_execute", {name: name})
+        .done(function(response){
+            if(response["response"] === true){
+                $.notify({message: response["message"]});
+                $.each(response["notifications"], function(i, notif){
+                    notif[1]["onClose"] = remove_notif;
+                    var n = $.notify(notif[0], notif[1]);
+                    n["$ele"].attr("data-index", notif[1]["index"]);
+                });
+            } else {
+                $.notify({message: response["error"]}, {type: "danger", delay: 0});
+            }
+        })
+        .fail(notify_error);
+}
+
 function _(s){
     /* Localization method
     s (str): string to look for in translation file

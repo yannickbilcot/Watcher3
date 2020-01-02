@@ -298,7 +298,7 @@ def get_torrents_status(stalled_for=None, progress={}):
     global command_id
     conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
 
-    logging.info('Get torrents from DelugeRPC')
+    logging.info('Get torrents from DelugeRPC: {}'.format(list(progress.keys())))
 
     host = conf['host']
     port = conf['port']

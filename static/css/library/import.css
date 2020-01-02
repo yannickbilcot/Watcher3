@@ -1,11 +1,12 @@
-div.buttons{
+div.buttons {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: flex-start;
+    padding-left: 0;
 }
 
-div.buttons a.btn{
+div.buttons a.btn {
     height: auto;
     margin: 1em;
 }

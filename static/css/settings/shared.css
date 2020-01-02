@@ -1,15 +1,15 @@
-form{
-    max-width: 95%;
+form {
+    max-width: 100%;
 }
 
-form > div{
+form > div {
     margin-bottom: 1em;
 }
 
-label{
+label {
     font-weight: 500;
 }
 
-button#save_settings{
+button#save_settings {
     margin: 0 1.25em 1em 0;
 }
