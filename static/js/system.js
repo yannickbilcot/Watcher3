@@ -205,6 +205,7 @@ function create_backup(event, button){
         .done(function(response){
             if(response["response"] === true){
                 $.notify({message: response["message"]}, {delay: 0});
+                window.open(url_base + "/backup", '_blank');
             } else {
                 $.notify({message: `${response["error"]}`}, {type: "danger", delay: 0});
             }
