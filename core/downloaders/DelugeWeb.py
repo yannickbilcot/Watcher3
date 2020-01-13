@@ -104,8 +104,11 @@ def add_torrent(data):
     try:
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
-        if response['result'] is True:
+        if response['result'] is True: # maybe Deluge Web 1.x returned true, 2.x returns array of array
             downloadid = Torrent.get_hash(data['torrentfile'])
+        elif isinstance(response['result'], list) and isinstance(response['result'][0], list) and\
+                len(response['result'][0]) == 2 and response['result'][0][0] is True:
+            downloadid = response['result'][0][1]
         else:
             return {'response': False, 'error': response['error']}
     except (SystemExit, KeyboardInterrupt):
