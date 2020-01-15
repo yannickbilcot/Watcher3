@@ -65,7 +65,7 @@ body {
 	line-height: 1.5;
 	color: #e0e0e0;
 	text-align: left;
-	background-color: #053c37
+	background-color: #052c25
 }
 
 [tabindex="-1"]:focus {
@@ -3732,7 +3732,7 @@ tbody.collapse.show {
 	flex-direction: column;
 	min-width: 0;
 	word-wrap: break-word;
-	background-color: #052c25;
+	background-color: #08493e;
 	background-clip: border-box;
 	border: 1px solid rgba(0,0,0,0.125);
 	border-radius: .25rem
@@ -4165,18 +4165,18 @@ tbody.collapse.show {
 
 .badge-available {
 	color: #4CAF50;
-	background-color: #41455B
+	background-color: #484c63
 }
 
 .badge-available[href]:hover, .badge-available[href]:focus {
 	color: #4CAF50;
 	text-decoration: none;
-	background-color: #383B52
+	background-color: #484c63
 }
 
 .badge-waiting {
 	color: #EDB500;
-	background-color: #41455B
+	background-color: #484c63
 }
 
 .badge-waiting[href]:hover, .badge-waiting[href]:focus {
@@ -4198,7 +4198,7 @@ tbody.collapse.show {
 
 .badge-light {
 	color: #fff;
-	background-color: #052c25
+	background-color: #0a4e41
 }
 
 .badge-light[href]:hover, .badge-light[href]:focus {
@@ -5307,7 +5307,7 @@ a.bg-danger:hover, a.bg-danger:focus, button.bg-danger:hover, button.bg-danger:f
 }
 
 .bg-light {
-	background-color: #052c25 
+	background-color: #053c37 
 }
 
 a.bg-light:hover, a.bg-light:focus, button.bg-light:hover, button.bg-light:focus {
