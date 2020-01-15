@@ -68,7 +68,7 @@ body {
 	line-height: 1.5;
 	color: #ebebeb;
 	text-align: left;
-	background-color: #00244a
+	background-color: #011f3d
 }
 
 [tabindex="-1"]:focus {
@@ -2288,30 +2288,29 @@ a.btn.disabled, fieldset:disabled a.btn {
 }
 
 .btn-light {
-	color: #fff;
-	background-color: #011f3d;
-	border-color: #0556aa
+	color: #ced4da;
+	background-color: #2e3d69;
+	border-color: #002d5d
 }
 
 .btn-light:hover {
-	color: #fff;
+	color: #ced4da;
 	background-color: #000c17;
-	border-color: #0556aa
+	border-color: #002d5d
 }
 
 .btn-light:focus, .btn-light.focus {
-	box-shadow: 0 0 0 .2rem rgba(1,31,61,0.5);
-	border-color: #0556aa;
-	border-color: #0556aa;
+	box-shadow: 0 0 rgba(0, 30, 61, 0.11);
+	border-color: #011932;
 }
 
 .btn-light.disabled, .btn-light:disabled {
-	color: #fff;
+	color: #ced4da;
 	background-color: #011f3d;
-	border-color: #0556aa
+	border-color: #002d5d
 }
 
-.btn-light:not(:disabled):not(.disabled):active,.btn-light:not(:disabled):not(.disabled).active,.show>.btn-light.dropdown-toggle{color:#fff;background-color:#00060b;border-color:#0556aa}.btn-light:not(:disabled):not(.disabled):active:focus,.btn-light:not(:disabled):not(.disabled).active:focus, .show>.btn-light.dropdown-toggle:focus {
+.btn-light:not(:disabled):not(.disabled):active,.btn-light:not(:disabled):not(.disabled).active,.show>.btn-light.dropdown-toggle{color:#fff;background-color:#00060b;border-color:#222222}.btn-light:not(:disabled):not(.disabled):active:focus,.btn-light:not(:disabled):not(.disabled).active:focus, .show>.btn-light.dropdown-toggle:focus {
 	box-shadow: 0 0 0 .2rem rgba(1,31,61,0.5)
 }
 
@@ -3732,7 +3731,7 @@ tbody.collapse.show {
 	flex-direction: column;
 	min-width: 0;
 	word-wrap: break-word;
-	background-color: #011f3d;
+	background-color: #19365b;
 	background-clip: border-box;
 	border: 1px solid rgba(0,0,0,0.125);
 	border-radius: .25rem
@@ -4165,35 +4164,35 @@ tbody.collapse.show {
 
 .badge-available {
 	color: #4CAF50;
-	background-color: #41455B
+	background-color: #4c5c6f
 }
 
 .badge-available[href]:hover, .badge-available[href]:focus {
 	color: #4CAF50;
 	text-decoration: none;
-	background-color: #383B52
+	background-color: #4c5c6f
 }
 
 .badge-waiting {
 	color: #EDB500;
-	background-color: #41455B
+	background-color: #4c5c6f
 }
 
 .badge-waiting[href]:hover, .badge-waiting[href]:focus {
 	color: #EDB500;
 	text-decoration: none;
-	background-color: #383B52
+	background-color: #4c5c6f
 }
 
 .badge-wanted {
 	color: #fff;
-	background-color: #41455B
+	background-color: #4c5c6f
 }
 
 .badge-wanted[href]:hover, .badge-wanted[href]:focus {
 	color: #fff;
 	text-decoration: none;
-	background-color: #383B52
+	background-color: #4c5c6f
 }
 
 .badge-light {
@@ -4697,7 +4696,7 @@ button.close {
 	flex-direction: column;
 	width: 100%;
 	pointer-events: auto;
-	background-color: #001429;
+	background-color: #08233f;
 	background-clip: padding-box;
 	border: 1px solid rgba(0,0,0,0.2);
 	border-radius: .3rem;
@@ -5307,7 +5306,7 @@ a.bg-danger:hover, a.bg-danger:focus, button.bg-danger:hover, button.bg-danger:f
 }
 
 .bg-light {
-	background-color: #011f3d 
+	background-color: #102640 
 }
 
 a.bg-light:hover, a.bg-light:focus, button.bg-light:hover, button.bg-light:focus {
@@ -5363,7 +5362,7 @@ a.bg-dark:hover, a.bg-dark:focus, button.bg-dark:hover, button.bg-dark:focus {
 }
 
 .border {
-	border: 1px solid #868e96 
+	border: 1px solid #1a1a1b
 }
 
 .border-top {
