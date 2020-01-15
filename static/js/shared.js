@@ -90,7 +90,7 @@ function _start_update(event){
         .fail(notify_error);
 }
 
-function _execute_task(event, elem, name){
+function alt_execute_task(event, elem, name){
     event.preventDefault();
 
     if(elem.classList.contains("disabled")){
@@ -98,9 +98,11 @@ function _execute_task(event, elem, name){
     }
     elem.classList.add("disabled");
 
-    elem.classList.remove("mdi-play-circle");
-    elem.classList.add("mdi-circle");
-    elem.classList.add("animated");
+    if(elem.classList.contains("mdi-play-circle")){
+        elem.classList.remove("mdi-play-circle");
+        elem.classList.add("mdi-circle");
+        elem.classList.add("animated");
+    }
 
     return $.post(url_base + "/ajax/manual_task_execute", {name: name})
         .done(function(response){
@@ -117,9 +119,11 @@ function _execute_task(event, elem, name){
         })
         .fail(notify_error)
         .always(function(){
-            elem.classList.remove("mdi-circle");
-            elem.classList.remove("animated");
-            elem.classList.add("mdi-play-circle");
+            if(elem.classList.contains("mdi-circle")){
+                elem.classList.remove("mdi-circle");
+                elem.classList.remove("animated");
+                elem.classList.add("mdi-play-circle");
+            }
             elem.classList.remove("disabled");
         });
 }

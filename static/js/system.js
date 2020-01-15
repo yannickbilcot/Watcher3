@@ -190,7 +190,7 @@ function time_string(time){
     return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
 }
 
-function create_backup(event, button){
+function create_backup(event, button, fh){
     event.preventDefault();
     var $btns = document.querySelectorAll("div#modal_create_backup button");
     var $thinker = document.querySelector("div#modal_create_backup div.thinker_small");
@@ -205,6 +205,7 @@ function create_backup(event, button){
         .done(function(response){
             if(response["response"] === true){
                 $.notify({message: response["message"]}, {delay: 0});
+                window.open(url_base + "/backup", '_blank');
             } else {
                 $.notify({message: `${response["error"]}`}, {type: "danger", delay: 0});
             }
@@ -289,7 +290,7 @@ function upload_restore_zip(event, button){
 
 function execute_task(event, elem, name){
     var $tr = elem.parentElement.parentElement;
-    var $post = _execute_task(event, elem, name);
+    var $post = alt_execute_task(event, elem, name);
     if($post){
         $post.done(function(response){
             var task = tasks[name];

@@ -104,8 +104,11 @@ def add_torrent(data):
     try:
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
-        if response['result'] is True:
+        if response['result'] is True: # maybe Deluge Web 1.x returned true, 2.x returns array of array
             downloadid = Torrent.get_hash(data['torrentfile'])
+        elif isinstance(response['result'], list) and isinstance(response['result'][0], list) and\
+                len(response['result'][0]) == 2 and response['result'][0][0] is True:
+            downloadid = response['result'][0][1]
         else:
             return {'response': False, 'error': response['error']}
     except (SystemExit, KeyboardInterrupt):
@@ -298,7 +301,7 @@ def get_torrents_status(stalled_for=None, progress={}):
     global command_id
     conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
 
-    logging.info('Get torrents from DelugeRPC')
+    logging.info('Get torrents from DelugeRPC: {}'.format(list(progress.keys())))
 
     host = conf['host']
     port = conf['port']
@@ -309,7 +312,7 @@ def get_torrents_status(stalled_for=None, progress={}):
 
     fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
     command = {'method': 'core.get_torrents_status',
-               'params': [{}, fields],
+               'params': [{'id': list(progress.keys())}, fields],
                'id': command_id
                }
     command_id += 1
@@ -323,7 +326,12 @@ def get_torrents_status(stalled_for=None, progress={}):
         now = int(datetime.timestamp(datetime.now()))
         response = Url.open(url, post_data=post_data, headers=headers)
         response = json.loads(response.text)
-        for id, torrent in response.items():
+        logging.debug('Response keys: {}'.format(list(response.keys())))
+        logging.debug(response)
+        for id, torrent in response.get('result', {}).items():
+            # deluge return empty hash for every requested hash, even when it's missing
+            if not torrent:
+                continue
             logging.info(torrent)
             data = {'hash': torrent['hash'], 'status': torrent['state'].lower(), 'name': torrent['name']}
             if data['status'] == 'downloading' and stalled_for:

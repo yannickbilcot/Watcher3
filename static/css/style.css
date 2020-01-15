@@ -1,186 +1,199 @@
-body{
-    margin: 6em 0 2em 0;
+body {
+  margin: 6em 0 2em 0;
 }
 
-input{
-    font-size: 1em;
-    line-height: 1.5em;
+input {
+  font-size: 1em;
+  line-height: 1.5em;
 }
 
-a{
-    cursor: pointer;
-}
-a:hover{
-    text-decoration: none;
+a {
+  cursor: pointer;
 }
 
-.shadow{
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1), 0 3px 3px rgba(0,0,0,0.1);
+a:hover {
+  text-decoration: none;
 }
 
-.container{
-    max-width: 960px;
+.shadow {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 3px 3px rgba(0, 0, 0, 0.1);
 }
 
-i.mdi{
-    font-size: 1.2em;
-    width: 1.25em;
-    display: inline-block;
-    vertical-align: middle;
-    user-select: none;
-    cursor: pointer;
-    transition: none;
-    text-align: center;
+.container {
+  max-width: 960px;
 }
 
-i.mdi.animated{
-    animation: material-zoom 2s infinite;
-    animation-timing-function: ease-in-out;
+i.mdi {
+  font-size: 1.2em;
+  width: 1.25em;
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+  cursor: pointer;
+  transition: none;
+  text-align: center;
 }
 
-nav.navbar{
-    padding: 0.5em;
+i.mdi.animated {
+  animation: material-zoom 2s infinite;
+  animation-timing-function: ease-in-out;
 }
 
-nav.navbar img{
-    height: 3em;
+nav.navbar {
+  padding: 0.5em;
 }
 
-nav.navbar .nav-link{
-    padding: .2rem 1rem;
+body .navbar-expand-md > .container,
+body .navbar-expand-md > .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+nav.navbar img {
+  height: 3em;
+  margin-left: 0;
+}
+
+nav.navbar .nav-link {
+  padding: .2rem 1rem;
 }
 
 @keyframes material-zoom {
-    0%{
-        transform: scale(0);
-        opacity: 0;
-    }
-    40%{
-        opacity: .9;
-    }
-    80%{
-        transform: scale(3);
-        opacity: 0;
-    }
-    100%{
-        opacity: 0;
-    }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  40% {
+    opacity: .9;
+  }
+
+  80% {
+    transform: scale(3);
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
-button{
-    overflow: hidden;
+button {
+  overflow: hidden;
 }
 
-ul{
-    list-style: none;
-    padding: 0;
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-textarea, input, button{
-    outline: none;
+textarea,
+input,
+button {
+  outline: none;
 }
 
 /* Nav Bar */
-.navbar{
-    position: fixed;
-    width: 100%;
-    top: 0;
-    left: 0;
-    z-index: 10;
+.navbar {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
-ul.dropdown-menu > li{
-    padding-left: 0.5em;
-    min-width: 10.5em;
+ul.dropdown-menu > li {
+  padding-left: 0.5em;
+  min-width: 10.5em;
 }
 
 /* Notification Animations */
-.animated{
-    animation-duration: 1s;
-    animation-fill-mode: both;
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 
-@keyframes fadeInDown{
-    0%{
-        opacity: 0;
-        transform: translate3d(0, -100%, 0);
-    }
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
 
-    100%{
-        transform: none;
-        opacity: 1;
-    }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
 }
 
-.fadeInDown{
+.fadeInDown {
   animation-name: fadeInDown;
 }
 
-@keyframes fadeOutDown{
-    0%{
-        opacity: 1;
-        transform: none;
-    }
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
 
-    100%{
-      opacity: 0;
-      transform: translate3d(100%, 0, 0);
-    }
+  100% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
 }
 
-.fadeOutDown{
+.fadeOutDown {
   animation-name: fadeOutDown;
 }
 
 
 /* Loading Animation */
-#thinker{
-    overflow: hidden;
-    width: 4em;
-    height: 4em;
-    line-height: 4em;
-    font-size: 4em;
-	position: absolute;
-    bottom: calc(50% - 2em);
-    right: calc(50% - 2em);
-    opacity: 1;
-    max-height: 0%;
-    text-align: center;
+#thinker {
+  overflow: hidden;
+  width: 4em;
+  height: 4em;
+  line-height: 4em;
+  font-size: 4em;
+  position: absolute;
+  bottom: calc(50% - 2em);
+  right: calc(50% - 2em);
+  opacity: 1;
+  max-height: 0%;
+  text-align: center;
 }
 
-.thinker_small{
-    transition: .6s;
-    max-height: 0%;
-    width: 100%;
-    font-size: 2em;
-	opacity: 1;
-    text-align: center;
-    overflow: hidden;
+.thinker_small {
+  transition: .6s;
+  max-height: 0%;
+  width: 100%;
+  font-size: 2em;
+  opacity: 1;
+  text-align: center;
+  overflow: hidden;
 }
 
-.modal-dialog.modal-wide{
-    max-width: 900px;
+.modal-dialog.modal-wide {
+  max-width: 900px;
 }
 
 .btn i.mdi,
-.input-group-prepend i.mdi{
-    font-size: 1.5em;
-    line-height: 1em;
+.input-group-prepend i.mdi {
+  font-size: 1.5em;
+  line-height: 1em;
 }
 
 /* Bootstrap Overrides */
-table.table th{
-    padding: .4rem;
+table.table th {
+  padding: .4rem;
 }
 
-h5{
-    display: inline-block;
+h5 {
+  display: inline-block;
 }
 
 hr {
-    width: 70%;
-    margin: 1em 15% 1.5em 15%;
-    border-top: 1px solid rgba(128, 128, 128, 0.25)
+  width: 70%;
+  margin: 1em 15% 1.5em 15%;
+  border-top: 1px solid rgba(128, 128, 128, 0.25);
 }
 
 /* Always hide hacks at the bottom and hope nobody sees it */
@@ -190,5 +203,24 @@ hr {
 */
 .modal,
 .modal-open {
-    padding-right: 0px !important;
+  padding-right: 0px !important;
+}
+
+ul#movie_list {
+  max-width: 960px;
+  width: 100%;
+  margin-top: 1.5em;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: flex-start;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+ul#movie_list li {
+    width: 100%;
+    margin: 0;
+    text-align: center;
 }

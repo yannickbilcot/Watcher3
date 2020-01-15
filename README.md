@@ -4,13 +4,15 @@
 
 Watcher is an automated movie NZB & Torrent searcher and snatcher. You can add a list of wanted movies and Watcher will automatically send the NZB or Torrent to your download client. Watcher also has basic post-processing capabilities such as renaming and moving.
 
-<p align="center"><a href="https://gitter.im/barbequesauce-Watcher3/development"><img alt="Gitter" src="https://img.shields.io/gitter/room/barbequesauce/watcher3.svg"/></a>
+### PLEASE NOTE: This repo (and my docker that auto builds from it) may often break. I tinker with it a lot and often make mistakes ;) If you're happy to beta test, by all means use this. If you want a saner, more stable release, use barbequesauce/watcher3 (git and docker). Any worthwhile changes will be PR'd to barbequesauce eventually.
+
+<p align="center"><a href="https://gitter.im/barbequesauce-Watcher3/development"><img alt="Gitter" src="https://img.shields.io/gitter/room/ellnic/watcher3.svg"/></a>
 <a href="https://kiwiirc.com/client/freenode.net/#watcher3"><img alt="IRC" src="https://img.shields.io/badge/Freenode-Online-Success.svg"/></a>
 <a href="https://discord.gg/wrHPyre"><img alt="Discord" src="https://img.shields.io/discord/620536178881331200?color=Green&label=discord&style=flat"/></a>
 <p align="center"><img alt="Codacy" src="https://api.codacy.com/project/badge/Grade/3392120a6afe40cc8dcfbb8b7e7b3713"/>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/barbequesauce/watcher3.svg"/></a>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/barbequesauce/watcher3.svg"/></a>
-<a href="https://hub.docker.com/r/barbequesauce/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/barbequesauce/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Pull Count" src="https://img.shields.io/docker/pulls/ellnic/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/automated/ellnic/watcher3.svg"/></a>
+<a href="https://hub.docker.com/r/ellnic/watcher3"><img alt="Docker Build" src="https://img.shields.io/docker/cloud/build/ellnic/watcher3.svg"/></a>
     
 
 Watcher is a work in progress and plans to add more features in the future, but we will always prioritize speed and stability over features. 
@@ -23,16 +25,15 @@ You may also wish to subscribe to the subreddit /r/watcher, but at this time the
 
 Refer to the wiki for more information about post-processing, start scripts, and other features. https://github.com/barbequesauce/Watcher3/wiki
 
-You may also wish to checkout ellnic's repo, which may (or may not) have certain downstream changes before they are pulled. https://github.com/ellnic/Watcher3 Please do not submit PR's there, submit them to barbequesauce.
-
 ## Recent Highlights (docker)
 
 Docker now checks for 'standard' config and db names of /config/config.cfg and /config/watcher.sqlite and renames and organises them to /config/watcher.cfg and /config/db/database.sqlite. Originals are placed in /configs/backups. This is useful if you previously ran using python and have literally dumped your config files from the userdata folder into your docker config folder.
 
-## Recent Highlights (Code) - Needs updating
 
-Recent highlights include some bugfixes and enhancements, a redesigned logo and colour scheme and a revised docker container. You can now select items per page in the library and the vanishing library bug is fixed. The docker container now runs with the newly added --posters flag so that the poster meta is stored in /config and is not lost on container update.
- 
+## Recent Highlights (code)
+
+-- NEEDS UPDATING
+
 ## Installation
 
 We have several options to choose from:
@@ -43,7 +44,7 @@ If you are not using Docker, Watcher requires Python 3. It is also recommended t
 
 Obtaining the files:
 
-    git clone https://github.com/barbequesauce/Watcher3.git
+    git clone https://github.com/ellnic/Watcher3.git
 
 Start Watcher using:
 
@@ -55,7 +56,7 @@ Open a browser and navigate to localhost:9090
 
 If you do not wish to use Git, follow these steps.
 
-1. Open your browser and go to https://github.com/barbequesauce/Watcher3
+1. Open your browser and go to https://github.com/ellnic/Watcher3
 2. Click on the green Clone or download button and click Download ZIP
 3. Once done downloading, extract the ZIP to the location in which you want Watcher installed
 4. Open a terminal and cd to the Watcher directory.
@@ -138,7 +139,7 @@ Our docker uses an Alpine 3.10 base, with a few extra things like nano and vim f
 
 1. Pull the container:
 
-``` docker pull barbequesauce/watcher3```
+``` docker pull ellnic/watcher3```
 
 2. Example run command:
 
@@ -149,16 +150,12 @@ Our docker uses an Alpine 3.10 base, with a few extra things like nano and vim f
   -v /path/to/downloads/:/downloads \
   -v /path/to/movies/:/movies \
   -e UMASK_SET=022 \
-  -e APP_GID=1000 -e APP_UID=1000 \
+  -e APP_UID=1000 -e APP_GID=1000 \
   -p 9090:9090 \
-  barbequesauce/watcher3
+  ellnic/watcher3
 ``` 
 
 
 If you wish to exec into the container to have a look around, use:
 
 ``` docker exec -it watcher3 /bin/bash```
-
-
-
-You may also wish to checkout ellnic's repo: https://github.com/ellnic/Watcher3 [this is considered unstable at times please see warning in readme]

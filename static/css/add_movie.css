@@ -1,23 +1,67 @@
-ul.nav.nav-pills{
-    justify-content: space-evenly;
+ul.nav.nav-pills {
+    justify-content: space-between;
 }
 
-ul#movies{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: 0;
-    max-height: 0%;
-    overflow: hidden;
-    transition: 0.6s;
-    padding-bottom: 4em;
-}
-
-ul#movies li{
-    width: 10em;
-    margin: 1em 0.5em;
+ul.nav.nav-pills li {
+    flex: 1;
     text-align: center;
+    margin-bottom: 0;
+}
+
+@media (max-width: 820px) {
+   ul.nav.nav-pills li {
+        width: calc(25% - 15px);
+        flex: auto;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 560px) {
+    ul.nav.nav-pills li {
+        width: calc(50% - 15px);
+    }
+}
+
+ul#movies {
+  max-width: 100%;
+  width: 100%;
+  justify-content: flex-start;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0;
+  overflow: hidden;
+  transition: 0.6s;
+  padding-bottom: 4em;
+  text-align: center;
+}
+
+ul#movies li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
+    text-align: center;
+}
+
+ul#movies li {
+    width: calc(20% - 15px);
+    margin: 1em 0.5em 0;
+    text-align: center;
+}
+
+@media (max-width: 820px) {
+    ul#movies li {
+        width: calc(25% - 15px);
+    }
+}
+
+@media (max-width: 560px) {
+    ul#movies li {
+        width: calc(50% - 15px);
+    }
+}
+
+ul#movies {
+    max-width: 960px;
 }
 
 .card-body{
@@ -75,7 +119,7 @@ img.poster{
 preload-icon {
     display: none;
 }
-	
+
 preload-icon.loading {
     align-items: center;
     display: flex;
@@ -86,12 +130,12 @@ preload-icon.loading {
     top: 0;
     width: 100%;
 }
-	
+
 preload-icon > .mdi {
     font-size: 3em;
     width: initial;
 }
-	
+
 iframe#trailer.unavailable {
     background: url("../images/trailer_unavailable.png") no-repeat 50% 50%;
 }
