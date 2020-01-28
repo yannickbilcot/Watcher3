@@ -248,7 +248,7 @@ def snatch_torrent(data):
                 core.sql.update('SEARCHRESULTS', 'torrentfile', magnet, 'guid', guid)
 
         if guid_:
-            core.sql.update('SEARCHRESULTS', 'guid', guid_, 'guid', guid)
+            core.sql.update('SEARCHRESULTS', 'guid', guid_.lower(), 'guid', guid)
             guid = guid_
         else:
             return {'response': False, 'error': 'Unable to get torrent hash from indexer.'}
