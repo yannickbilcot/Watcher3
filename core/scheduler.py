@@ -375,7 +375,7 @@ class FinishedTorrentsCheck(object):
             if config['enabled']:
                 progress = {}
                 now = int(datetime.datetime.timestamp(datetime.datetime.now()))
-                if config.get('removestalledfor') or client in ('DelugeRPC', 'DelugeWeb'): # temp check until removestalledfor is added to deluge
+                if config.get('removestalledfor'):
                     progress = core.sql.get_download_progress(client)
 
                 downloader = getattr(downloaders, client)

@@ -198,28 +198,26 @@ def get_torrents_status(stalled_for=None, progress={}):
 
         torrents = []
         now = int(datetime.timestamp(datetime.now()))
-        fields = ['hash', 'state', 'name', 'last_seen_complete', 'time_since_download', 'total_payload_download']
+        fields = ['hash', 'state', 'name', 'last_seen_complete', 'time_since_download', 'total_payload_download', 'active_time']
         for id, torrent in client.call('core.get_torrents_status', {'id': list(progress.keys())}, fields).items():
             # deluge return empty hash for every requested hash, even when it's missing
             if not torrent:
                 continue
-            logging.info(torrent)
+            logging.debug(torrent)
             data = {'hash': torrent[b'hash'].decode(), 'status': torrent[b'state'].lower().decode(), 'name': torrent[b'name'].decode()}
             if data['status'] == 'downloading' and stalled_for:
-                if b'last_seen_complete' in torrent and b'time_since_download' in torrent:
-                    if now > torrent['last_seen_complete'] + stalled_for * 3600 and \
-                            now > torrent['time_since_download'] + stalled_for * 3600:
-                        #data['status'] = 'stalled'
-                        logging.info('torrent {} detected as stalled'.format(data['name']))
-                elif data['hash'] in progress:
+                if b'last_seen_complete' in torrent and b'time_since_download' in torrent: # deluge 2.x
+                    if torrent[b'last_seen_complete'] == 0 or now > torrent[b'last_seen_complete'] + stalled_for * 3600:
+                        if torrent[b'time_since_download'] != -1 and torrent[b'time_since_download'] > stalled_for * 3600 or \
+                                torrent[b'time_since_download'] == -1 and torrent[b'active_time'] > stalled_for * 3600:
+                            data['status'] = 'stalled'
+                elif data['hash'] in progress: # deluge 1.x
                     data['progress'] = torrent[b'total_payload_download']
                     torrent_progress = progress[data['hash']]
                     if data['progress'] == torrent_progress['progress'] and \
                             now > torrent_progress['time'] + stalled_for * 3600:
-                        #data['status'] = 'stalled'
-                        logging.info('torrent {} detected as stalled'.format(data['name']))
+                        data['status'] = 'stalled'
 
-            logging.info(data)
             torrents.append(data)
 
         return torrents
