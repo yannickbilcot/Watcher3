@@ -60,8 +60,8 @@ class TheMovieDatabase(object):
 
         if search_term[:2] == 'tt' and search_term[2:].isdigit():
             movies = TheMovieDatabase._search_imdbid(search_term)
-        elif search_term.isdigit():
-            movies = TheMovieDatabase._search_tmdbid(search_term)
+        elif search_term[:5] == 'tmdb:' and search_term[5:].strip().isdigit():
+            movies = TheMovieDatabase._search_tmdbid(search_term[5:].strip())
         else:
             movies = TheMovieDatabase._search_title(search_term)
 
@@ -88,7 +88,7 @@ class TheMovieDatabase(object):
         title = Url.normalize(title)
 
         url = 'https://api.themoviedb.org/3/search/movie?page=1&include_adult={}&'.format('true' if core.CONFIG['Search']['allowadult'] else 'false')
-        if title[-4:].isdigit():
+        if len(title) > 4 and title[-4:].isdigit():
             query = 'query={}&year={}'.format(title[:-5], title[-4:])
         else:
             query = 'query={}'.format(title)
@@ -104,6 +104,7 @@ class TheMovieDatabase(object):
             if results.get('success') == 'false':
                 return []
             else:
+                logging.debug(results)
                 return results['results'][:6]
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -135,6 +136,7 @@ class TheMovieDatabase(object):
             else:
                 response = results['movie_results'][0]
                 response['imdbid'] = imdbid
+                logging.debug(response)
                 return [response]
         except (SystemExit, KeyboardInterrupt):
             raise
@@ -166,12 +168,16 @@ class TheMovieDatabase(object):
                 return []
             else:
                 results = json.loads(response.text)
+                if 'status' in results:
+                    # watcher thinks movie is already added when it has status
+                    results['release_status'] = results.pop('status')
                 results['imdbid'] = results.pop('imdb_id')
                 logging.warning('TMDB returned imdbid as {}'.format(results['imdbid']))
                 if results['imdbid'] == 'N/A' or results['imdbid'] == '':
                     logging.warning('TMDB did not have an IMDBid for this movie')
                     return []
                 else:
+                    logging.debug(results)
                     return [results]
         except (SystemExit, KeyboardInterrupt):
             raise
