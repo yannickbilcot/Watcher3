@@ -625,7 +625,7 @@ class Metadata(object):
         dates = []
         for i in movie.get('release_dates', {}).get('results', []):
             for d in i['release_dates']:
-                if d['type'] > 4:
+                if d['type'] >= 4:
                     dates.append(d['release_date'])
 
         if dates:
