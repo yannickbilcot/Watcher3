@@ -23,6 +23,8 @@ Watcher may change frequently, so we strongly suggest that you come by and say h
 
 You may also wish to subscribe to the subreddit /r/watcher, but at this time there is little activity there. It was for the original project, and most the current developement talk is happening via IRC and Gitter. We now also have [Discord](https://discord.gg/wrHPyre)
 
+Note that Python 3 is required, although latest builds (3.8.x) are not fully functional yet. 
+
 Refer to the wiki for more information about post-processing, start scripts, and other features. https://github.com/barbequesauce/Watcher3/wiki
 
 ## Recent Highlights (docker)
