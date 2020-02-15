@@ -27,7 +27,7 @@ def _send(method, post_data=None):
             logging.error('Unable to connect to QBittorrent: {}'.format(r))
             return False
 
-    url = '{}:{}/{}'.format(conf['host'], conf['port'], method)
+    url = '{}:{}/api/v2/{}'.format(conf['host'], conf['port'], method)
 
     try:
         response = Url.open(url, post_data=post_data, headers={'cookie': cookie})
@@ -99,13 +99,13 @@ def add_torrent(data):
                  }
 
     try:
-        _send('command/download', post_data=post_data)
+        _send('torrents/add', post_data=post_data)
         downloadid = Torrent.get_hash(data['torrentfile'])
         return {'response': True, 'downloadid': downloadid}
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logging.error('QBittorrent command/download failed.', exc_info=True)
+        logging.error('QBittorrent torrents/add failed.', exc_info=True)
         return {'response': False, 'error': str(e)}
 
 
@@ -113,12 +113,12 @@ def _get_download_dir(base_url):
     logging.debug('Getting default download dir for QBittorrent.')
 
     try:
-        response = _send('query/preferences')
+        response = _send('app/preferences')
         return json.loads(response)['save_path']
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logging.error('QBittorrent query/preferences failed.', exc_info=True)
+        logging.error('QBittorrent app/preferences failed.', exc_info=True)
         return None
 
 
@@ -129,7 +129,7 @@ def _login(url, username, password):
 
     post_data = {'username': username, 'password': password}
 
-    url = '{}login'.format(url)
+    url = '{}api/v2/auth/login'.format(url)
     try:
         response = Url.open(url, post_data=post_data)
         cookie = response.headers.get('Set-Cookie')
@@ -159,12 +159,12 @@ def cancel_download(downloadid):
     logging.info('Cancelling download # {} in QBittorrent.'.format(downloadid))
 
     try:
-        _send('command/deletePerm', post_data={'hashes': downloadid.lower()})
+        _send('torrents/delete', post_data={'hashes': downloadid.lower(), 'deleteFiles': False})
         return True
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logging.error('QBittorrent query/preferences failed.', exc_info=True)
+        logging.error('QBittorrent torrents/delete failed.', exc_info=True)
         return None
 
 
