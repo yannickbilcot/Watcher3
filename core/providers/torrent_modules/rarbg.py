@@ -110,7 +110,7 @@ def get_rss():
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logging.error('Rarbg RSS fetch failed.', exc_info=True)
+        logging.error('Rarbg RSS fetch failed, empty feed.', exc_info=False)
         return []
 
 
