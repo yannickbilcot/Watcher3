@@ -3,6 +3,7 @@ import logging
 from time import time, sleep
 import core
 import os
+import re
 from core.helpers import Comparisons, Url
 _k = Comparisons._k
 
@@ -58,9 +59,11 @@ class TheMovieDatabase(object):
 
         logging.info('Searching TheMovieDB for {}'.format(search_term))
 
-        if search_term[:2] == 'tt' and search_term[2:].isdigit():
+        if re.match('^tt[0-9]{7,9}$', search_term):
             movies = TheMovieDatabase._search_imdbid(search_term)
-        elif search_term[:5] == 'tmdb:' and search_term[5:].strip().isdigit():
+        elif re.match('^imdb:\s*tt[0-9]{7,8}\s*$', search_term):
+            movies = TheMovieDatabase._search_imdbid(search_term[5:].strip())
+        elif re.match('^tmdb:\s*[0-9]+\s*$', search_term):
             movies = TheMovieDatabase._search_tmdbid(search_term[5:].strip())
             if movies and 'status' in movies[0]:
                 # watcher thinks movie is already added when it has status, so we don't want status in search result
