@@ -73,7 +73,7 @@ def add_torrent(data):
         if conf['addpaused']:
             client.load(data['torrentfile'])
         else:
-            client.load_start(data['torrentfile'])
+            client.load.start(data['torrentfile'])
 
         if conf['label'] and downloadid:
             t = 0
