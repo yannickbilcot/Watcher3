@@ -153,6 +153,7 @@ default status Available.
                 results[idx] = result
 
     for idx, result in enumerate(results):
+        logging.debug('Parse {}'.format(result['title']))
         results[idx]['ptn'] = PTN.parse(result['title'])
         results[idx]['resolution'] = get_source(results[idx]['ptn'])
 
@@ -243,6 +244,7 @@ def rss_sync(movies):
 
         # Get source media and resolution
         for idx, result in enumerate(new_results):
+            logging.debug('Parse {}'.format(result['title']))
             new_results[idx]['ptn'] = PTN.parse(result['title'])
             new_results[idx]['resolution'] = get_source(new_results[idx]['ptn'])
 
