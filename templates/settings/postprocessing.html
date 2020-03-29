@@ -106,6 +106,7 @@
                         <option value="copy">${_('Copy')}</option>
                         <option value="hardlink">${_('Hardlink')}</option>
                         <option value="symboliclink" ${'disabled=true' if os == 'windows' else ''}>${_('Symbolic Link')}</option>
+                        <option value="keeplink" ${'disabled=true' if os == 'windows' else ''}>${_('Keep Link')}</option>
                     </select>
                 </div>
 
