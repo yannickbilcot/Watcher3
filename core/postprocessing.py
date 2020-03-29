@@ -581,7 +581,7 @@ class Postprocessing(object):
         if config['cleanupenabled']:
             result['tasks']['cleanup'] = {'enabled': True}
 
-            if config['movermethod'] in ('copy', 'hardlink', 'symboliclink'):
+            if config['movermethod'] in ('copy', 'hardlink', 'symboliclink', 'keeplink'):
                 logging.info('File copy or linking enabled -- skipping Cleanup.')
                 result['tasks']['cleanup']['response'] = None
                 return result
@@ -866,6 +866,15 @@ class Postprocessing(object):
                 os.link(data['original_file'], new_file_location)
             except Exception as e:
                 logging.error('Mover failed: Unable to create hardlink.', exc_info=True)
+                return ''
+        elif config['movermethod'] == 'keeplink':
+            if core.PLATFORM == 'windows':
+                logging.warning('Attempting to create symbolic link on Windows. This will fail without SeCreateSymbolicLinkPrivilege.')
+            logging.info('Creating symbolic link from {} to {}'.format(data['original_file'], new_file_location))
+            try:
+                os.symlink(data['original_file'], new_file_location)
+            except Exception as e:
+                logging.error('Mover failed: Unable to create symbolic link.', exc_info=True)
                 return ''
         elif config['movermethod'] == 'copy':
             logging.info('Copying {} to {}.'.format(data['original_file'], new_file_location))
