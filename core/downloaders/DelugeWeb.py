@@ -301,7 +301,7 @@ def get_torrents_status(stalled_for=None, progress={}):
     global command_id
     conf = core.CONFIG['Downloader']['Torrent']['DelugeWeb']
 
-    logging.info('Get torrents from DelugeRPC: {}'.format(list(progress.keys())))
+    logging.info('Get torrents from DelugeWeb: {}'.format(list(progress.keys())))
 
     host = conf['host']
     port = conf['port']
@@ -310,7 +310,7 @@ def get_torrents_status(stalled_for=None, progress={}):
     if cookie is None:
         _login(url, conf['pass'])
 
-    fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download']
+    fields = ['hash', 'state', 'last_seen_complete', 'name', 'time_since_download', 'total_payload_download', 'active_time']
     command = {'method': 'core.get_torrents_status',
                'params': [{'id': list(progress.keys())}, fields],
                'id': command_id
@@ -332,23 +332,21 @@ def get_torrents_status(stalled_for=None, progress={}):
             # deluge return empty hash for every requested hash, even when it's missing
             if not torrent:
                 continue
-            logging.info(torrent)
+            logging.debug(torrent)
             data = {'hash': torrent['hash'], 'status': torrent['state'].lower(), 'name': torrent['name']}
             if data['status'] == 'downloading' and stalled_for:
-                if 'last_seen_complete' in torrent and 'time_since_download' in torrent:
-                    if now > torrent['last_seen_complete'] + stalled_for * 3600 and \
-                            now > torrent['time_since_download'] + stalled_for * 3600:
-                        #data['status'] = 'stalled'
-                        logging.info('torrent {} detected as stalled'.format(data['name']))
-                elif data['hash'] in progress:
+                if 'last_seen_complete' in torrent and 'time_since_download' in torrent: # deluge 2.x
+                    if torrent['last_seen_complete'] == 0 or now > torrent['last_seen_complete'] + stalled_for * 3600:
+                        if torrent['time_since_download'] != -1 and torrent['time_since_download'] > stalled_for * 3600 or \
+                                torrent['time_since_download'] == -1 and torrent['active_time'] > stalled_for * 3600:
+                            data['status'] = 'stalled'
+                elif data['hash'] in progress: # deluge 1.x
                     data['progress'] = torrent['total_payload_download']
                     torrent_progress = progress[data['hash']]
                     if data['progress'] == torrent_progress['progress'] and \
                             now > torrent_progress['time'] + stalled_for * 3600:
-                        #data['status'] = 'stalled'
-                        logging.info('torrent {} detected as stalled'.format(data['name']))
+                        data['status'] = 'stalled'
 
-            logging.info(data)
             torrents.append(data)
 
         return torrents

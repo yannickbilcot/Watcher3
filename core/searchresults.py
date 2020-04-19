@@ -49,7 +49,7 @@ def score(releases, imdbid=None, imported=False):
         logging.debug('Releases are of origin "Import", using custom default quality profile.')
         titles = []
         check_size = False
-        movie_details = {'year': '\n'}
+        movie_details = {}
         filters = {'requiredwords': '', 'preferredwords': '', 'ignoredwords': ''}
         quality = import_quality()
         category = {'requiredwords': '', 'preferredwords': '', 'ignoredwords': ''}
@@ -105,12 +105,14 @@ def score(releases, imdbid=None, imported=False):
             releases = threshold_score(releases, 'leechers', core.CONFIG['Search']['leecherspoints'], core.CONFIG['Search']['leechersthreshold'])
 
     releases = score_sources(releases, sources, check_size=check_size)
+    if year:
+        releases = score_year(releases, int(year))
 
     if quality['scoretitle']:
         titles = [movie_details.get('title')]
         if movie_details.get('alternative_titles'):
             titles += movie_details['alternative_titles'].split(',')
-        releases = fuzzy_title(releases, titles, year=year)
+        releases = fuzzy_title(releases, titles)
 
     if preferred_groups and preferred_groups != ['']:
         releases = score_preferred(releases, preferred_groups)
@@ -342,16 +344,44 @@ def score_preferred(releases, group_list):
                 continue
     return releases
 
+def score_year(releases, year):
+    ''' Increase score for each group of 'words' match
+    releases (list[dict]): scene release metadata to score and filter
+    year (int): expected year
 
-def fuzzy_title(releases, titles, year='\n'):
+    Iterates through releases and adds 20 points to every
+        entry with exact year match
+    Keeps releases without year or 1 year higher or lower.
+
+    Returns list[dict]
+    '''
+
+    logging.info('Checking year match.')
+
+    reject = 0
+
+    for r in releases:
+        if r['reject_reason']:
+            reject += 1
+            continue
+        if 'ptn' not in r:
+            r['ptn'] = PTN.parse(r['title'])
+        if 'year' in r['ptn']:
+            if r['ptn']['year'] == year:
+                r['score'] += 20
+            if abs(year - r['ptn']['year']) > 1:
+                reject += 1
+                r['reject_reason'] = 'Year mismatch'
+
+    return releases
+
+
+def fuzzy_title(releases, titles):
     ''' Score and remove releases based on title match
     releases (list[dict]): scene release metadata to score and filter
     titles (list): titles to match against
-    year (str): year of movie release           <optional -default '\n'>
 
     If titles is an empty list every result is treated as a perfect match
-    Matches releases based on release_title.split(year)[0]. If year is not passed,
-        matches on '\n', which will include the entire string.
 
     Iterates through releases and removes any entry that does not
         fuzzy match 'title' > 70.

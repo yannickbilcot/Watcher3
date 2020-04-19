@@ -249,7 +249,7 @@ class SQL(object):
 
         logging.debug('Updating {} to {} for rows that match {}:{} in {}.'.format(COLUMN, VALUE, idcol, idval.split('&')[0], TABLE))
 
-        sql = 'UPDATE {} SET {}=? WHERE {}=?'.format(TABLE, COLUMN, idcol)
+        sql = 'UPDATE {} SET {}=? WHERE {}=? COLLATE NOCASE'.format(TABLE, COLUMN, idcol)
         vals = (VALUE, idval)
 
         command = [sql, vals]
@@ -654,7 +654,7 @@ class SQL(object):
 
         logging.debug('Checking if {} exists in database table {}'.format(','.join(matches), TABLE))
 
-        command = ['SELECT 1 FROM {} WHERE {}'.format(TABLE, ' AND '.join(matches))]
+        command = ['SELECT 1 FROM {} WHERE {} COLLATE NOCASE'.format(TABLE, ' AND '.join(matches))]
 
         row = self.execute(command)
 
