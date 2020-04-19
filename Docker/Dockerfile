@@ -1,5 +1,4 @@
-FROM arm32v6/alpine:3.10.3
-COPY qemu-arm-static /usr/bin/
+FROM alpine:3.10.3
 
 ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3" PATH="/opt/watcher3:$PATH"
 
@@ -11,7 +10,7 @@ RUN rm -rf /tmp/* /var/tmp/* /opt/$APP_NAME/entrypoint.sh /opt/$APP_NAME/Docker
 
 WORKDIR /opt/watcher3
 
-COPY Docker/entrypoint.sh /
+COPY entrypoint.sh /
 
 RUN chmod +x /entrypoint.sh && mkdir /config
 
@@ -22,3 +21,4 @@ EXPOSE 9090
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["watcher.py"]
+
