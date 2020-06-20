@@ -16,7 +16,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.5, !=3.8"
+python = ">=3.5, <3.8"
 bencodepy = "^0.9.5"
 cherrypy = "^11.0.0"
 requests = "^2.24.0"
@@ -30,6 +30,8 @@ stringscore = "^0.1.0"
 cheroot = "^8.3.0"
 deluge_client = "^1.9.0"
 infi = "^0.0.1"
+rtorrent-python = "^0.2.9"
+rtorrent-xmlrpc = "^0.0.3"
 
 [tool.poetry.dev-dependencies]
 

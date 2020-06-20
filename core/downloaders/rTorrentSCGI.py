@@ -1,5 +1,5 @@
 import logging
-from lib import rtorrent
+import rtorrent_xmlrpc as rtorrent
 import core
 import xmlrpc.client
 from core.helpers import Torrent

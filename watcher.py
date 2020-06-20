@@ -142,7 +142,7 @@ if __name__ == '__main__':
         if core.PLATFORM == '*nix':
             Daemonizer(cherrypy.engine).subscribe()
         elif core.PLATFORM == 'windows':
-            from cherrypysytray import SysTrayPlugin  # noqa
+            from lib.cherrypysytsray import SysTrayPlugin  # noqa
             menu_options = (('Open Browser', None, lambda *args: webbrowser.open(core.SERVER_URL)),)
             systrayplugin = SysTrayPlugin(cherrypy.engine, 'core/favicon.ico', 'Watcher', menu_options)
             systrayplugin.subscribe()

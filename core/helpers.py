@@ -12,7 +12,7 @@ import logging
 import re
 
 
-logging.getLogger('lib.requests').setLevel(logging.CRITICAL)
+logging.getLogger('requests').setLevel(logging.CRITICAL)
 
 
 class Url(object):
