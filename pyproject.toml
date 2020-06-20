@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "watcher3"
+version = "0.1.0"
+description = "Watcher is an automated movie NZB & Torrent searcher and snatcher."
+authors = ["nosmokingbandit", "barbequesauce"]
+license = "Apache-2.0"
+
+readme = "README.md"
+repository = "https://github.com/barbequesauce/Watcher3"
+
+
+keywords = ["torrent", "usenet", "download"]
+
+classifiers = [
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.5, !=3.8"
+bencodepy = "^0.9.5"
+cherrypy = "^11.0.0"
+requests = "^2.24.0"
+transmissionrpc = "^0.11"
+mako = "^1.1.3"
+sqlalchemy = "^1.3.17"
+parse-torrent-name = "^1.1.1"
+hachoir = "^3.1.1"
+xmljson = "^0.2.1"
+stringscore = "^0.1.0"
+cheroot = "^8.3.0"
+deluge_client = "^1.9.0"
+infi = "^0.0.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
