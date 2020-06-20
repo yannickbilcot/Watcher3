@@ -1,6 +1,6 @@
 import logging
 
-from lib import transmissionrpc
+import transmissionrpc
 
 import core
 from datetime import datetime
