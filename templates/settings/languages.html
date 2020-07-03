@@ -1,0 +1,72 @@
+<%def name="generate_language(code, names)">
+    <tr>
+        <td class="code">
+            <div class="input-group">
+                <input type="text" data-id="code" class="form-control" placeholder="es" value="${code}">
+            </div>
+        </td>
+        <td class="names">
+            <div class="input-group">
+                <input type="text" data-id="names" class="form-control" placeholder="Spanish, Espa&ntilde;ol" value="${names}" data-toggle="tooltip" title="${_('Names to use when search movies with original title')}">
+            </div>
+        </td>
+        <td>
+            <button class="btn btn-outline-danger" onclick="delete_language(event, this)">
+                <i class="mdi mdi-delete"></i>
+            </button>
+        </td>
+    </tr>
+</%def>
+
+
+<!DOCTYPE HTML5>
+<html>
+    <head>
+        ${head}
+        <link href="${url_base}/static/css/settings/shared.css?v=010" rel="stylesheet">
+        <link href="${url_base}/static/css/settings/languages.css?v=001" rel="stylesheet">
+
+        <script src="${url_base}/static/js/settings/shared.js?v=012" type="text/javascript"></script>
+        <script src="${url_base}/static/js/settings/languages.js?v=001" type="text/javascript"></script>
+    </head>
+    <body>
+        ${navbar}
+        <div class="container">
+            <h1>${_('Languages')}</h1>
+            <form id='languages' class="mx-auto">
+                <table class="table">
+                    <thead class="thead-light">
+                        <th class="code">
+                            ${_('Code')}
+                        </th>
+                        <th class="names">
+                            ${_('Names')}
+                        </th>
+                        <th width="1%"></th>
+                    </thead>
+                    <tbody>
+                        %for code, names in config.items():
+                        ${generate_language(code, names)}
+                        %endfor
+                    </tbody>
+                </table>
+            </form>
+
+            <div class='col-md-12' id="add_category">
+                <button class="btn btn-outline-primary" onclick="add_language(event)">
+                    <i class="mdi mdi-plus"></i>
+                </button>
+            </div>
+
+            <button id="save_settings" class="btn btn-success float-right" onclick="save_settings(event, this)">
+                <i class="mdi mdi-content-save"></i>
+
+            </button>
+        </div>
+
+        <template id="language_template">
+            ${generate_language('', '')}
+        </template>
+
+    </body>
+</html>

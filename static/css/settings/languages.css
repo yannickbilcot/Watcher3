@@ -1,0 +1,10 @@
+#languages tr .code{
+    width: 30%;
+    display: inline-block;
+    text-align: center;
+}
+#languages tr .names{
+    width: 69%;
+    display: inline-block;
+    text-align: center;
+}
