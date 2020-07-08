@@ -29,20 +29,24 @@ function _get_settings(){
     each(document.querySelectorAll("#languages tbody tr"), function(element){
         // Name
         var code = element.querySelector("input[data-id=\"code\"]").value;
-        if(!code){
-            element.querySelector("input#code").classList.add("border-danger");
+        if(!code || !code.match(/^[a-z]{2}-[A-Z]{2}$/)){
+            element.querySelector("input[data-id=\"code\"]").classList.add("border-danger");
             blanks = true;
             return;
         }
         var names = element.querySelector("input[data-id=\"names\"]").value;
         if(!names){
-            element.querySelector("input#names").classList.add("border-danger");
+            element.querySelector("input[data-id=\"names\"]").classList.add("border-danger");
             blanks = true;
             return;
         }
 
         langs[code] = names;
     });
+
+    if(blanks === true){
+        return false;
+    }
 
     return {"Languages": langs};
 }
