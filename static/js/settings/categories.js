@@ -68,5 +68,9 @@ function _get_settings(){
         categories[name] = category;
     });
 
+    if(blanks === true){
+        return false;
+    }
+
     return {"Categories": categories};
 }

@@ -178,9 +178,9 @@ function _get_settings(){
         });
     });
 
-    if(blanks == true){
+    if(blanks === true){
         return false;
-    };
+    }
 
     return {"Quality": settings}
 }
