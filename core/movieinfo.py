@@ -149,7 +149,7 @@ class TheMovieDatabase(object):
             return []
 
     @staticmethod
-    def _search_tmdbid(tmdbid):
+    def _search_tmdbid(tmdbid, language=None):
         ''' Search TMDB for tmdbid
         tmdbid (str): themoviedatabase id #
 
@@ -160,8 +160,10 @@ class TheMovieDatabase(object):
 
         url = 'https://api.themoviedb.org/3/movie/{}?language=en-US&append_to_response=alternative_titles,external_ids,release_dates'.format(tmdbid)
 
+        if (language):
+            url += ',translations'
         logging.info('Searching TMDB {}'.format(url))
-        url = url + '&api_key={}'.format(_k(b'tmdb'))
+        url += '&api_key={}'.format(_k(b'tmdb'))
 
         TheMovieDatabase._use_token()
 
@@ -173,6 +175,8 @@ class TheMovieDatabase(object):
             else:
                 results = json.loads(response.text)
                 results['imdbid'] = results.pop('imdb_id')
+                if language:
+                    results = TheMovieDatabase.process_language_info(results, language)
                 logging.warning('TMDB returned imdbid as {}'.format(results['imdbid']))
                 if results['imdbid'] == 'N/A' or results['imdbid'] == '':
                     logging.warning('TMDB did not have an IMDBid for this movie')
@@ -184,6 +188,39 @@ class TheMovieDatabase(object):
         except Exception as e:
             logging.error('Error searching for TMDBID on TMDB.', exc_info=True)
             return []
+
+    @staticmethod
+    def process_language_info(result, language):
+        ''' Search alternative title for country in language, or translation for language
+         sets lang_titles and change overview with translated overview if translation is found
+        result (dict): data for movie
+        language (str): language in format lang_code-country_code (iso 639-1 and iso 3166-1)
+
+        Returns list of results
+        '''
+
+        lang, country = language.split('-')
+        if result['original_language'] == lang:
+            result['title'] = result['original_title']
+            result.pop('translations')
+            return result
+
+        result['lang_titles'] = []
+        for title in result.get('alternative_titles', {}).get('titles', []):
+            if title['iso_3166_1'] == country:
+                result['lang_titles'].append(title['title'])
+
+        for translation in result.get('translations', {}).get('translations', []):
+            if translation['iso_3166_1'] == country and translation['iso_639_1'] == lang:
+                result['lang_titles'].append(translation['data']['title'])
+                result['overview'] = translation['data']['overview']
+                break
+
+        result.pop('translations')
+        if result['lang_titles']:
+            result['en_title'] = result['title']
+            result['title'] = result['lang_titles'][0]
+        return result
 
     @staticmethod
     def get_imdbid(tmdbid=None, title=None, year=''):

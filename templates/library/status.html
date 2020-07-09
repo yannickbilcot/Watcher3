@@ -3,9 +3,9 @@
 
 <head>
     ${head}
-    <link href="${url_base}/static/css/library/status.css?v=028" rel="stylesheet">
+    <link href="${url_base}/static/css/library/status.css?v=029" rel="stylesheet">
     <script src="${url_base}/static/js/lib/echo.min.js?v=010" type="text/javascript"></script>
-    <script src="${url_base}/static/js/library/status.js?v=034" type="text/javascript"></script>
+    <script src="${url_base}/static/js/library/status.js?v=035" type="text/javascript"></script>
 </head>
 
 <body>
@@ -121,7 +121,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">
-                            {title}
+                            <span class="title">{title}</span>
                             <span class="year">{year}</span>
                         </h4>
                         <button class="btn btn-light border btn-sm float-right" data-dismiss="modal">
@@ -231,6 +231,26 @@
                                         <select id="movie_status" class="btn btn-light border border form-control">
                                             <option value="Automatic">${_('Automatic')}</option>
                                             <option value="Disabled">${_('Finished')}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="mdi mdi-translate" title="${_('Language')}"></i>
+                                            </span>
+                                        </div>
+                                        <select id="movie_language" class="btn btn-light border border form-control" onchange="change_language(event, this, '{imdbid}', '{tmdbid}')">
+                                            <option value="">${_('Default')}</option>
+                                            %for i in languages:
+                                            <option value="${i}">${i}</option>
+                                            %endfor
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <select id="movie_title" class="btn btn-light border border form-control">
+                                            <option value="{title}">{title}</option>
                                         </select>
                                     </div>
                                 </div>

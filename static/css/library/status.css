@@ -238,7 +238,7 @@ div#settings_basic,
 div#settings_advanced{
     transition: 0.75s;
     opacity: 1.0;
-    max-height: 13.5em;
+    max-height: 16.5em;
     overflow-y: hidden;
 }
 

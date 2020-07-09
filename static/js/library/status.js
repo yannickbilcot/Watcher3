@@ -602,6 +602,48 @@ function update_metadata(event, elem, imdbid, tmdbid){
     });
 }
 
+function change_language(event, elem, imdbid, tmdbid){
+    event.preventDefault();
+
+    var $i = elem.parentElement.querySelector("i.mdi");
+    $i.classList.remove("mdi-translate");
+    $i.classList.add("mdi-circle");
+    $i.classList.add("animated");
+
+    $.post(url_base + "/ajax/movie_metadata", {
+        "imdbid": imdbid,
+        "tmdbid": tmdbid,
+        "language": elem.value
+    })
+    .done(function(response){
+        if(response["response"] === true){
+            change_movie_info(response["tmdb_data"]);
+            console.log(response["tmdb_data"]);
+        } else {
+            $.notify({message: response["error"]}, {type: "danger"});
+        }
+    })
+    .fail(notify_error)
+    .always(function(){
+        $i.classList.remove("mdi-circle");
+        $i.classList.remove("animated");
+        $i.classList.add("mdi-translate");
+    });
+}
+
+function change_movie_info(tmdb_data){
+    $movie_status_modal.find('.plot').text(tmdb_data.overview);
+    var $titles = $movie_status_modal.find('#movie_title');
+    $titles.find('> option').remove();
+    if (tmdb_data.lang_titles){
+        for(title of tmdb_data.lang_titles){
+            $titles.append($('<option>').attr('value', title).text(title));
+        }
+    } else {
+        $titles.append($('<option>').attr('value', tmdb_data.title).text(tmdb_data.title));
+    }
+}
+
 function remove_movie(event, elem, imdbid){
     event.preventDefault();
 

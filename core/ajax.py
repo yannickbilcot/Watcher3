@@ -863,6 +863,37 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    def movie_metadata(self, imdbid, tmdbid=None, language=None):
+        ''' Re-downloads metadata for imdbid
+        imdbid (str): imdbid of movie
+        tmdbid (str): tmdbid of movie     <optional - default None>
+
+        If tmdbid is None, looks in database for tmdbid using imdbid.
+        If that fails, looks on tmdb api for imdbid
+        If that fails returns error message
+
+
+        Returns dict ajax-style response
+        '''
+
+        if tmdbid is None:
+            tmdbid = core.sql.get_movie_details('imdbid', imdbid).get('tmdbid')
+            if not tmdbid:
+                logging.debug('TMDB id not found in local database, searching TMDB for {}'.format(imdbid))
+                tmdb_data = TheMovieDatabase._search_imdbid(imdbid)
+                tmdbid = tmdb_data[0].get('id') if tmdb_data else None
+            if not tmdbid:
+                logging.debug('Unable to find {} on TMDB.'.format(imdbid))
+                return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(imdbid)}
+
+        results = TheMovieDatabase._search_tmdbid(tmdbid, language)
+        if results:
+            return {'response': True, 'tmdb_data': results[0]}
+        else:
+            return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(tmdbid)}
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
     def single_movie_details(self, key, value):
         ''' Gets single movie's details from database
         key (str): key for sql.get_movie_details

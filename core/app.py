@@ -117,7 +117,8 @@ class App(object):
                 del status_count['Disabled']
 
             return App.status_template.render(profiles=core.CONFIG['Quality']['Profiles'].keys(), categories=core.CONFIG['Categories'].keys(),
-                                              status_count=status_count, categories_count=categories_count, **self.defaults())
+                                              status_count=status_count, categories_count=categories_count,
+                                              languages = core.CONFIG['Languages'].keys(), **self.defaults())
         elif page == 'manage':
             movies = core.sql.get_user_movies()
             return App.manage_template.render(movies=movies, profiles=core.CONFIG['Quality']['Profiles'].keys(),
