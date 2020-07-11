@@ -479,6 +479,14 @@ function open_info_modal(event, elem){
         if (movie["download_language"]){
             $movie_status_modal.find("select#movie_language > option[value='" + movie["download_language"] + "']").attr("selected", true);
         }
+        if (movie["alternative_titles"]){
+            var title_select = $movie_status_modal.find('select#movie_title');
+            for(title of movie["alternative_titles"].split(',')){
+                if (title !== movie['title']){
+                    title_select.append($('<option>').attr('value', title).text(title));
+                }
+            }
+        }
         var $status_select = $movie_status_modal.find("select#movie_status");
 
         if(movie["status_select"] === "Disabled"){
