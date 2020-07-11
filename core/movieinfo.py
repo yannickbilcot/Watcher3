@@ -210,16 +210,20 @@ class TheMovieDatabase(object):
 
         for translation in result.get('translations', {}).get('translations', []):
             if translation['iso_3166_1'] == country and translation['iso_639_1'] == lang:
-                if 'lang_titles' in result:
+                if 'lang_titles' in result and translation['data'].get('title'):
                     result['lang_titles'].add(translation['data']['title'])
-                result['overview'] = translation['data']['overview']
+                if translation['data'].get('overview'):
+                    result['overview'] = translation['data']['overview']
                 break
 
         result.pop('translations')
-        if result.get('lang_titles'):
-            result['lang_titles'] = list(result['lang_titles'])
-            result['english_title'] = result['title']
-            result['title'] = result['lang_titles'][0]
+        if 'lang_titles' in result:
+            result['lang_titles'] = list(result['lang_titles']) # set can't be returned in ajax request
+            if result['lang_titles']:
+                result['english_title'] = result['title']
+                result['title'] = result['lang_titles'][0]
+            else:
+                result.pop('lang_titles')
         return result
 
     @staticmethod
