@@ -476,6 +476,9 @@ function open_info_modal(event, elem){
         $movie_status_modal.data("movie", movie);
         $movie_status_modal.find("select#movie_quality > option[value='" + movie["quality"] + "']").attr("selected", true);
         $movie_status_modal.find("select#movie_category > option[value='" + movie["category"] + "']").attr("selected", true);
+        if (movie["download_language"]){
+            $movie_status_modal.find("select#movie_language > option[value='" + movie["download_language"] + "']").attr("selected", true);
+        }
         var $status_select = $movie_status_modal.find("select#movie_status");
 
         if(movie["status_select"] === "Disabled"){
@@ -618,7 +621,6 @@ function change_language(event, elem, imdbid, tmdbid){
     .done(function(response){
         if(response["response"] === true){
             change_movie_info(response["tmdb_data"]);
-            console.log(response["tmdb_data"]);
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
         }
@@ -738,23 +740,39 @@ function update_movie_options(event, elem, imdbid){
     var quality = document.getElementById("movie_quality").value;
     var category = document.getElementById("movie_category").value;
     var status = document.getElementById("movie_status").value;
+    var language = document.getElementById("movie_language").value;
+    var title = document.getElementById("movie_title").value;
 
     var filters = {};
     each(document.querySelectorAll("#settings_advanced input"), function(input){
         filters[input.id] = input.value;
     });
+    filters = JSON.stringify(filters);
 
     $.post(url_base + "/ajax/update_movie_options", {
         "quality": quality,
         "category": category,
         "status": status,
-        "filters": JSON.stringify(filters),
+        "language": language,
+        "title": title,
+        "filters": filters,
         "imdbid": imdbid
     })
     .done(function(response){
         if(response["response"]){
             $.notify({message: response["message"]});
             update_movie_status(imdbid, response["status"]);
+            $movie_status_modal.find('.modal-title .title').text(title);
+            var $movie_li = find_movie_in_list(imdbid), title_span = $movie_li.querySelector('.title');
+            title_span.title = title;
+            title_span.innerText = title;
+            var movie_info = JSON.parse($movie_li.dataset.movie);
+            movie_info.quality = quality;
+            movie_info.category = category;
+            movie_info.download_language = language;
+            movie_info.title = title;
+            movie_info.plot = $movie_status_modal.find('.plot').text();
+            $movie_li.dataset.movie = JSON.stringify(movie_info);
         } else {
             $.notify({message: response["error"]}, {type: "danger"});
         }
@@ -927,6 +945,10 @@ function unmark_bad(event, elem, guid, imdbid){
     });
 }
 
+function find_movie_in_list(imdbid){
+    return $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`);
+}
+
 function update_movie_status(imdbid, status){
     /* Updates movie in Status list to status
     imdbid: str imdb id# of movie to change
@@ -943,7 +965,7 @@ function update_movie_status(imdbid, status){
         label.classList = `badge badge-${status_colors[status]} status`;
     }
 
-    var $movie_li = $movie_list.querySelector(`li[data-imdbid="${imdbid}"]`),
+    var $movie_li = find_movie_in_list(imdbid),
         $status_label = $movie_li.querySelector("span.status");
     $status_label.classList.remove($status_label.innerText);
     $status_label.classList.add(status);

@@ -521,10 +521,13 @@ class Ajax(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def update_movie_options(self, quality, category, status, filters, imdbid):
+    def update_movie_options(self, quality, category, status, language, title, filters, imdbid):
         ''' Updates quality settings for individual title
         quality (str): name of new quality
+        category (str): name of new category
         status (str): management state ('automatic', 'disabled')
+        language (str): name of language to download movie
+        title (str): movie title
         filters (str): JSON.stringified dict of filter words
         imdbid (str): imdb identification number
 
@@ -534,8 +537,16 @@ class Ajax(object):
         success = {'response': True, 'message': _('Movie options updated.')}
 
         logging.info('Setting Quality and filters for {}.'.format(imdbid))
+        new_data = {'quality': quality, 'category': category, 'filters': filters, 'title': title, 'download_language': language}
+        tmdb_data = self.movie_metadata(imdbid, language=language).get('tmdb_data')
+        if tmdb_data is not None:
+            new_data['plot'] = tmdb_data['overview']
+            if 'english_title' in tmdb_data:
+                new_data['english_title'] = tmdb_data['english_title']
+            else:
+                new_data['english_title'] = None
 
-        if not core.sql.update_multiple_values('MOVIES', {'quality': quality, 'category': category, 'filters': filters}, 'imdbid', imdbid):
+        if not core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid):
             return {'response': False, 'error': Errors.database_write}
 
         logging.info('Updating status to {} for {}.'.format(status, imdbid))

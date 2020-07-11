@@ -11,7 +11,7 @@ import sqlalchemy as sqla
 
 logging = logging.getLogger(__name__)
 
-current_version = 15
+current_version = 16
 
 
 def proxy_to_dict(p):
@@ -72,7 +72,9 @@ class SQL(object):
                                  sqla.Column('origin', sqla.TEXT),
                                  sqla.Column('sort_title', sqla.TEXT),
                                  sqla.Column('filters', sqla.TEXT),
-                                 sqla.Column('category', sqla.TEXT)
+                                 sqla.Column('category', sqla.TEXT),
+                                 sqla.Column('english_title', sqla.TEXT),
+                                 sqla.Column('download_language', sqla.TEXT)
                                  )
         self.SEARCHRESULTS = sqla.Table('SEARCHRESULTS', self.metadata,
                                         sqla.Column('score', sqla.SMALLINT),
@@ -1138,6 +1140,11 @@ class DatabaseUpdate(object):
 
     @staticmethod
     def update_15():
+        ''' Add reject_reason column to SEARCHRESULTS '''
+        core.sql.update_tables()
+
+    @staticmethod
+    def update_16():
         ''' Add reject_reason column to SEARCHRESULTS '''
         core.sql.update_tables()
 
