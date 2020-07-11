@@ -546,6 +546,15 @@ class Ajax(object):
             else:
                 new_data['english_title'] = None
 
+            if tmdb_data.get('lang_titles'):
+                new_data['alternative_titles'] = ','.join([title for title in tmdb_data['lang_titles'] if title != new_data['title']])
+            elif tmdb_data.get('alternative_titles') and not isinstance(tmdb_data.get('alternative_titles'), str):
+                a_t = []
+                for i in tmdb_data.get('alternative_titles', {}).get('titles', []):
+                    if i['iso_3166_1'] == 'US':
+                        a_t.append(i['title'])
+                new_data['alternative_titles'] = ','.join(a_t)
+
         if not core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid):
             return {'response': False, 'error': Errors.database_write}
 
