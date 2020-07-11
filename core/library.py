@@ -614,7 +614,9 @@ class Metadata(object):
         if not movie.get('tmdbid'):
             movie['tmdbid'] = movie.get('id')
 
-        if movie.get('alternative_titles') and not isinstance(movie.get('alternative_titles'), str):
+        if movie.get('lang_titles'):
+            movie['alternative_titles'] = ','.join([title for title in movie['lang_titles'] if title != movie['title']])
+        elif movie.get('alternative_titles') and not isinstance(movie.get('alternative_titles'), str):
             a_t = []
             for i in movie.get('alternative_titles', {}).get('titles', []):
                 if i['iso_3166_1'] == 'US':
@@ -702,7 +704,7 @@ class Metadata(object):
                 logging.debug('Unable to find {} on TMDB.'.format(imdbid))
                 return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(imdbid)}
 
-        new_data = TheMovieDatabase._search_tmdbid(tmdbid)
+        new_data = TheMovieDatabase._search_tmdbid(tmdbid, movie.get('download_language'))
 
         if not new_data:
             logging.warning('Empty response from TMDB.')
