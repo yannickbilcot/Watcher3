@@ -203,21 +203,22 @@ class TheMovieDatabase(object):
         if result['original_language'] == lang:
             result['title'] = result['original_title']
         else:
-            result['lang_titles'] = []
+            result['lang_titles'] = set()
             for title in result.get('alternative_titles', {}).get('titles', []):
                 if title['iso_3166_1'] == country:
-                    result['lang_titles'].append(title['title'])
+                    result['lang_titles'].add(title['title'])
 
         for translation in result.get('translations', {}).get('translations', []):
             if translation['iso_3166_1'] == country and translation['iso_639_1'] == lang:
                 if 'lang_titles' in result:
-                    result['lang_titles'].append(translation['data']['title'])
+                    result['lang_titles'].add(translation['data']['title'])
                 result['overview'] = translation['data']['overview']
                 break
 
         result.pop('translations')
         if result.get('lang_titles'):
-            result['en_title'] = result['title']
+            result['lang_titles'] = list(result['lang_titles'])
+            result['english_title'] = result['title']
             result['title'] = result['lang_titles'][0]
         return result
 
