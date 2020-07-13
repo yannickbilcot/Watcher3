@@ -669,8 +669,10 @@ class Ajax(object):
         if files.get('error'):
             yield json.dumps({'error': files['error']})
             raise StopIteration()
-        library = [i['imdbid'] for i in core.sql.get_user_movies()]
-        files = files['files']
+        user_movies = core.sql.get_user_movies()
+        library_files = [i['finished_file'] for i in user_movies]
+        library = [i['imdbid'] for i in user_movies]
+        files = [file for file in files['files'] if file not in library_files]
         length = len(files)
 
         if length == 0:
