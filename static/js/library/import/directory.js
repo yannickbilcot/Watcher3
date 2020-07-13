@@ -183,7 +183,7 @@ function start_import(event, button){
         }
 
         movie["resolution"] = row.querySelector("select.source_select").value;
-        if (movie['tmdbid'].toString() === $tmdbid_input.value){
+        if (movie["tmdbid"] && movie["tmdbid"].toString() === $tmdbid_input.value){
             movies.push(movie);
         } else {
             movie["tmdbid"] = $tmdbid_input.value;
