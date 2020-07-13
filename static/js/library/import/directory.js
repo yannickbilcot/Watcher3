@@ -103,6 +103,10 @@ function connect(event, elem){
 
                 if(response["response"] === "incomplete" || response["response"] === "complete"){
                     no_imports = false;
+                    var title_column = movie["title"];
+                    if (movie["tmdbid"]){
+                        title_column = `<a href="https://www.themoviedb.org/movie/${movie["tmdbid"]}">${title_column}</a>`
+                    }
                     $row = $(`<tr>
                                     <td>
                                         <i class="mdi mdi-checkbox-marked c_box" value="True"></i>
@@ -111,7 +115,7 @@ function connect(event, elem){
                                         ${movie["finished_file"]}
                                     </td>
                                     <td>
-                                        ${movie["title"]}
+                                        ${title_column}
                                     </td>
                                     <td>
                                         <input type="number" class="tmdbid form-control form-control-sm" placeholder="0000" value="${movie["tmdbid"] || ""}"/>
