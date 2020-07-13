@@ -101,7 +101,7 @@ function connect(event, elem){
                     select.querySelector(`option[value="${movie["resolution"]}"]`).setAttribute("selected", true);
                 }
 
-                if(response["response"] === "incomplete"){
+                if(response["response"] === "incomplete" || response["response"] === "complete"){
                     no_imports = false;
                     $row = $(`<tr>
                                     <td>
@@ -114,7 +114,7 @@ function connect(event, elem){
                                         ${movie["title"]}
                                     </td>
                                     <td>
-                                        <input type="number" class="incomplete_tmdbid form-control form-control-sm" placeholder="0000" value="${movie["tmdbid"] || ""}"/>
+                                        <input type="number" class="tmdbid form-control form-control-sm" placeholder="0000" value="${movie["tmdbid"] || ""}"/>
                                     </td>
                                     <td class="resolution">
                                         ${select.outerHTML}
@@ -124,33 +124,13 @@ function connect(event, elem){
                                     </td>
                                 </tr>`)[0];
                     $row.dataset.movie = JSON.stringify(movie);
-                    $incomplete_table.innerHTML += $row.outerHTML;
-                    $incomplete_div.classList.remove("hidden");
-                } else if(response["response"] === "complete"){
-                    no_imports = false;
-                    $row = $(`<tr>
-                                    <td>
-                                        <i class="mdi mdi-checkbox-marked c_box" value="True"></i>
-                                    </td>
-                                    <td>
-                                        ${movie["finished_file"]}
-                                    </td>
-                                    <td>
-                                        ${movie["title"]}
-                                    </td>
-                                    <td>
-                                        ${movie["tmdbid"]}
-                                    </td>
-                                    <td class="resolution">
-                                        ${select.outerHTML}
-                                    </td>
-                                    <td>
-                                        ${movie["human_size"]}
-                                    </td>
-                                </tr>`)[0];
-                    $row.dataset.movie = JSON.stringify(movie);
-                    $complete_table.innerHTML += $row.outerHTML;
-                    $complete_div.classList.remove("hidden");
+                    if(response["response"] === "complete"){
+                        $complete_table.innerHTML += $row.outerHTML;
+                        $complete_div.classList.remove("hidden");
+                    } else {
+                        $incomplete_table.innerHTML += $row.outerHTML;
+                        $incomplete_div.classList.remove("hidden");
+                    }
                 }
 
                 var progress_percent = Math.round(parseInt(response["progress"][0], 10) / parseInt(response["progress"][1], 10) * 100);
@@ -181,43 +161,36 @@ function connect(event, elem){
 function start_import(event, button){
     event.preventDefault();
 
+    var movies = [];
     var corrected_movies = [];
     var blanks = false;
-    each(document.querySelectorAll("div#incomplete_movies table > tbody > tr "), function(row, index){
+    each(document.querySelectorAll("div#incomplete_movies table > tbody > tr, div#complete_movies table > tbody > tr"), function(row, index){
         if(!is_checked(row.querySelector("i.c_box"))){
             return;
         }
 
         movie = JSON.parse(row.dataset.movie);
 
-        var $tmdbid_input = row.querySelector("input.incomplete_tmdbid");
-        movie["tmdbid"] = $tmdbid_input.value;
-
-        if(!movie["tmdbid"]){
+        var $tmdbid_input = row.querySelector("input.tmdbid");
+        if(!$tmdbid_input.value){
             blanks = true;
             $tmdbid_input.classList.add("border-danger");
-            return
+            return;
         }
 
         movie["resolution"] = row.querySelector("select.source_select").value;
-        corrected_movies.push(movie);
+        if (movie['tmdbid'].toString() === $tmdbid_input.value){
+            movies.push(movie);
+        } else {
+            movie["tmdbid"] = $tmdbid_input.value;
+            corrected_movies.push(movie);
+        }
     });
 
     if(blanks){
         $.notify({message: _("Fill highlighted fields or disable movie to continue.")}, {type: "warning"});
         return false;
     }
-
-    var movies = [];
-    each(document.querySelectorAll("div#complete_movies table > tbody > tr "), function(row, index){
-        if(!is_checked(row.querySelector("i.c_box"))){
-            return
-        }
-
-        movie = JSON.parse(row.dataset.movie);
-        movie["resolution"] = row.querySelector("select.source_select").value;
-        movies.push(movie);
-    });
 
     $("form#import").slideUp(600);
     $progress_bar.style.width = "0%";
