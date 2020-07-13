@@ -830,6 +830,7 @@ class Ajax(object):
 
         try:
             response['list'] = [i for i in os.listdir(new_path) if os.path.isdir(os.path.join(new_path, i)) and not i.startswith('.')]
+            response['list'].sort()
         except Exception as e:
             response = {'error': str(e)}
             logging.error('Error listing directory.', exc_info=True)
