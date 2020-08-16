@@ -119,6 +119,8 @@ function connect(event, elem){
                     var title_column = movie["title"];
                     if (movie["tmdbid"]){
                         title_column = `<a href="https://www.themoviedb.org/movie/${movie["tmdbid"]}">${title_column}</a>`
+                    } else {
+                        title_column = `<a href="https://www.themoviedb.org/search/movie?query=${title_column}" target="_blank">Search ${title_column}</a>`
                     }
                     $row = $(`<tr>
                                     <td>
