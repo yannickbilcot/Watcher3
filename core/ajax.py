@@ -641,12 +641,13 @@ class Ajax(object):
         return response
 
     @cherrypy.expose
-    def scan_library_directory(self, directory, minsize, recursive, skipduplicatedirs):
+    def scan_library_directory(self, directory, minsize, recursive, skipduplicatedirs, maxresults):
         ''' Calls library to scan directory for movie files
         directory (str): directory to scan
         minsize (str/int): minimum file size in mb, coerced to int
         recursive (bool): whether or not to search subdirs
         skipduplicatedirs (bool): whether or not to skip duplicate dirs
+        maxresults (str/int): maximum result count, coerced to int
 
         Finds all files larger than minsize in directory.
         Removes all movies from gathered list that are already in library.
@@ -666,6 +667,7 @@ class Ajax(object):
 
         recursive = json.loads(recursive)
         minsize = int(minsize)
+        # Note - do not limit the result set here, or we might get stuck looking at files we already have
         files = core.library.ImportDirectory.scan_dir(directory, minsize, recursive)
         if files.get('error'):
             yield json.dumps({'error': files['error']})
@@ -698,6 +700,12 @@ class Ajax(object):
 
             # We do not need the dict any more, so release the memory
             del library_file_dirs
+
+        # Limit the number of results
+        # We do this here instead of at the scan so we skip files we have already imported
+        maxresults = int(maxresults)
+        if maxresults and maxresults > 0:
+            files = files[0:maxresults]
 
         length = len(files)
 

@@ -66,6 +66,18 @@ function connect(event, elem){
     var recursive = is_checked(document.getElementById("scan_recursive"));
     var skipduplicatedirs = is_checked(document.getElementById("skip_duplicate_dirs"));
 
+    var $maxresults = document.getElementById("max_results");
+    var maxresults = $maxresults.value;
+    if(maxresults === ""){
+        $maxresults.classList.add("border-danger");
+        return false;
+    } else {
+        maxresults = parseInt(maxresults, 10);
+        if(maxresults < 0){
+            maxresults = 0;
+        }
+    }
+
     $("form#connect").slideUp(600);
     $progress_bar.style.width = "0%";
     $progress.style.maxHeight = "100%";
@@ -79,7 +91,7 @@ function connect(event, elem){
     var last_response_len = false;
     $.ajax(url_base + "/ajax/scan_library_directory", {
         method: "POST",
-        data: {"directory": directory, "minsize": minsize, "recursive": recursive, "skipduplicatedirs": skipduplicatedirs},
+        data: {"directory": directory, "minsize": minsize, "recursive": recursive, "skipduplicatedirs": skipduplicatedirs, "maxresults": maxresults},
         xhrFields: {
             onprogress: function(e){
                 var response_update, $row, movie, select;
