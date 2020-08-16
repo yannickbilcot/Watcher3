@@ -41,17 +41,24 @@ class ImportDirectory(object):
             else:
                 files = [os.path.join(directory, i) for i in os.listdir(directory) if os.path.isfile(os.path.join(directory, i))]
         except Exception as e:
+            logging.debug('scan_dir() ImportDirectory._walk exception {}'.format(str(e)))
             return {'error': str(e)}
 
         f = []
         logging.debug('Specified minimum file size: {} Bytes.'.format(minsize * 1024**2))
         ms = minsize * 1024**2
         for i in files:
-            s = os.path.getsize(i)
-            if not s >= (ms):
-                logging.debug('{} size is {} skipping.'.format(i, s))
+            # Ignore file not found errors (eg file was deleted between directory walk and size check)
+            try:
+                s = os.path.getsize(i)
+                if not s >= (ms):
+                    logging.debug('{} size is {} skipping.'.format(i, s))
+                    continue
+                f.append(i)
+            except Exception as e:
+                logging.debug('scan_dir() os.path.getsize exception {}'.format(str(e)))
                 continue
-            f.append(i)
+
         return {'files': f}
 
     @staticmethod
