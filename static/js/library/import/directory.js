@@ -64,6 +64,7 @@ function connect(event, elem){
     }
 
     var recursive = is_checked(document.getElementById("scan_recursive"));
+    var skipduplicatedirs = is_checked(document.getElementById("skip_duplicate_dirs"));
 
     $("form#connect").slideUp(600);
     $progress_bar.style.width = "0%";
@@ -78,7 +79,7 @@ function connect(event, elem){
     var last_response_len = false;
     $.ajax(url_base + "/ajax/scan_library_directory", {
         method: "POST",
-        data: {"directory": directory, "minsize": minsize, "recursive": recursive},
+        data: {"directory": directory, "minsize": minsize, "recursive": recursive, "skipduplicatedirs": skipduplicatedirs},
         xhrFields: {
             onprogress: function(e){
                 var response_update, $row, movie, select;
