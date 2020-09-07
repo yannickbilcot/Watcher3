@@ -111,6 +111,8 @@ default status Available.
     title = movie['title']
     year = movie['year']
     quality = movie['quality']
+    english_title = movie.get('english_title', '')
+    language = movie.get('download_language', '')
 
     logging.info('Performing backlog search for {} {}.'.format(title, year))
     proxy.create()
@@ -121,13 +123,13 @@ default status Available.
         for i in nn.search_all(imdbid):
             results.append(i)
     if core.CONFIG['Downloader']['Sources']['torrentenabled']:
-        if movie['title'] != movie.get('english_title', ''):
+        if title != english_title:
             for i in torrent.search_all(imdbid, title, year):
                 results.append(i)
-        if movie.get('english_title', '') and movie['download_language']:
-            for lang_name in core.config.lang_names(movie['download_language']):
-                title = '{} {}'.format(movie.get('english_title', ''), lang_name)
-                for i in torrent.search_all(imdbid, title, year, movie['title'] != movie.get('english_title', '')):
+        if english_title and language:
+            for lang_name in core.config.lang_names(language):
+                title = '{} {}'.format(english_title, lang_name)
+                for i in torrent.search_all(imdbid, title, year, title != english_title):
                     results.append(i)
 
     proxy.destroy()
