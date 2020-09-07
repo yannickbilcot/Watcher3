@@ -3,6 +3,7 @@ import random
 import datetime
 import core
 import collections
+import re
 from core import localization
 from core.helpers import Comparisons
 
@@ -20,6 +21,12 @@ base_file = 'core/base_config.cfg'
 def default_profile():
     return [k for k, v in core.CONFIG['Quality']['Profiles'].items() if v.get('default')][0]
 
+def lang_names(lang):
+    lang_names = core.CONFIG['Languages'][lang]
+    if lang_names:
+        return re.split(',[ ]*', lang_names)
+    else:
+        return []
 
 def new_config():
     ''' Copies base_file to config directory.

@@ -11,7 +11,9 @@ def base_url():
         url = url[:-1]
     return url
 
-def search(imdbid, term):
+def search(imdbid, term, ignore_if_imdbid_cap = False):
+    if ignore_if_imdbid_cap:
+        return []
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on ThePirateBay for {}.'.format(imdbid))

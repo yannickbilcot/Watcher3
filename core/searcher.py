@@ -27,10 +27,6 @@ def _t_search_grab(movie):
     '''
     logging.info('Executing automatic search/grab for {}.'.format(movie['title']))
 
-    imdbid = movie['imdbid']
-    title = movie['title']
-    year = movie['year']
-    quality = movie['quality']
 
     if core.CONFIG['Search']['verifyreleases'] == 'predb':
         movie = predb.backlog_search(movie)
@@ -38,7 +34,7 @@ def _t_search_grab(movie):
     if not Manage.verify(movie):
         return
 
-    if core.CONFIG['Search']['searchafteradd'] and search(imdbid, title, year, quality) and core.CONFIG['Search']['autograb']:
+    if core.CONFIG['Search']['searchafteradd'] and search(movie) and core.CONFIG['Search']['autograb']:
         best_release = snatcher.get_best_release(movie)
         if best_release:
             snatcher.download(best_release)
@@ -77,13 +73,8 @@ def search_all():
     if backlog_movies:
         logging.debug('Backlog movies: {}'.format(', '.join(i['title'] for i in backlog_movies)))
         for movie in backlog_movies:
-            imdbid = movie['imdbid']
-            title = movie['title']
-            year = movie['year']
-            quality = movie['quality']
-
-            logging.info('Performing backlog search for {} {}.'.format(title, year))
-            search(imdbid, title, year, quality)
+            logging.info('Performing backlog search for {} {}.'.format(movie['title'], movie['year']))
+            search(movie)
             continue
 
     rss_movies = [i for i in _get_rss_movies(movies) if Manage.verify(i, today=today)]
@@ -96,12 +87,9 @@ def search_all():
     return
 
 
-def search(imdbid, title, year, quality):
+def search(movie):
     ''' Executes backlog search for required movies
-    imdbid (str): imdb identification number
-    title (str): movie title
-    year (str/int): year of movie release
-    quality (str): name of quality profile
+    movie (dict): movie to run search for
 
     Gets new search results from newznab providers.
     Pulls existing search results and updates new data with old. This way the
@@ -119,6 +107,11 @@ default status Available.
     Returns Bool if movie is found.
     '''
 
+    imdbid = movie['imdbid']
+    title = movie['title']
+    year = movie['year']
+    quality = movie['quality']
+
     logging.info('Performing backlog search for {} {}.'.format(title, year))
     proxy.create()
 
@@ -128,8 +121,14 @@ default status Available.
         for i in nn.search_all(imdbid):
             results.append(i)
     if core.CONFIG['Downloader']['Sources']['torrentenabled']:
-        for i in torrent.search_all(imdbid, title, year):
-            results.append(i)
+        if movie['title'] != movie.get('english_title', ''):
+            for i in torrent.search_all(imdbid, title, year):
+                results.append(i)
+        if movie.get('english_title', '') and movie['download_language']:
+            for lang_name in core.config.lang_names(movie['download_language']):
+                title = '{} {}'.format(movie.get('english_title', ''), lang_name)
+                for i in torrent.search_all(imdbid, title, year, movie['title'] != movie.get('english_title', '')):
+                    results.append(i)
 
     proxy.destroy()
 

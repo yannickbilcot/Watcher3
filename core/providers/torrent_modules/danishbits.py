@@ -6,13 +6,15 @@ import json
 logging = logging.getLogger(__name__)
 
 
-def search(imdbid, term):
+def search(imdbid, term, ignore_if_imdbid_cap = False):
     ''' Search api for movie
     imdbid (str): imdb id #
 
     Returns list of dicts of parsed releases
     '''
 
+    if ignore_if_imdbid_cap:
+        return []
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
     username = core.CONFIG['Indexers']['PrivateTorrent']['danishbits']['username']
     passkey = core.CONFIG['Indexers']['PrivateTorrent']['danishbits']['passkey']

@@ -43,7 +43,7 @@ class Torrent(NewzNabProvider):
         self.feed_type = 'torrent'
         return
 
-    def search_all(self, imdbid, title, year):
+    def search_all(self, imdbid, title, year, ignore_if_imdbid_cap = False):
         ''' Performs backlog search for all indexers.
         imdbid (str): imdb id #
         title (str): movie title
@@ -76,6 +76,8 @@ class Torrent(NewzNabProvider):
                     continue
 
             if 'imdbid' in caps:
+                if ignore_if_imdbid_cap:
+                    return results
                 logging.info('{} supports imdbid search.'.format(url_base))
                 r = self.search_newznab(url_base, apikey, 'movie', imdbid=imdbid)
             else:
@@ -93,7 +95,7 @@ class Torrent(NewzNabProvider):
                     logging.warning('Torrent indexer {} enabled but not found in torrent_modules.'.format(indexer))
                     continue
                 else:
-                    for i in getattr(torrent_modules, indexer).search(imdbid, term):
+                    for i in getattr(torrent_modules, indexer).search(imdbid, term, ignore_if_imdbid_cap):
                         if i not in results:
                             results.append(i)
 
@@ -103,7 +105,7 @@ class Torrent(NewzNabProvider):
                     logging.warning('Torrent indexer {} enabled but not found in torrent_modules.'.format(indexer))
                     continue
                 else:
-                    for i in getattr(torrent_modules, indexer).search(imdbid, term):
+                    for i in getattr(torrent_modules, indexer).search(imdbid, term, ignore_if_imdbid_cap):
                         if i not in results:
                             results.append(i)
 

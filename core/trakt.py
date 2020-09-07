@@ -53,13 +53,11 @@ def sync():
         imdbid = i['ids']['imdb']
         logging.info('Adding movie {} {} from Trakt'.format(i['title'], imdbid))
 
-        added = Manage.add_movie({'id': i['ids']['tmdb'],
-                                  'imdbid': i['ids']['imdb'],
-                                  'title': i['title'],
-                                  'origin': 'Trakt'})
+        movie = {'id': i['ids']['tmdb'], 'imdbid': i['ids']['imdb'], 'title': i['title'], 'origin': 'Trakt'}
+        added = Manage.add_movie(movie)
         try:
             if added['response'] and core.CONFIG['Search']['searchafteradd'] and i['year'] != 'N/A':
-                searcher.search(imdbid, i['title'], i['year'], core.config.default_profile())
+                searcher.search(movie)
         except Exception as e:
             logging.error('Movie {} did not get added.'.format(i['title']), exc_info=False)
     return success
@@ -121,7 +119,7 @@ def sync_rss():
                         r = Manage.add_movie(movie)
 
                         if r['response'] and core.CONFIG['Search']['searchafteradd'] and movie['year'] != 'N/A':
-                            searcher.search(movie['imdbid'], movie['title'], movie['year'], core.config.default_profile())
+                            searcher.search(movie)
                     else:
                         logging.warning('Unable to find {} {} on TheMovieDatabase'.format(title, year))
 

@@ -60,7 +60,7 @@ def sync():
         except Exception as e:
             logging.warning('Unable to sync list {}'.format(list_id))
 
-    m = []
+    movies = []
     for imdbid in movies_to_add:
         movie = TheMovieDatabase._search_imdbid(imdbid)
         if not movie:
@@ -74,12 +74,12 @@ def sync():
 
         added = Manage.add_movie(movie)
         if added['response']:
-            m.append((imdbid, movie['title'], movie['year']))
+            if movie['year'] != 'N/A':
+                movies.append(movie)
 
     if core.CONFIG['Search']['searchafteradd']:
-        for i in m:
-            if i[2] != 'N/A':
-                searcher.search(i[0], i[1], i[2], core.config.default_profile())
+        for movie in movies:
+            searcher.search(movie)
 
     logging.info('Storing last synced date.')
     if core.sql.row_exists('SYSTEM', name='imdb_sync_record'):

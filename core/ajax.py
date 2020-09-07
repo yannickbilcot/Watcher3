@@ -251,7 +251,7 @@ class Ajax(object):
         if not movie:
             return {'response': False, 'error': Errors.database_read.format(imdbid)}
         else:
-            success = searcher.search(imdbid, movie['title'], movie['year'], movie['quality'])
+            success = searcher.search(movie)
             status = core.sql.get_movie_details('imdbid', imdbid)['status']
 
             if success:
@@ -1243,16 +1243,10 @@ class Ajax(object):
         movies = [i for i in core.sql.get_user_movies() if i['imdbid'] in ids]
 
         for i, movie in enumerate(movies):
-            title = movie['title']
-            year = movie['year']
-            imdbid = movie['imdbid']
-            year = movie['year']
-            quality = movie['quality']
+            logging.info('Performing backlog search for {} {}.'.format(movie['title'], movie['year']))
 
-            logging.info('Performing backlog search for {} {}.'.format(title, year))
-
-            if not searcher.search(imdbid, title, year, quality):
-                response = {'response': False, 'error': Errors.database_write, 'imdbid': imdbid, 'index': i + 1}
+            if not searcher.search(movie):
+                response = {'response': False, 'error': Errors.database_write, 'imdbid': movie['imdbid'], 'index': i + 1}
             else:
                 response = {'response': True, 'index': i + 1}
 
