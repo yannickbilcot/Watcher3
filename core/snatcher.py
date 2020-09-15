@@ -183,6 +183,12 @@ def download(data):
     if data['type'] in ('torrent', 'magnet'):
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             response = snatch_torrent(data)
+            if not response['response']:
+                for result in core.sql.get_single_search_result('guid', data['guid'], all_indexers=True):
+                    if result['indexer'] != indexer:
+                        response = snatch_torrent(result)
+                        if response['response'] is True:
+                            break
         else:
             return {'response': False, 'message': 'Torrent submitted but torrent snatching is disabled.'}
 

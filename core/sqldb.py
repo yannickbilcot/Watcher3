@@ -694,14 +694,14 @@ class SQL(object):
 
         return results
 
-    def get_single_search_result(self, idcol, idval, like=False):
+    def get_single_search_result(self, idcol, idval, like=False, all_indexers=False):
         ''' Gets single search result
         idcol (str): identifying column
         idval (str): identifying value
 
         Finds in SEARCHRESULTS a row where idcol == idval
 
-        Returns dict
+        Returns dict if all_indexers is False, list of dicts if all_indexers is True
         '''
 
         logging.debug('Retrieving search result details for {}.'.format(idval.split('&')[0]))
@@ -712,9 +712,12 @@ class SQL(object):
         result = self.execute(command)
 
         if result:
-            data = result.fetchone()
-            if data:
-                return dict(data)
+            if all_indexers:
+                return result.fetchall()
+            else:
+                data = result.fetchone()
+                if data:
+                    return dict(data)
         return {}
 
     def _get_existing_schema(self):
