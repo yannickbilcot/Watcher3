@@ -87,7 +87,7 @@ def add_torrent(data):
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logging.error('Unable to send torrent to TransmissionRPC.', exc_info=True)
+        logging.error('Unable to send torrent {} to TransmissionRPC.'.format(url), exc_info=True)
         return {'response': False, 'error': str(e)}
 
 def set_torrent_limits(downloadid):
