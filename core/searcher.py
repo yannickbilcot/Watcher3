@@ -319,9 +319,6 @@ default False>
     BATCH_DB_STRING = []
 
     for result in results:
-        if result.get('download_time'):
-            # convert download_time to datetime
-            result['download_time'] = datetime.datetime.fromtimestamp(result['download_time'])
         if 'date_found' not in result:
             result['date_found'] = today
         BATCH_DB_STRING.append(result)

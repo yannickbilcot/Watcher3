@@ -92,7 +92,7 @@ class SQL(object):
                                         sqla.Column('download_client', sqla.TEXT),
                                         sqla.Column('freeleech', sqla.SMALLINT),
                                         sqla.Column('download_progress', sqla.INT),
-                                        sqla.Column('download_time', sqla.TIMESTAMP),
+                                        sqla.Column('download_time', sqla.INT),
                                         sqla.Column('seeders', sqla.SMALLINT),
                                         sqla.Column('leechers', sqla.SMALLINT),
                                         sqla.Column('reject_reason', sqla.TEXT)
