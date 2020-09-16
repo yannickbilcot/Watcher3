@@ -416,14 +416,27 @@ def fuzzy_title(releases, titles):
 
             rel_title_ss = result.get('ptn', PTN.parse(result['title']))['title']
 
-            logging.debug('Comparing release substring {} with titles {}.'.format(rel_title_ss, titles))
-            matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
-            if any(match > 70 for match in matches):
-                result['score'] += int(max(matches) / 5)
+            if not english_title or any(title != english_title for title in titles):
+                logging.debug('Comparing release substring {} with titles {}.'.format(rel_title_ss, titles))
+                matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
+                if any(match > 70 for match in matches):
+                    result['score'] += int(max(matches) / 5)
+                    continue
             else:
-                logging.debug('{} best title match was {}%, removing search result.'.format(result['title'], max(matches)))
-                result['reject_reason'] = 'mismatch title (best match was {}%)'.format(max(matches))
-                reject += 1
+                matches = [0]
+
+            if english_title and any(re.search(r'\b' + lang + r'\b', result['title'].lower()) for lang in lang_names):
+                logging.debug('Comparing release substring {} with english title {}.'.format(rel_title_ss, english_title))
+                match = _fuzzy_title(rel_title_ss, english_title)
+                if match > 70:
+                    result['score'] += int(match / 5)
+                    continue
+                else:
+                    matches.append(match)
+
+            logging.debug('{} best title match was {}%, removing search result.'.format(result['title'], max(matches)))
+            result['reject_reason'] = 'mismatch title (best match was {}%)'.format(max(matches))
+            reject += 1
 
     logging.info('Keeping {} releases.'.format(len(releases) - reject))
     return releases
