@@ -79,6 +79,10 @@ def score(releases, imdbid=None, imported=False):
     required_groups = words_to_list(quality['requiredwords']) + words_to_list(filters['requiredwords']) + words_to_list(category['requiredwords'])
     preferred_groups = words_to_list(quality['preferredwords']) + words_to_list(filters['preferredwords']) + words_to_list(category['preferredwords'])
     ignored_groups = words_to_list(quality['ignoredwords']) + words_to_list(filters['ignoredwords']) + words_to_list(category['ignoredwords'])
+    if movie_details.get('download_language'):
+        lang_names = [lang.lower() for lang in core.config.lang_names(movie_details.get('download_language'))]
+        logging.debug('remove {} names from ignored groups: {}'.format(movie_details['download_language'], lang_names))
+        ignored_groups = [group for group in ignored_groups if not ' '.join(group).lower() in lang_names]
 
     # Begin scoring and filtering
     reset(releases)
