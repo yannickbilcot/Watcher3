@@ -213,12 +213,18 @@ def rss_sync(movies):
         imdbid = movie['imdbid']
         title = movie['title']
         year = movie['year']
+        english_title = movie.get('english_title')
 
         logging.info('Parsing RSS for {} {}'.format(title, year))
 
         nn_found = [i for i in newznab_results if i['imdbid'] == imdbid]
 
-        tor_found = [i for i in torrent_results if _match_torrent_name(title, year, i['title'])]
+        tor_found = []
+        for i in torrent_results:
+            if _match_torrent_name(title, year, i['title']):
+                tor_found.append(i)
+            elif english_title and _match_torrent_name(english_title, year, i['title']):
+                tor_found.append(i)
         for idx, result in enumerate(tor_found):
             result['imdbid'] = imdbid
             tor_found[idx] = result
