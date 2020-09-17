@@ -127,10 +127,8 @@ default status Available.
             for i in torrent.search_all(imdbid, title, year):
                 results.append(i)
         if english_title and language:
-            for lang_name in core.config.lang_names(language):
-                title = '{} {}'.format(english_title, lang_name)
-                for i in torrent.search_all(imdbid, title, year, title != english_title):
-                    results.append(i)
+            for i in torrent.search_all(imdbid, english_title, year, title != english_title):
+                results.append(i)
 
     proxy.destroy()
 
