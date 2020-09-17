@@ -11,10 +11,10 @@ def search(imdbid, term):
 
     logging.info('Performing backlog search on Torrentz2 for {}.'.format(imdbid))
 
-    url = 'https://www.torrentz2.eu/feed?f={}'.format(term)
+    url = 'https://torrentz2.is/feed?f={}'.format(term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.torrentz2.e') is True:
+        if proxy_enabled and core.proxy.whitelist('https://torrentz2.is') is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -35,10 +35,10 @@ def get_rss():
 
     logging.info('Fetching latest RSS from Torrentz2.')
 
-    url = 'https://www.torrentz2.eu/feed?f=movies'
+    url = 'https://torrentz2.is/feed?f=movies'
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.torrentz2.e') is True:
+        if proxy_enabled and core.proxy.whitelist('https://torrentz2.is') is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
