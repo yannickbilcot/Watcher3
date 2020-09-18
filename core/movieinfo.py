@@ -202,14 +202,17 @@ class TheMovieDatabase(object):
         lang, country = language.split('-')
         if result['original_language'] == lang:
             result['title'] = result['original_title']
+            logging.debug('Requested lang {} is original language'.format(lang))
         else:
             result['lang_titles'] = set()
             for title in result.get('alternative_titles', {}).get('titles', []):
                 if title['iso_3166_1'] == country:
                     result['lang_titles'].add(title['title'])
+            logging.debug('Found {} titles in language {}'.format(len(result['lang_titles']), lang))
 
         for translation in result.get('translations', {}).get('translations', []):
             if translation['iso_3166_1'] == country and translation['iso_639_1'] == lang:
+                logging.debug('Found translation for lang {}-{}'.format(lang, country))
                 if 'lang_titles' in result and translation['data'].get('title'):
                     result['lang_titles'].add(translation['data']['title'])
                 if translation['data'].get('overview'):
@@ -218,12 +221,14 @@ class TheMovieDatabase(object):
 
         result.pop('translations')
         if 'lang_titles' in result:
+            result['english_title'] = result['title'] # set english title, if no lang titles they are equal
             result['lang_titles'] = list(result['lang_titles']) # set can't be returned in ajax request
             if result['lang_titles']:
-                result['english_title'] = result['title']
                 result['title'] = result['lang_titles'][0]
             else:
-                result.pop('lang_titles')
+                # no translation was found, so setting lang_titles to default title only
+                # lang_titles will be used for alternative_titles, and they are supposed to be in requested language
+                result['lang_titles'].append(result['title'])
         return result
 
     @staticmethod
