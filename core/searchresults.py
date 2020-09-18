@@ -6,6 +6,7 @@ from base64 import b16encode
 import core
 from core.helpers import Url
 import json
+import re
 
 logging = logging.getLogger(__name__)
 
@@ -83,6 +84,8 @@ def score(releases, imdbid=None, imported=False):
         lang_names = [lang.lower() for lang in core.config.lang_names(movie_details.get('download_language'))]
         logging.debug('remove {} names from ignored groups: {}'.format(movie_details['download_language'], lang_names))
         ignored_groups = [group for group in ignored_groups if not ' '.join(group).lower() in lang_names]
+    else:
+        lang_names = []
 
     # Begin scoring and filtering
     reset(releases)
@@ -116,7 +119,7 @@ def score(releases, imdbid=None, imported=False):
         titles = [movie_details.get('title')]
         if movie_details.get('alternative_titles'):
             titles += movie_details['alternative_titles'].split(',')
-        releases = fuzzy_title(releases, titles)
+        releases = fuzzy_title(releases, titles, movie_details.get('english_title'), lang_names)
 
     if preferred_groups and preferred_groups != ['']:
         releases = score_preferred(releases, preferred_groups)
@@ -380,7 +383,7 @@ def score_year(releases, year):
     return releases
 
 
-def fuzzy_title(releases, titles):
+def fuzzy_title(releases, titles, english_title, lang_names):
     ''' Score and remove releases based on title match
     releases (list[dict]): scene release metadata to score and filter
     titles (list): titles to match against
@@ -405,6 +408,7 @@ def fuzzy_title(releases, titles):
                 continue
             result['score'] += 20
     else:
+        titles = [title for title in titles if title != english_title]
         for result in releases:
             if result['reject_reason']:
                 reject += 1
@@ -416,7 +420,7 @@ def fuzzy_title(releases, titles):
 
             rel_title_ss = result.get('ptn', PTN.parse(result['title']))['title']
 
-            if not english_title or any(title != english_title for title in titles):
+            if titles:
                 logging.debug('Comparing release substring {} with titles {}.'.format(rel_title_ss, titles))
                 matches = [_fuzzy_title(rel_title_ss, title) for title in titles]
                 if any(match > 70 for match in matches):
@@ -440,7 +444,6 @@ def fuzzy_title(releases, titles):
 
     logging.info('Keeping {} releases.'.format(len(releases) - reject))
     return releases
-
 
 def _fuzzy_title(a, b):
     ''' Determines how much of a is in b
