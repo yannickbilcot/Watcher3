@@ -45,7 +45,7 @@
         <link href="${url_base}/static/css/settings/indexers.css?v=010" rel="stylesheet">
 
         <script src="${url_base}/static/js/settings/shared.js?v=012" type="text/javascript"></script>
-        <script src="${url_base}/static/js/settings/indexers.js?v=013" type="text/javascript"></script>
+        <script src="${url_base}/static/js/settings/indexers.js?v=014" type="text/javascript"></script>
 
     </head>
     <body>
@@ -109,88 +109,109 @@
             <h1>${_('Torrent Indexers')}</h1>
             <form class="form-group row bg-light rounded mx-auto py-3" data-category="torrent">
                 <div class="col-md-6">
+                    <label>LimeTorrents</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="limetorrents" value="${config['Torrent']['limetorrents']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="limetorrents-enabled" value="${config['Torrent']['limetorrents']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            LimeTorrents
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="limetorrents-url" class="form-control" value="${config['Torrent']['limetorrents']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>Rarbg</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="rarbg" value="${config['Torrent']['rarbg']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="rarbg-enabled" value="${config['Torrent']['rarbg']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            Rarbg
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="rarbg-url" class="form-control" value="${config['Torrent']['rarbg']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>ThePirateBay</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="thepiratebay" value="${config['Torrent']['thepiratebay']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="thepiratebay-enabled" value="${config['Torrent']['thepiratebay']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            ThePirateBay
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="thepiratebay-url" class="form-control" value="${config['Torrent']['thepiratebay']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>TorrentDownloads</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="torrentdownloads" value="${config['Torrent']['torrentdownloads']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="torrentdownloads-enabled" value="${config['Torrent']['torrentdownloads']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            TorrentDownloads
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="torrentdownloads-url" class="form-control" value="${config['Torrent']['torrentdownloads']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>Torrentz2</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="torrentz2" value="${config['Torrent']['torrentz2']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="torrentz2-enabled" value="${config['Torrent']['torrentz2']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            Torrentz2
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="torrentz2-url" class="form-control" value="${config['Torrent']['torrentz2']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>YTS</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="yts" value="${config['Torrent']['yts']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="yts-enabled" value="${config['Torrent']['yts']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            YTS
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="yts-url" class="form-control" value="${config['Torrent']['yts']['url']}">
                 </div>
                 <div class="col-md-6">
+                    <label>Zooqle (${_('backlog only')})</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
-                                <i class="mdi mdi-checkbox-blank-outline c_box" id="zooqle" value="${config['Torrent']['zooqle']}"></i>
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="zooqle-enabled" value="${config['Torrent']['zooqle']['enabled']}"></i>
                             </span>
                         </div>
                         <span class="input-group-item form-control">
-                            Zooqle (${_('backlog only')})
+                            ${_('Enabled')}
                         </span>
                     </div>
+                    <label>${_('URL')}</label>
+                    <input type="text" id="zooqle-url" class="form-control" value="${config['Torrent']['zooqle']['url']}">
                 </div>
             </form>
 

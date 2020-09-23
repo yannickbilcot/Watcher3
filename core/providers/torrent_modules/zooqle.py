@@ -10,16 +10,24 @@ logging = logging.getLogger(__name__)
 Does not supply rss feed -- backlog searches only.
 '''
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['zooqle']['url']
+    if not url:
+        url = 'https://zooqle.com'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Searching Zooqle for {}.'.format(term))
 
-    url = 'https://zooqle.com/search?q={}&fmt=rss'.format(term)
+    host = base_url()
+    url = '{}/search?q={}&fmt=rss'.format(host, term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.zooqle.com') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text

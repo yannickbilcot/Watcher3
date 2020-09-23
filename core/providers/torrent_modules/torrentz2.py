@@ -5,16 +5,24 @@ from xml.etree.cElementTree import fromstring
 from xmljson import yahoo
 logging = logging.getLogger(__name__)
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['torrentz2']['url']
+    if not url:
+        url = 'https://torrentz2.is'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on Torrentz2 for {}.'.format(imdbid))
 
-    url = 'https://torrentz2.is/feed?f={}'.format(term)
+    host = base_url()
+    url = '{}/feed?f={}'.format(host, term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://torrentz2.is') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -35,10 +43,11 @@ def get_rss():
 
     logging.info('Fetching latest RSS from Torrentz2.')
 
-    url = 'https://torrentz2.is/feed?f=movies'
+    host = base_url()
+    url = '{}/feed?f=movies'.format(host)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://torrentz2.is') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text

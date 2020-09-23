@@ -6,16 +6,24 @@ from core.helpers import Url
 
 logging = logging.getLogger(__name__)
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['torrentdownloads']['url']
+    if not url:
+        url = 'https://www.torrentdownloads.me'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on TorrentDownloads for {}.'.format(imdbid))
 
-    url = 'http://www.torrentdownloads.me/rss.xml?type=search&search={}'.format(term)
+    host = base_url()
+    url = '{}/rss.xml?type=search&search={}'.format(host, term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('http://www.torrentdownloads.me') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -36,10 +44,11 @@ def get_rss():
 
     logging.info('Fetching latest RSS from TorrentDownloads.')
 
-    url = 'http://www.torrentdownloads.me/rss2/last/4'
+    host = base_url()
+    url = '{}/rss2/last/4'.format(host)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('http://www.torrentdownloads.me') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -64,6 +73,7 @@ def _parse(xml, imdbid):
         logging.error('Unexpected XML format from TorrentDownloads.', exc_info=True)
         return []
 
+    host = base_url()
     results = []
     for i in items:
         result = {}
@@ -75,7 +85,7 @@ def _parse(xml, imdbid):
             result['title'] = i['title']['content'] if isinstance(i['title'], dict) else i['title']
             result['imdbid'] = imdbid
             result['indexer'] = 'TorrentDownloads'
-            result['info_link'] = 'http://www.torrentdownloads.me{}'.format(i['link'])
+            result['info_link'] = '{}{}'.format(host, i['link'])
             result['torrentfile'] = core.providers.torrent.magnet(i['info_hash'], i['title'])
             result['guid'] = i['info_hash']
             result['type'] = 'magnet'

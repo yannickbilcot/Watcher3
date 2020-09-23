@@ -137,6 +137,10 @@ def merge_new_options():
         print('Default Quality Profile not specified, setting *{}* to Default.'.format(target))
         new_config['Quality']['Profiles'][target]['default'] = True
 
+    for indexer, setting in new_config['Indexers']['Torrent'].items():
+        if isinstance(setting, bool):
+            new_config['Indexers']['Torrent'][indexer] = {'enabled': setting, 'url': ''}
+
     with open(core.CONF_FILE, 'w') as f:
         json.dump(new_config, f, indent=4, sort_keys=True)
 

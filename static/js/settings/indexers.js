@@ -109,7 +109,17 @@ function _get_settings(){
 // INDEXERS['TORRENT']
 
     each(document.querySelectorAll("form[data-category='torrent'] i.c_box"), function(checkbox){
-        settings["Torrent"][checkbox.id] = is_checked(checkbox);
+        var name, setting;
+        [name, setting] = checkbox.id.split('-');
+        settings["Torrent"][name] ||= {};
+        settings["Torrent"][name][setting] = is_checked(checkbox);
+    });
+
+    each(document.querySelectorAll("form[data-category='torrent'] input.form-control"), function(input){
+        var name, setting;
+        [name, setting] = input.id.split('-');
+        settings["Torrent"][name] ||= {};
+        settings["Torrent"][name][setting] = input.value;
     });
 
 // INDEXERS['PRIVATETORRENT']

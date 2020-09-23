@@ -7,16 +7,24 @@ import re
 
 logging = logging.getLogger(__name__)
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['limetorrents']['url']
+    if not url:
+        url = 'https://www.limetorrents.info'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on LimeTorrents for {}.'.format(imdbid))
 
-    url = 'https://www.limetorrents.info/searchrss/{}'.format(term)
+    host = base_url()
+    url = '{}/searchrss/{}'.format(host, term)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.info') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -37,10 +45,11 @@ def get_rss():
 
     logging.info('Fetching latest RSS from ')
 
-    url = 'https://www.limetorrents.info/rss/16/'
+    host = base_url()
+    url = '{}/rss/16/'.format(host)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.limetorrents.info') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -80,9 +89,9 @@ def _parse(xml, imdbid):
             result['title'] = i['title']
             result['imdbid'] = imdbid
             result['indexer'] = 'LimeTorrents'
-            result['info_link'] = i['link']
+            result['info_link'] = re.sub(r'^(https:)+//', 'https://', i['link'])
             result['torrentfile'] = i['enclosure']['url']
-            result['guid'] = result['torrentfile'].split('.')[1].split('/')[-1].lower()
+            result['guid'] = result['torrentfile'].split('.')[-2].split('/')[-1].lower()
             result['type'] = 'torrent'
             result['downloadid'] = None
             result['freeleech'] = 0

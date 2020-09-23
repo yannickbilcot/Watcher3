@@ -3,17 +3,25 @@ import xml.etree.cElementTree as ET
 import core
 from core.helpers import Url
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['thepiratebay']['url']
+    if not url:
+        url = 'https://www.thepiratebay.org'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on ThePirateBay for {}.'.format(imdbid))
 
-    url = 'https://www.thepiratebay.org/search/{}/0/99/200'.format(imdbid)
+    host = base_url()
+    url = '{}/search/tt0307453/0/99/200'.format(host, imdbid)
 
     headers = {'Cookie': 'lw=s'}
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.thepiratebay.org') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True, headers=headers).text
         else:
             response = Url.open(url, headers=headers).text
@@ -34,10 +42,11 @@ def get_rss():
 
     logging.info('Fetching latest RSS from ThePirateBay.')
 
-    url = 'https://www.thepiratebay.org/browse/201/0/3/0'
+    host = base_url()
+    url = '{}/browse/201/0/3/0'.format(host)
     headers = {'Cookie': 'lw=s'}
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.thepiratebay.org') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True, headers=headers).text
         else:
             response = Url.open(url, headers=headers).text
@@ -56,6 +65,7 @@ def get_rss():
 def _parse(html, imdbid):
     logging.info('Parsing ThePirateBay results.')
 
+    host = base_url()
     html = ' '.join(html.split())
     rows = []
     for i in html.split('<tr>')[1:-1]:
@@ -84,7 +94,7 @@ def _parse(html, imdbid):
             result['pubdate'] = None
             result['imdbid'] = imdbid
             result['indexer'] = 'ThePirateBay'
-            result['info_link'] = 'https://www.thepiratebay.org{}'.format(i[1][0].attrib['href'])
+            result['info_link'] = '{}{}'.format(host, i[1][0].attrib['href'])
             result['torrentfile'] = i[3][0][0].attrib['href'].replace('%26', '&')
             result['guid'] = result['torrentfile'].split('&')[0].split(':')[-1]
             result['type'] = 'magnet'

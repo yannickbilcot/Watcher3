@@ -6,16 +6,24 @@ import xml.etree.cElementTree as ET
 
 logging = logging.getLogger(__name__)
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['yts']['url']
+    if not url:
+        url = 'https://yts.mx'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def search(imdbid, term):
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Performing backlog search on YTS for {}.'.format(imdbid))
 
-    url = 'https://yts.ag/api/v2/list_movies.json?limit=1&query_term={}'.format(imdbid)
+    host = base_url()
+    url = '{}/api/v2/list_movies.json?limit=1&query_term={}'.format(host, imdbid)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.yts.ag') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -40,10 +48,11 @@ def get_rss():
 
     logging.info('Fetching latest RSS from YTS.')
 
-    url = 'https://yts.ag/rss/0/all/all/0'
+    host = base_url()
+    url = '{}/rss/0/all/all/0'.format(host)
 
     try:
-        if proxy_enabled and core.proxy.whitelist('https://www.yts.ag') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -62,6 +71,7 @@ def get_rss():
 def _parse(movie, imdbid, title):
     logging.info('Parsing {} YTS results.'.format(len(movie['torrents'])))
 
+    host = base_url()
     results = []
     for i in movie['torrents']:
         result = {}
@@ -75,7 +85,7 @@ def _parse(movie, imdbid, title):
             result['title'] = '{}.Bluray.{}.YTS'.format(title, i['quality'])
             result['imdbid'] = imdbid
             result['indexer'] = 'YTS'
-            result['info_link'] = 'https://yts.ag/movie/{}'.format(title.replace(' ', '-'))
+            result['info_link'] = '{}/movie/{}'.format(host, title.replace(' ', '-'))
             result['torrentfile'] = core.providers.torrent.magnet(i['hash'], result['title'])
             result['guid'] = i['hash']
             result['type'] = 'magnet'

@@ -87,8 +87,8 @@ class Torrent(NewzNabProvider):
             for i in r:
                 results.append(i)
 
-        for indexer, enabled in core.CONFIG['Indexers']['Torrent'].items():
-            if enabled:
+        for indexer, settings in core.CONFIG['Indexers']['Torrent'].items():
+            if settings['enabled']:
                 if not hasattr(torrent_modules, indexer):
                     logging.warning('Torrent indexer {} enabled but not found in torrent_modules.'.format(indexer))
                     continue
@@ -121,8 +121,8 @@ class Torrent(NewzNabProvider):
 
         results = self._get_rss()
 
-        for indexer, enabled in core.CONFIG['Indexers']['Torrent'].items():
-            if enabled:
+        for indexer, settings in core.CONFIG['Indexers']['Torrent'].items():
+            if settings['enabled']:
                 if not hasattr(torrent_modules, indexer):
                     logging.warning('Torrent indexer {} enabled but not found in torrent_modules.'.format(indexer))
                     continue

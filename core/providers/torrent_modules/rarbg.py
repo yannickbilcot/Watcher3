@@ -17,6 +17,13 @@ timeout = None
 _api_token = None
 _token_timeout = datetime.datetime.now()
 
+def base_url():
+    url = core.CONFIG['Indexers']['Torrent']['rarbg']['url']
+    if not url:
+        url = 'https://www.torrentapi.org'
+    elif url[-1] == '/':
+        url = url[:-1]
+    return url
 
 def _token():
     ''' Gets/sets token and monitors token timeout
@@ -46,6 +53,7 @@ def search(imdbid, term):
 
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
+    host = base_url()
     logging.info('Performing backlog search on Rarbg for {}.'.format(imdbid))
     if timeout:
         now = datetime.datetime.now()
@@ -54,11 +62,11 @@ def search(imdbid, term):
             now = datetime.datetime.now()
 
     try:
-        url = 'https://www.torrentapi.org/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(_token(), imdbid)
+        url = '{}/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(host, _token(), imdbid)
 
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
-        if proxy_enabled and core.proxy.whitelist('https://www.torrentapi.org') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -83,6 +91,7 @@ def get_rss():
     '''
     global timeout
 
+    host = base_url()
     proxy_enabled = core.CONFIG['Server']['Proxy']['enabled']
 
     logging.info('Fetching latest RSS from ')
@@ -93,10 +102,10 @@ def get_rss():
             now = datetime.datetime.now()
 
     try:
-        url = 'https://www.torrentapi.org/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(_token())
+        url = '{}/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(host, _token())
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
-        if proxy_enabled and core.proxy.whitelist('https://www.torrentapi.org') is True:
+        if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
         else:
             response = Url.open(url).text
@@ -120,7 +129,8 @@ def _get_token():
     Returns str or None
     '''
     logging.info('Getting RarBG access token.')
-    url = 'https://www.torrentapi.org/pubapi_v2.php?get_token=get_token&app_id=Watcher'
+    host = base_url()
+    url = '{}/pubapi_v2.php?get_token=get_token&app_id=Watcher'.format(host)
 
     try:
         result = json.loads(Url.open(url).text)
