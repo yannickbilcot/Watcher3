@@ -546,6 +546,23 @@ class Postprocessing(object):
 
         data.update(Metadata.convert_to_db(data))
 
+        dir, file_name = os.path.split(data['original_file'])
+        ext = os.path.splitext(file_name)[1]
+        regexp = re.compile(r'(?<=\bcd)[1-9]\b|(?<=\bcd )[1-9]\b|(?<=\.)[1-9](?={}$)'.format(re.escape(ext)), re.IGNORECASE)
+        data['suffix'] = re.search(regexp, file_name)
+        if data['suffix']:
+            data['suffix'] = '.{}'.format(data['suffix'][0])
+            data['additional_files'] = []
+            logging.info('Found splitted movie, with suffix: {}'.format(data['suffix']))
+            file_re = re.sub(regexp, '([1-9])', re.escape(file_name))
+            for file in os.listdir(dir):
+                path = os.path.join(dir, file)
+                suffix = re.findall(file_re, file)[0] if file != file_name and os.path.isfile(path) else None
+                if suffix:
+                    suffix = '.{}'.format(suffix[0])
+                    logging.info('Found {}, with suffix {}'.format(path, suffix))
+                    data['additional_files'].append([path, suffix])
+
         # mover. sets ['finished_file']
         if config['moverenabled']:
             result['tasks']['mover'] = {'enabled': True}
@@ -707,19 +724,29 @@ class Postprocessing(object):
         if core.CONFIG['Postprocessing']['replacespaces']:
             new_name = new_name.replace(' ', '.')
 
-        new_name = new_name + ext
+        if data.get('suffix'):
+            new_file_name = new_name + data['suffix'] + ext
+        else:
+            new_file_name = new_name + ext
 
-        logging.info('Renaming {} to {}'.format(os.path.basename(data.get('original_file')), new_name))
-        try:
-            os.rename(data['finished_file'], os.path.join(path, new_name))
-        except (SystemExit, KeyboardInterrupt):
-            raise
-        except Exception as e:  # noqa
-            logging.error('Renamer failed: Could not rename file.', exc_info=True)
-            return ''
+        renames = [[data['finished_file'], os.path.join(path, new_file_name)]]
+        if data.get('additional_files'):
+            for idx, (add_file, suffix) in enumerate(data['additional_files']):
+                data['additional_files'][idx] = os.path.join(path, new_name + suffix + ext)
+                renames.append([add_file, data['additional_files'][idx]])
+
+        for original_file, new_file in renames:
+            logging.info('Renaming {} to {}'.format(os.path.basename(original_file), os.path.basename(new_file)))
+            try:
+                os.rename(original_file, new_file)
+            except (SystemExit, KeyboardInterrupt):
+                raise
+            except Exception as e:  # noqa
+                logging.error('Renamer failed: Could not rename file.', exc_info=True)
+                return ''
 
         # return the new name so the mover knows what our file is
-        return new_name
+        return new_file_name
 
     def recycle(self, recycle_bin, abs_filepath):
         ''' Sends file to recycle bin dir
@@ -803,6 +830,8 @@ class Postprocessing(object):
         config = core.CONFIG['Postprocessing']
         if config['recyclebinenabled']:
             recycle_bin = self.compile_path(config['recyclebindirectory'], data)
+        else:
+            recycle_bin = None
         category = data.get('category', None)
         if category in core.CONFIG['Categories']:
             moverpath = core.CONFIG['Categories'][category]['moverpath']
@@ -819,8 +848,6 @@ class Postprocessing(object):
             logging.error('Mover failed: Could not create directory {}.'.format(target_folder), exc_info=True)
             return ''
 
-        current_file_path = data['original_file']
-        current_path, file_name = os.path.split(current_file_path)
         # If finished_file exists, recycle or remove
         if data.get('finished_file'):
             old_movie = data['finished_file']
@@ -840,68 +867,11 @@ class Postprocessing(object):
                         return ''
                 if config['removeadditionalfiles']:
                     self.remove_additional_files(old_movie)
-        # Check if the target file name exists in target dir, recycle or remove
-        if os.path.isfile(os.path.join(target_folder, file_name)):
-            existing_movie_file = os.path.join(target_folder, file_name)
-            logging.info('Existing file {} found in {}'.format(file_name, target_folder))
-            if config['recyclebinenabled']:
-                if not self.recycle(recycle_bin, existing_movie_file):
-                    return ''
-            else:
-                logging.info('Deleting old file {}'.format(existing_movie_file))
-                try:
-                    os.remove(existing_movie_file)
-                except Exception as e:
-                    logging.error('Mover failed: Could not delete file.', exc_info=True)
-                    return ''
-            if config['removeadditionalfiles']:
-                self.remove_additional_files(existing_movie_file)
 
-        # Finally the actual move process
-        new_file_location = os.path.join(target_folder, os.path.basename(data['original_file']))
-
-        if config['movermethod'] == 'hardlink':
-            logging.info('Creating hardlink from {} to {}.'.format(data['original_file'], new_file_location))
-            try:
-                os.link(data['original_file'], new_file_location)
-            except Exception as e:
-                logging.error('Mover failed: Unable to create hardlink.', exc_info=True)
-                return ''
-        elif config['movermethod'] == 'keeplink':
-            if core.PLATFORM == 'windows':
-                logging.warning('Attempting to create symbolic link on Windows. This will fail without SeCreateSymbolicLinkPrivilege.')
-            logging.info('Creating symbolic link from {} to {}'.format(data['original_file'], new_file_location))
-            try:
-                os.symlink(data['original_file'], new_file_location)
-            except Exception as e:
-                logging.error('Mover failed: Unable to create symbolic link.', exc_info=True)
-                return ''
-        elif config['movermethod'] == 'copy':
-            logging.info('Copying {} to {}.'.format(data['original_file'], new_file_location))
-            try:
-                shutil.copy(data['original_file'], new_file_location)
-            except Exception as e:
-                logging.error('Mover failed: Unable to copy movie.', exc_info=True)
-                return ''
-        else:
-            logging.info('Moving {} to {}'.format(current_file_path, new_file_location))
-            try:
-                shutil.copyfile(current_file_path, new_file_location)
-                os.unlink(current_file_path)
-            except Exception as e:
-                logging.error('Mover failed: Could not move file.', exc_info=True)
-                return ''
-
-            if config['movermethod'] == 'symboliclink':
-                if core.PLATFORM == 'windows':
-                    logging.warning('Attempting to create symbolic link on Windows. This will fail without SeCreateSymbolicLinkPrivilege.')
-                logging.info('Creating symbolic link from {} to {}'.format(new_file_location, data['original_file']))
-                try:
-                    os.symlink(new_file_location, data['original_file'])
-                except Exception as e:
-                    logging.error('Mover failed: Unable to create symbolic link.', exc_info=True)
-                    return ''
-
+        new_file_location = self.moverfile(data['original_file'], target_folder, recycle_bin)
+        if data.get('additional_files'):
+            for idx, (path, suffix) in enumerate(data['additional_files']):
+                data['additional_files'][idx][0] = self.moverfile(path, target_folder, recycle_bin)
         keep_extensions = [i.strip() for i in config['moveextensions'].split(',') if i != '']
 
         if len(keep_extensions) > 0:
@@ -936,6 +906,73 @@ class Postprocessing(object):
                             shutil.copyfile(old_abs_path, target_file)
                         except Exception as e:  # noqa
                             logging.error('Moving additional files failed: Could not copy {}.'.format(old_abs_path), exc_info=True)
+        return new_file_location
+
+    def moverfile(self, file_path, target_folder, recycle_bin):
+        config = core.CONFIG['Postprocessing']
+        current_path, file_name = os.path.split(file_path)
+        # Check if the target file name exists in target dir, recycle or remove
+        if os.path.isfile(os.path.join(target_folder, file_name)):
+            existing_movie_file = os.path.join(target_folder, file_name)
+            logging.info('Existing file {} found in {}'.format(file_name, target_folder))
+            if config['recyclebinenabled']:
+                if not self.recycle(recycle_bin, existing_movie_file):
+                    return ''
+            else:
+                logging.info('Deleting old file {}'.format(existing_movie_file))
+                try:
+                    os.remove(existing_movie_file)
+                except Exception as e:
+                    logging.error('Mover failed: Could not delete file.', exc_info=True)
+                    return ''
+            if config['removeadditionalfiles']:
+                self.remove_additional_files(existing_movie_file)
+
+        # Finally the actual move process
+        new_file_location = os.path.join(target_folder, file_name)
+
+        if config['movermethod'] == 'hardlink':
+            logging.info('Creating hardlink from {} to {}.'.format(file_path, new_file_location))
+            try:
+                os.link(file_path, new_file_location)
+            except Exception as e:
+                logging.error('Mover failed: Unable to create hardlink.', exc_info=True)
+                return ''
+        elif config['movermethod'] == 'keeplink':
+            if core.PLATFORM == 'windows':
+                logging.warning('Attempting to create symbolic link on Windows. This will fail without SeCreateSymbolicLinkPrivilege.')
+            logging.info('Creating symbolic link from {} to {}'.format(file_path, new_file_location))
+            try:
+                os.symlink(file_path, new_file_location)
+            except Exception as e:
+                logging.error('Mover failed: Unable to create symbolic link.', exc_info=True)
+                return ''
+        elif config['movermethod'] == 'copy':
+            logging.info('Copying {} to {}.'.format(file_path, new_file_location))
+            try:
+                shutil.copy(file_path, new_file_location)
+            except Exception as e:
+                logging.error('Mover failed: Unable to copy movie.', exc_info=True)
+                return ''
+        else:
+            logging.info('Moving {} to {}'.format(file_path, new_file_location))
+            try:
+                shutil.copyfile(file_path, new_file_location)
+                os.unlink(file_path)
+            except Exception as e:
+                logging.error('Mover failed: Could not move file.', exc_info=True)
+                return ''
+
+            if config['movermethod'] == 'symboliclink':
+                if core.PLATFORM == 'windows':
+                    logging.warning('Attempting to create symbolic link on Windows. This will fail without SeCreateSymbolicLinkPrivilege.')
+                logging.info('Creating symbolic link from {} to {}'.format(new_file_location, file_path))
+                try:
+                    os.symlink(new_file_location, file_path)
+                except Exception as e:
+                    logging.error('Mover failed: Unable to create symbolic link.', exc_info=True)
+                    return ''
+
         return new_file_location
 
     def cleanup(self, path):
