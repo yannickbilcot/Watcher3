@@ -78,6 +78,7 @@ def _parse(xml, imdbid):
         logging.info("No result found in LimeTorrents")
         return []
 
+    host = base_url()
     results = []
     for i in rss['item']:
         result = {}
@@ -90,7 +91,7 @@ def _parse(xml, imdbid):
             result['imdbid'] = imdbid
             result['indexer'] = 'LimeTorrents'
             if i['link'][0] == '/':
-                result['info_link'] = base_url() + i['link']
+                result['info_link'] = host + i['link']
             else: # some proxies have wrong link url (https:https://...)
                 result['info_link'] = re.sub(r'^(https:)+//', 'https://', i['link'])
             result['guid'] = i['enclosure']['url'].split('.')[-2].split('/')[-1].lower()
