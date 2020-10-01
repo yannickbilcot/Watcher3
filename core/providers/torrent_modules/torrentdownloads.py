@@ -3,6 +3,7 @@ from xml.etree.cElementTree import fromstring
 from xmljson import yahoo
 import core
 from core.helpers import Url
+import re
 
 logging = logging.getLogger(__name__)
 
@@ -67,6 +68,7 @@ def get_rss():
 def _parse(xml, imdbid):
     logging.info('Parsing TorrentDownloads results.')
 
+    xml = re.sub(r'&(?!amp;)', '&amp;', xml)
     try:
         items = yahoo.data(fromstring(xml))['rss']['channel']['item']
     except Exception as e:
