@@ -67,9 +67,12 @@ def _parse(response, imdbid):
     logging.info('Parsing ThePirateBay results.')
 
     # proxies may require to set base_url to https://host/newapi/, but info_link must link to https://host/
-    host = re.sub(r'(https?://[^/]*).*', r'\1', base_url())
     rows = json.loads(response)
+    if len(rows) == 1 and re.match(r'0*$', rows[0].get('info_hash')):
+        logging.info('Nothing found on ThePirateBay')
+        return []
 
+    host = re.sub(r'(https?://[^/]*).*', r'\1', base_url())
     results = []
     for row in rows:
         result = {}
