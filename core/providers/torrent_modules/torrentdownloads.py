@@ -70,14 +70,18 @@ def _parse(xml, imdbid):
 
     xml = re.sub(r'&(?!amp;)', '&amp;', xml)
     try:
-        items = yahoo.data(fromstring(xml))['rss']['channel']['item']
+        rss = yahoo.data(fromstring(xml))['rss']['channel']
     except Exception as e:
         logging.error('Unexpected XML format from TorrentDownloads.', exc_info=True)
         return []
 
+    if 'item' not in rss:
+        logging.info("No result found in TorrentDownloads")
+        return []
+
     host = base_url()
     results = []
-    for i in items:
+    for i in rss['item']:
         result = {}
         try:
             result['score'] = 0
