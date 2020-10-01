@@ -89,10 +89,17 @@ def _parse(xml, imdbid):
             result['title'] = i['title']
             result['imdbid'] = imdbid
             result['indexer'] = 'LimeTorrents'
-            result['info_link'] = re.sub(r'^(https:)+//', 'https://', i['link'])
-            result['torrentfile'] = i['enclosure']['url']
-            result['guid'] = result['torrentfile'].split('.')[-2].split('/')[-1].lower()
-            result['type'] = 'torrent'
+            if i['link'][0] == '/':
+                result['info_link'] = base_url() + i['link']
+            else: # some proxies have wrong link url (https:https://...)
+                result['info_link'] = re.sub(r'^(https:)+//', 'https://', i['link'])
+            result['guid'] = i['enclosure']['url'].split('.')[-2].split('/')[-1].lower()
+            if re.search(r'https?://itorrents\.org/', i['enclosure']['url']):
+                result['torrentfile'] = core.providers.torrent.magnet(result['guid'], result['title'])
+                result['type'] = 'magnet'
+            else:
+                result['torrentfile'] = i['enclosure']['url']
+                result['type'] = 'torrent'
             result['downloadid'] = None
             result['freeleech'] = 0
             result['download_client'] = None
