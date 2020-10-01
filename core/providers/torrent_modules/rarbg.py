@@ -111,16 +111,19 @@ def get_rss():
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
         if proxy_enabled and core.proxy.whitelist(host) is True:
-            response = Url.open(url, proxy_bypass=True).text
+            response = Url.open(url, proxy_bypass=True)
         else:
-            response = Url.open(url).text
+            response = Url.open(url)
 
-        results = json.loads(response).get('torrent_results')
-        if results:
-            return _parse(results)
+        if response.status_code != 200:
+            return [] # no need to log anything, Url.open already has logged a warning
         else:
-            logging.info('Nothing found in Rarbg RSS.')
-            return []
+            results = json.loads(response.text).get('torrent_results')
+            if results:
+                return _parse(results)
+            else:
+                logging.info('Nothing found in Rarbg RSS.')
+                return []
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
