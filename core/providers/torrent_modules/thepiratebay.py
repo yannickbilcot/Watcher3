@@ -79,7 +79,7 @@ def _parse(response, imdbid):
         try:
             result['title'] = row['name']
             result['score'] = 0
-            result['size'] = row['size']
+            result['size'] = int(row['size'])
             result['status'] = 'Available'
             result['pubdate'] = datetime.fromtimestamp(int(row['added']))
             result['imdbid'] = imdbid
