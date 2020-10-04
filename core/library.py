@@ -1218,6 +1218,26 @@ class Manage(object):
         return stats
 
     @staticmethod
+    def search_results(imdbid, quality=None):
+        ''' Gets search results for movie
+        imdbid (str): imdb id #
+        quality (str): quality profile for movie    <optional - default None>
+
+        Passes request to sql.get_search_results() then filters out unused download methods.
+
+        Returns list of results
+        '''
+
+        results = core.sql.get_search_results(imdbid, quality=quality, rejected=True)
+
+        if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
+            results = [res for res in results if res.get('type') != 'nzb']
+        if not core.CONFIG['Downloader']['Sources']['torrentenabled']:
+            results = [res for res in results if res.get('type') != 'torrent']
+
+        return results
+
+    @staticmethod
     def update_movie_options(imdbid, quality, category, language, title, filters):
         ''' Updates quality settings for individual title
         imdbid (str): imdb identification number

@@ -10,7 +10,7 @@ import logging
 
 logging = logging.getLogger(__name__)
 
-api_version = 2.5
+api_version = 2.6
 
 ''' API
 
@@ -121,6 +121,22 @@ mode=search_movie
         Response:
             {'response': True, 'results', [{'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot']}
             
+mode=search_results
+    Description:
+        Return search results for movie
+        Accept imdbid param
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=search_results&imdbid=tt1234567
+        Response:
+            {'response': True, 'results', [{'status': 'Available', 'title': 'Movie Title', 'guid': 'xxx', 'indexer': 'Indexer Name', ...]}
+
+        Request:
+            ?apikey=123456789&mode=search_results&imdbid=tt0000000
+        Response:
+            {'response': false, 'error': 'no movie for tt0000000'}
+            
 mode=update_metadata
     Description:
         Update metadata for movie.
@@ -205,6 +221,7 @@ Major version changes can be expected to break api interactions
 2.3     Update dispatch method. Allow arbitrary filters in liststatus.
 2.4     Allow category argument in addmovie method.
 2.5     Add search_movie, task, update_check, update_metadata and update_movie_options methods.
+2.6     Add search_results method.
 '''
 
 
@@ -444,10 +461,16 @@ class API(object):
 
         Returns dict ajax-style response
         '''
-        if not params.get('imdbid'):
+        imdbid = params.get('imdbid')
+        if not imdbid:
             return {'response': False, 'error': 'no imdbid supplied'}
 
-        #return ajax.get_search_results(params['imdbid'])
+        movie = core.sql.get_movie_details('imdbid', imdbid)
+        if not movie:
+            return {'response': False, 'error': 'no movie for {}'.format(imdbid)}
+
+        results = Manage.search_results(imdbid, quality=movie.get('quality'))
+        return {'response': True, 'results': results}
 
     @api_json_out
     def search_movie(self, params):

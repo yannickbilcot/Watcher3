@@ -120,12 +120,7 @@ class Ajax(object):
         Returns dict ajax-style response
         '''
 
-        results = core.sql.get_search_results(imdbid, quality=quality, rejected=True)
-
-        if not core.CONFIG['Downloader']['Sources']['usenetenabled']:
-            results = [res for res in results if res.get('type') != 'nzb']
-        if not core.CONFIG['Downloader']['Sources']['torrentenabled']:
-            results = [res for res in results if res.get('type') != 'torrent']
+        results = Manage.search_results(imdbid, quality=quality)
 
         if not results:
             ne = core.scheduler_plugin.task_list['Movie Search'].next_execution
