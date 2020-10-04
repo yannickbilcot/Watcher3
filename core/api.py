@@ -1,6 +1,6 @@
 import core
 from core.movieinfo import TheMovieDatabase
-from core.library import Manage
+from core.library import Metadata, Manage
 from core import searcher
 import cherrypy
 import threading
@@ -10,7 +10,7 @@ import logging
 
 logging = logging.getLogger(__name__)
 
-api_version = 2.4
+api_version = 2.5
 
 ''' API
 
@@ -109,6 +109,50 @@ mode=poster
             ?apikey=123456789&mode=poster&imdbid=tt0000000
         Response:
             {'response': false, 'error': 'file not found: tt0000000.jpg'}
+            
+mode=search_movie
+    Description:
+        Search a movie by title, in defined indexers
+        Accept q param
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=search_movie&q=Movie%20Title
+        Response:
+            {'response': True, 'results', [{'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot']}
+            
+mode=update_metadata
+    Description:
+        Update metadata for movie.
+        Requires imdbid, tmdbid optional
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=update_metadata&imdbid=tt1234567
+        Response:
+            {'response': True, 'message': 'Metadata updated'}
+
+        Request:
+            ?apikey=123456789&mode=update_metadata&imdbid=tt0000000
+        Response:
+            {'response': false, 'error': 'Empty response from TMDB'}
+            
+mode=update_movie_options
+    Description:
+        Update options for movie.
+        Requires imdbid
+        Category, quality, title, language and filters are optional
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=update_movie_options&imdbid=tt1234567&quality=Default
+        Response:
+            {'response': True, 'message': 'Movie options updated'}
+
+        Request:
+            ?apikey=123456789&mode=update_metadata&imdbid=tt0000000
+        Response:
+            {'response': false, 'error': 'Error saving movie options'}
 
 mode=server_shutdown
     Description:
@@ -128,6 +172,20 @@ mode=server_restart
     Example:
         ?apikey=123456789&mode=restart
 
+mode=task
+    Description:
+        Starts task manually.
+
+    Example:
+        ?apikey=123456789&mode=task&task=PostProcessing%20Scan
+
+mode=update_check
+    Description:
+        Starts update check task.
+
+    Example:
+        ?apikey=123456789&mode=update_check
+
 
 # API Version
 Methods added to the api or minor adjustments to existing methods will increase the version by X.1
@@ -145,7 +203,8 @@ Major version changes can be expected to break api interactions
 2.1     Adjust addmovie() to pass origin argument. Adjust addmovie() to search tmdb for itself rather than in core.ajax()
 2.2     Update documentation for all methods
 2.3     Update dispatch method. Allow arbitrary filters in liststatus.
-2.4     Allow category argument in addmovie method
+2.4     Allow category argument in addmovie method.
+2.5     Add search_movie, task, update_check, update_metadata and update_movie_options methods.
 '''
 
 
@@ -273,17 +332,32 @@ class API(object):
 
     @api_json_out
     def removemovie(self, params):
-        ''' Remove movie from library
+        ''' Remove movie from library, if delete_file is true, finished_file will be deleted too
         params (dict): params passed in request url, must include imdbid
 
         Returns dict
         '''
-        if not params.get('imdbid'):
+        imdbid = params.get('imdbid')
+        if not imdbid:
             return {'response': False, 'error': 'no imdbid supplied'}
 
-        logging.info('API request remove movie {}'.format(params['imdbid']))
+        logging.info('API request remove movie {}'.format(imdbid))
 
-        return Manage.remove_movie(params['imdbid'])
+        if params['delete_file']:
+            f = core.sql.get_movie_details('imdbid', imdbid).get('finished_file')
+            if f:
+                try:
+                    logging.debug('Finished file for {} is {}'.format(imdbid, f))
+                    os.unlink(f)
+                    # clear finished_* columns, in case remove_movie fails
+                    core.sql.update_multiple_values('MOVIES', {'finished_date': None, 'finished_score': None,
+                                                               'finished_file': None}, 'imdbid', imdbid)
+                except Exception as e:
+                    error = 'Unable to delete file {}'.format(f)
+                    logging.error(error, exc_info=True)
+                    return {'response': False, 'error': error}
+
+        return Manage.remove_movie(imdbid)
 
     def poster(self, params):
         ''' Return poster
@@ -310,6 +384,90 @@ class API(object):
                 return json.dumps(err).encode('utf-8')
 
     @api_json_out
+    def update_metadata(self, params):
+        ''' Re-downloads metadata for imdbid
+        params(dict): params passed in request url, must include imdbid, may include tmdbid
+
+        If tmdbid is None, looks in database for tmdbid using imdbid.
+        If that fails, looks on tmdb api for imdbid
+        If that fails returns error message
+
+        Returns dict ajax-style response
+        '''
+        if not params.get('imdbid'):
+            return {'response': False, 'error': 'no imdbid supplied'}
+
+        r = Metadata.update(params['imdbid'], params.get('tmdbid'))
+
+        if r['response'] is True:
+            return {'response': True, 'message': 'Metadata updated'}
+        else:
+            return r
+
+    @api_json_out
+    def update_movie_options(self, params):
+        ''' Re-downloads metadata for imdbid
+        params(dict): params passed in request url, must include imdbid, may include these params:
+
+        quality (str): name of new quality
+        category (str): name of new category
+        status (str): management state ('automatic', 'disabled')
+        language (str): name of language to download movie
+        title (str): movie title
+        filters (str): JSON.stringified dict of filter words
+
+        Returns dict ajax-style response
+        '''
+        imdbid = params.get('imdbid')
+        if not imdbid:
+            return {'response': False, 'error': 'no imdbid supplied'}
+
+        movie = core.sql.get_movie_details('imdbid', imdbid)
+        if not movie:
+            return {'response': False, 'error': 'no movie for {}'.format(imdbid)}
+
+        quality = params.get('quality', movie['quality'])
+        category = params.get('category', movie['category'])
+        language = params.get('language', movie['download_language'])
+        title = params.get('title', movie['title'])
+        filters = params.get('filters', movie['filters'])
+        if Manage.update_movie_options(imdbid, quality, category, language, title, filters):
+            return {'response': True, 'message': 'Movie options updated'}
+        else:
+            return {'response': False, 'message': 'Unable to write to database'}
+
+
+    @api_json_out
+    def search_results(self, params):
+        ''' Gets search results for movie
+        params(dict): params passed in request url, must include imdbid
+
+        Returns dict ajax-style response
+        '''
+        if not params.get('imdbid'):
+            return {'response': False, 'error': 'no imdbid supplied'}
+
+        #return ajax.get_search_results(params['imdbid'])
+
+    @api_json_out
+    def search_movie(self, params):
+        ''' Search indexers for specific movie
+        params(dict): params passed in request url, must include q
+
+        Returns dict ajax-style response
+        '''
+        if not params.get('q'):
+            return {'response': False, 'error': 'no query supplied'}
+
+        results = TheMovieDatabase.search(params['q'])
+        if results:
+            Manage.add_status_to_search_movies(results)
+        else:
+            return {'response': False, 'error': 'No Results found for {}'.format(params['q'])}
+
+        return {'response': True, 'results': results}
+
+    @api_json_out
     def version(self, *args):
         ''' Simple endpoint to return commit hash
         Mostly used to test connectivity without modifying the server.
@@ -323,6 +481,26 @@ class API(object):
         ''' Returns config contents as JSON object
         '''
         return {'response': True, 'config': core.CONFIG}
+
+    @api_json_out
+    def task(self, params):
+        ''' Returns config contents as JSON object
+        '''
+        if not params.get('task'):
+            return {'response': False, 'error': 'no task supplied'}
+
+        task = core.scheduler_plugin.task_list.get(params['task'])
+        if task:
+            task.now()
+            return {'response': True}
+        else:
+            return {'response': False, 'error': 'No task "{}"'.format(params['task'])}
+
+    @api_json_out
+    def update_check(self, *args):
+        ''' Returns config contents as JSON object
+        '''
+        return core.updater.update_check()
 
     @api_json_out
     def server_shutdown(self, *args):
