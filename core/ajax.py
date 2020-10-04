@@ -536,26 +536,7 @@ class Ajax(object):
 
         success = {'response': True, 'message': _('Movie options updated.')}
 
-        logging.info('Setting Quality and filters for {}.'.format(imdbid))
-        new_data = {'quality': quality, 'category': category, 'filters': filters, 'title': title, 'download_language': language}
-        tmdb_data = self.movie_metadata(imdbid, language=language).get('tmdb_data')
-        if tmdb_data is not None:
-            new_data['plot'] = tmdb_data['overview']
-            if 'english_title' in tmdb_data:
-                new_data['english_title'] = tmdb_data['english_title']
-            else:
-                new_data['english_title'] = None
-
-            if tmdb_data.get('lang_titles'):
-                new_data['alternative_titles'] = ','.join([title for title in tmdb_data['lang_titles'] if title != new_data['title']])
-            elif tmdb_data.get('alternative_titles') and not isinstance(tmdb_data.get('alternative_titles'), str):
-                a_t = []
-                for i in tmdb_data.get('alternative_titles', {}).get('titles', []):
-                    if i['iso_3166_1'] == 'US':
-                        a_t.append(i['title'])
-                new_data['alternative_titles'] = ','.join(a_t)
-
-        if not core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid):
+        if not Manage.update_movie_options(imdbid, quality, category, language, title, filters):
             return {'response': False, 'error': Errors.database_write}
 
         logging.info('Updating status to {} for {}.'.format(status, imdbid))
@@ -896,21 +877,11 @@ class Ajax(object):
         Returns dict ajax-style response
         '''
 
-        if tmdbid is None:
-            tmdbid = core.sql.get_movie_details('imdbid', imdbid).get('tmdbid')
-            if not tmdbid:
-                logging.debug('TMDB id not found in local database, searching TMDB for {}'.format(imdbid))
-                tmdb_data = TheMovieDatabase._search_imdbid(imdbid)
-                tmdbid = tmdb_data[0].get('id') if tmdb_data else None
-            if not tmdbid:
-                logging.debug('Unable to find {} on TMDB.'.format(imdbid))
-                return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(imdbid)}
-
-        results = TheMovieDatabase._search_tmdbid(tmdbid, language)
-        if results:
-            return {'response': True, 'tmdb_data': results[0]}
+        result = Metadata.tmdb_data(imdbid, tmdbid=tmdbid, language=language)
+        if result:
+            return {'response': True, 'tmdb_data': result}
         else:
-            return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(tmdbid)}
+            return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(tmdbid or imdbid)}
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

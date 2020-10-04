@@ -662,6 +662,35 @@ class Metadata(object):
         return movie
 
     @staticmethod
+    def tmdb_data(imdbid, tmdbid=None, language=None):
+        ''' Gets metadata for imdbid
+        imdbid (str): imdbid of movie
+        tmdbid (str): tmdbid of movie     <optional - default None>
+
+        If tmdbid is None, looks in database for tmdbid using imdbid.
+        If that fails, looks on tmdb api for imdbid
+        If that fails returns error message
+
+        Returns dict ajax-style response
+        '''
+
+        if tmdbid is None:
+            tmdbid = core.sql.get_movie_details('imdbid', imdbid).get('tmdbid')
+            if not tmdbid:
+                logging.debug('TMDB id not found in local database, searching TMDB for {}'.format(imdbid))
+                tmdb_data = TheMovieDatabase._search_imdbid(imdbid)
+                tmdbid = tmdb_data[0].get('id') if tmdb_data else None
+            if not tmdbid:
+                logging.debug('Unable to find {} on TMDB.'.format(imdbid))
+                return None
+
+        results = TheMovieDatabase._search_tmdbid(tmdbid, language)
+        if results:
+            return results[0]
+        else:
+            return None
+
+    @staticmethod
     def update(imdbid, tmdbid=None, force_poster=True):
         ''' Updates metadata from TMDB
         imdbid (str): imdb id #
@@ -1187,3 +1216,39 @@ class Manage(object):
         stats['added_dates'] = sorted([{'added_date': k, 'value': v} for k, v in added_dates.items() if v is not None], key=lambda k: k['added_date'])
         stats['scores'] = sorted([{'score': k, 'value': v} for k, v in scores.items()], key=lambda k: k['score'])
         return stats
+
+    @staticmethod
+    def update_movie_options(imdbid, quality, category, language, title, filters):
+        ''' Updates quality settings for individual title
+        imdbid (str): imdb identification number
+        quality (str): name of new quality
+        category (str): name of new category
+        language (str): name of language to download movie
+        title (str): movie title
+        filters (str): JSON.stringified dict of filter words
+
+        Returns dict ajax-style response
+        '''
+
+        logging.info('Setting quality, category, title, language and filters for {}.'.format(imdbid))
+        new_data = {'quality': quality, 'category': category, 'filters': filters, 'title': title, 'download_language': language}
+        movie = core.sql.get_movie_details('imdbid', imdbid)
+        if movie.get('download_language') != language:
+            tmdb_data = Metadata.tmdb_data(imdbid, tmdbid=movie.get('tmdbid'), language=language)
+            if tmdb_data is not None:
+                new_data['plot'] = tmdb_data['overview']
+                if 'english_title' in tmdb_data:
+                    new_data['english_title'] = tmdb_data['english_title']
+                else:
+                    new_data['english_title'] = None
+
+                if tmdb_data.get('lang_titles'):
+                    new_data['alternative_titles'] = ','.join([title for title in tmdb_data['lang_titles'] if title != new_data['title']])
+                elif tmdb_data.get('alternative_titles') and not isinstance(tmdb_data.get('alternative_titles'), str):
+                    a_t = []
+                    for i in tmdb_data.get('alternative_titles', {}).get('titles', []):
+                        if i['iso_3166_1'] == 'US':
+                            a_t.append(i['title'])
+                    new_data['alternative_titles'] = ','.join(a_t)
+
+        return core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid)
