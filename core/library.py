@@ -1271,4 +1271,9 @@ class Manage(object):
                             a_t.append(i['title'])
                     new_data['alternative_titles'] = ','.join(a_t)
 
+        if new_data['title'] != movie['title']:
+            alt_titles = movie.get('alternative_titles', '').split(',')
+            if movie['title'] not in alt_titles:
+                alt_titles.append(movie['title'])
+                new_data['alternative_titles'] = ','.join(alt_titles)
         return core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid)
