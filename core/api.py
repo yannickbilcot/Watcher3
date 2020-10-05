@@ -1,7 +1,7 @@
 import core
 from core.movieinfo import TheMovieDatabase
 from core.library import Metadata, Manage
-from core import searcher
+from core import searcher, snatcher
 import cherrypy
 import threading
 import os
@@ -170,6 +170,22 @@ mode=update_movie_options
         Response:
             {'response': false, 'error': 'Error saving movie options'}
 
+mode=manual_download
+    Description:
+        Sends search result to downloader
+        Requires guid and kind (torrent, magnet, nzb) params
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=manual_download&guid=60b725f10c9c85c70d97880dfe8191b3&kind=magnet
+        Response:
+            {'response': True, 'message': 'Sent to Transmission', 'download_client': 'Transmission', 'downloadid': 'xxx'}
+
+        Request:
+            ?apikey=123456789&mode=manual_download&guid=60b725f10c9c85c70d97880dfe8191b3&kind=magnet
+        Response:
+            {'response': False, 'error': 'Snatch failed'}
+            
 mode=server_shutdown
     Description:
         Gracefully terminate Watcher server and child processes.
@@ -222,6 +238,7 @@ Major version changes can be expected to break api interactions
 2.4     Allow category argument in addmovie method.
 2.5     Add search_movie, task, update_check, update_metadata and update_movie_options methods.
 2.6     Add search_results method.
+2.7     Add manual_download method.
 '''
 
 
@@ -489,6 +506,35 @@ class API(object):
             return {'response': False, 'error': 'No Results found for {}'.format(params['q'])}
 
         return {'response': True, 'results': results}
+
+    @api_json_out
+    def manual_download(self, params):
+        ''' Sends search result to downloader
+        params(dict): params passed in request url, must include guid and kind (torrent, magnet, nzb)
+
+        Returns dict ajax-style response
+        '''
+        guid = params.get('guid')
+        kind = params.get('kind')
+        if not guid:
+            return {'response': False, 'error': 'no guid supplied'}
+        if kind not in ('torrent', 'magnet', 'nzb'):
+            return {'response': False, 'error': 'no guid supplied'}
+
+        torrent_enabled = core.CONFIG['Downloader']['Sources']['torrentenabled']
+        usenet_enabled = core.CONFIG['Downloader']['Sources']['usenetenabled']
+
+        if kind == 'nzb' and not usenet_enabled:
+            return {'response': False, 'error': 'Link is NZB but no Usent client is enabled.'}
+        elif kind in ('torrent', 'magnet') and not torrent_enabled:
+            return {'response': False, 'error': 'Link is {} but no Torrent client is enabled.'.format(kind)}
+
+        data = dict(core.sql.get_single_search_result('guid', guid))
+        if data:
+            data['year'] = core.sql.get_movie_details('imdbid', data['imdbid'])['year']
+            return snatcher.download(data)
+        else:
+            return {'response': False, 'error': 'Unable to read {} details from database'.format(kind)}
 
     @api_json_out
     def version(self, *args):
