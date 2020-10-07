@@ -1239,7 +1239,7 @@ class Manage(object):
 
     @staticmethod
     def update_movie_options(imdbid, quality, category, language, title, filters):
-        ''' Updates quality settings for individual title
+        ''' Updates quality settings for individual title, if any value is None it won't be changed
         imdbid (str): imdb identification number
         quality (str): name of new quality
         category (str): name of new category
@@ -1252,8 +1252,9 @@ class Manage(object):
 
         logging.info('Setting quality, category, title, language and filters for {}.'.format(imdbid))
         new_data = {'quality': quality, 'category': category, 'filters': filters, 'title': title, 'download_language': language}
+        new_data = {k: v for k, v in new_data.items() if v is not None}
         movie = core.sql.get_movie_details('imdbid', imdbid)
-        if movie.get('download_language') != language:
+        if language is not None and movie.get('download_language') != language:
             tmdb_data = Metadata.tmdb_data(imdbid, tmdbid=movie.get('tmdbid'), language=language)
             if tmdb_data is not None:
                 new_data['plot'] = tmdb_data['overview']
@@ -1262,6 +1263,8 @@ class Manage(object):
                 else:
                     new_data['english_title'] = None
 
+                if 'title' not in new_data:
+                    new_data['title'] = tmdb_data['title']
                 if tmdb_data.get('lang_titles'):
                     new_data['alternative_titles'] = ','.join([title for title in tmdb_data['lang_titles'] if title != new_data['title']])
                 elif tmdb_data.get('alternative_titles') and not isinstance(tmdb_data.get('alternative_titles'), str):
@@ -1270,10 +1273,11 @@ class Manage(object):
                         if i['iso_3166_1'] == 'US':
                             a_t.append(i['title'])
                     new_data['alternative_titles'] = ','.join(a_t)
+        else:
+            if new_data.get('title') and new_data['title'] != movie['title']:
+                alt_titles = movie.get('alternative_titles', '').split(',')
+                if movie['title'] not in alt_titles:
+                    alt_titles.append(movie['title'])
+                    new_data['alternative_titles'] = ','.join(alt_titles)
 
-        if new_data['title'] != movie['title']:
-            alt_titles = movie.get('alternative_titles', '').split(',')
-            if movie['title'] not in alt_titles:
-                alt_titles.append(movie['title'])
-                new_data['alternative_titles'] = ','.join(alt_titles)
         return core.sql.update_multiple_values('MOVIES', new_data, 'imdbid', imdbid)

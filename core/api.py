@@ -502,11 +502,11 @@ class API(object):
         if not movie:
             return {'response': False, 'error': 'no movie for {}'.format(imdbid)}
 
-        quality = params.get('quality', movie['quality'])
-        category = params.get('category', movie['category'])
-        language = params.get('language', movie['download_language'])
-        title = params.get('title', movie['title'])
-        filters = params.get('filters', movie['filters'])
+        quality = params.get('quality')
+        category = params.get('category')
+        language = params.get('language')
+        title = params.get('title')
+        filters = params.get('filters')
         if Manage.update_movie_options(imdbid, quality, category, language, title, filters):
             movie = core.sql.get_movie_details('imdbid', imdbid)
             return {'response': True, 'message': 'Movie options updated', 'movie': movie}
