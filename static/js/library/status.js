@@ -651,6 +651,11 @@ function change_movie_info(tmdb_data){
         }
     } else {
         $titles.append($('<option>').attr('value', tmdb_data.title).text(tmdb_data.title));
+        if (tmdb_data.alternative_titles) {
+            for(title of tmdb_data.alternative_titles.titles){
+                if (title.iso_3166_1 == 'US') $titles.append($('<option>').attr('value', title.title).text(title.title));
+            }
+        }
     }
 }
 
