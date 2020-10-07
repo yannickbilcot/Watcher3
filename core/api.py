@@ -10,7 +10,7 @@ import logging
 
 logging = logging.getLogger(__name__)
 
-api_version = 2.6
+api_version = 2.8
 
 ''' API
 
@@ -119,7 +119,7 @@ mode=search_movie
         Request:
             ?apikey=123456789&mode=search_movie&q=Movie%20Title
         Response:
-            {'response': True, 'results', [{'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot']}
+            {'response': True, 'results', [{'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot'}]
             
 mode=search_results
     Description:
@@ -136,6 +136,22 @@ mode=search_results
             ?apikey=123456789&mode=search_results&imdbid=tt0000000
         Response:
             {'response': false, 'error': 'no movie for tt0000000'}
+            
+mode=movie_metadata
+    Description:
+        Gets metadata for movie.
+        Requires imdbid, tmdbid optional, language optional (lang_code-country_code)
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=movie_metadata&imdbid=tt1234567&language=es-ES
+        Response:
+            {'response': True, 'tmdb_data': {'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot'}}
+
+        Request:
+            ?apikey=123456789&mode=movie_metadata&imdbid=tt0000000
+        Response:
+            {'response': false, 'error': 'Empty response from TMDB'}
             
 mode=update_metadata
     Description:
@@ -163,7 +179,7 @@ mode=update_movie_options
         Request:
             ?apikey=123456789&mode=update_movie_options&imdbid=tt1234567&quality=Default
         Response:
-            {'response': True, 'message': 'Movie options updated'}
+            {'response': True, 'message': 'Movie options updated', 'movie': {'tmdbid': 'xxxx', 'title': 'Movie Title', 'year': 2019, 'plot': 'Movie plot'}}
 
         Request:
             ?apikey=123456789&mode=update_metadata&imdbid=tt0000000
@@ -239,6 +255,7 @@ Major version changes can be expected to break api interactions
 2.5     Add search_movie, task, update_check, update_metadata and update_movie_options methods.
 2.6     Add search_results method.
 2.7     Add manual_download method.
+2.8     Add movie_metadata method, and return movie with new data in update_movie_options.
 '''
 
 
@@ -439,6 +456,31 @@ class API(object):
             return r
 
     @api_json_out
+    def movie_metadata(self, params):
+        ''' Gets metadata for imdbid from TheMovieDB
+        params(dict): params passed in request url, must include imdbid, may include tmdbid and language
+        imdbid (str): imdbid of movie
+        tmdbid (str): tmdbid of movie     <optional - default None>
+
+        If tmdbid is None, looks in database for tmdbid using imdbid.
+        If that fails, looks on tmdb api for imdbid
+        If that fails returns error message
+
+
+        Returns dict ajax-style response
+        '''
+        imdbid = params.get('imdbid')
+        if not imdbid:
+            return {'response': False, 'error': 'no imdbid supplied'}
+
+        tmdbid = params.get('tmdbid')
+        result = Metadata.tmdb_data(imdbid, tmdbid=tmdbid, language=params.get('language'))
+        if result:
+            return {'response': True, 'tmdb_data': result}
+        else:
+            return {'response': False, 'error': 'Unable to find {} on TMDB.'.format(tmdbid or imdbid)}
+
+    @api_json_out
     def update_movie_options(self, params):
         ''' Re-downloads metadata for imdbid
         params(dict): params passed in request url, must include imdbid, may include these params:
@@ -466,7 +508,8 @@ class API(object):
         title = params.get('title', movie['title'])
         filters = params.get('filters', movie['filters'])
         if Manage.update_movie_options(imdbid, quality, category, language, title, filters):
-            return {'response': True, 'message': 'Movie options updated'}
+            movie = core.sql.get_movie_details('imdbid', imdbid)
+            return {'response': True, 'message': 'Movie options updated', 'movie': movie}
         else:
             return {'response': False, 'message': 'Unable to write to database'}
 
