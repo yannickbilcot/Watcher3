@@ -10,7 +10,7 @@ import logging
 
 logging = logging.getLogger(__name__)
 
-api_version = 2.8
+api_version = 2.9
 
 ''' API
 
@@ -185,6 +185,17 @@ mode=update_movie_options
             ?apikey=123456789&mode=update_metadata&imdbid=tt0000000
         Response:
             {'response': false, 'error': 'Error saving movie options'}
+            
+mode=update_movie_file
+    Description:
+        Update finished_file for movie.
+        Requires imdbid and file
+
+    Example:
+        Request:
+            ?apikey=123456789&mode=update_movie_file&imdbid=tt1234567&file=/data/movies/Movie (Year)/new_movie_file.mp4
+        Response:
+            {'response': True, 'message': 'Finished file updated'}
 
 mode=manual_download
     Description:
@@ -256,6 +267,7 @@ Major version changes can be expected to break api interactions
 2.6     Add search_results method.
 2.7     Add manual_download method.
 2.8     Add movie_metadata method, and return movie with new data in update_movie_options.
+2.9     Add update_movie_file method.
 '''
 
 
@@ -513,6 +525,28 @@ class API(object):
         else:
             return {'response': False, 'message': 'Unable to write to database'}
 
+    @api_json_out
+    def update_movie_file(self, params):
+        ''' Re-downloads metadata for imdbid
+        params(dict): params passed in request url, must include imdbid and file
+
+        imdbid (str): imdbid of movie
+        file (str): new path for file, to save in finished_file field
+
+        Returns dict ajax-style response
+        '''
+        imdbid = params.get('imdbid')
+        if not imdbid:
+            return {'response': False, 'error': 'no imdbid supplied'}
+        file = params.get('file')
+        if not file:
+            return {'response': False, 'error': 'no file supplied'}
+
+        logging.info('Changing finished_file to {} for {}'.format(file, imdbid))
+        if core.sql.update('MOVIES', 'finished_file', file, 'imdbid', imdbid):
+            return {'response': True, 'message': 'Finished file updated'}
+        else:
+            return {'response': False, 'message': 'Unable to write to database'}
 
     @api_json_out
     def search_results(self, params):
