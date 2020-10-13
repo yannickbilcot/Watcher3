@@ -6,7 +6,7 @@
         <link href="${url_base}/static/css/settings/search.css?v=010" rel="stylesheet">
 
         <script src="${url_base}/static/js/settings/shared.js?v=012" type="text/javascript"></script>
-        <script src="${url_base}/static/js/settings/search.js?v=011" type="text/javascript"></script>
+        <script src="${url_base}/static/js/settings/search.js?v=012" type="text/javascript"></script>
     </head>
     <body>
         ${navbar}
@@ -46,9 +46,10 @@
 
                 <div class="col-md-6">
                     <label>${_('Verify Availability')}</label>
-                    <select id="verifyreleases" class="form-control select-sm" value="${config['verifyreleases']}">
+                    <select id="verifyreleases" class="form-control select-sm" value="${'predb_unknown' if config.get('predb_unknown') else config['verifyreleases']}">
                         <option value="">${_('Disabled')}</option>
                         <option value="predb">PreDB</option>
+                        <option value="predb_unknown">PreDB (include unknown)</option>
                         <option value="mediareleasedate">${_('Home Media Release Date')}</option>
                     </select>
                 </div>

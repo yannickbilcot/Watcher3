@@ -78,7 +78,10 @@ def _search_db(title_year):
 
     title_year = Url.normalize(title_year, ascii_only=True)
 
-    url = 'http://predb.me/?cats=movies&search={}&rss=1'.format(title_year)
+    categories = 'movies'
+    if core.CONFIG['Search'].get('predb_unknown'):
+        categories += ',unknown'
+    url = 'http://predb.me/?cats={}&search={}&rss=1'.format(categories, title_year)
 
     try:
         response = Url.open(url).text
@@ -104,7 +107,10 @@ def _search_rss(movies):
     logging.info('Checking predb rss for {}'.format(', '.join(i['title'] for i in movies)))
 
     try:
-        feed = Url.open('https://predb.me/?cats=movies&rss=1').text
+        categories = 'movies'
+        if core.CONFIG['Search'].get('predb_unknown'):
+            categories += ',unknown'
+        feed = Url.open('https://predb.me/?cats={}&rss=1'.format(categories)).text
         items = _parse_predb_xml(feed)
 
         for movie in movies:

@@ -35,6 +35,10 @@ function _get_settings(){
         }
         settings[input.id] = parse_input(input);
     })
+    if(settings['verifyreleases'] === 'predb_unknown'){
+        settings['verifyreleases'] = 'predb';
+        settings['predb_unknown'] = true;
+    }
 
 // SERVER['WATCHLISTS']
     required_fields = []
