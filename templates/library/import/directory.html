@@ -59,6 +59,30 @@
                         </span>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <label>${_('Skip duplicate dirs')}</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i id="skip_duplicate_dirs" class="mdi mdi-checkbox-marked c_box" value="True"></i>
+                            </span>
+                        </span>
+                        <span class="input-group-item form-control">
+                            ${_('Skip duplicate dirs')}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label>${_('Maximum Result Count')}</label>
+                    <div class="input-group">
+                        <input type="number" id="max_results" class="form-control" min="0" value="100">
+                        <span class="input-group-append">
+                            <span class="input-group-text">
+                                ${_('Results')}
+                            </span>
+                        </span>
+                    </div>
+                </div>
                 <div class="col-md-12 mt-3">
                     <button class="btn btn-primary float-right" onclick="connect(event, this)">
                         <i class="mdi mdi-file-find"></i>

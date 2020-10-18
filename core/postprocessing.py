@@ -673,6 +673,28 @@ class Postprocessing(object):
 
         Returns str new path
         '''
+
+        # Find the first alpha/digit character in {sort_title} or {title}
+        if data['sort_title'] and 'first' not in data:
+            for c in data['sort_title']:
+                if c.isalpha():
+                    data['first'] = c.upper()
+                    break
+                if c.isdigit():
+                    data['first'] = '#'
+                    break
+        # Find the first alpha/digit character in {title}
+        if data['title'] and 'first' not in data:
+            for c in data['title']:
+                if c.isalpha():
+                    data['first'] = c.upper()
+                    break
+                if c.isdigit():
+                    data['first'] = '#'
+                    break
+        if 'first' not in data:
+            data['first'] = '#'
+
         new_string = string
         for k, v in data.items():
             k = '{' + k + '}'
