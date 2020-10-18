@@ -68,10 +68,7 @@ function connect(event, elem){
 
     var $maxresults = document.getElementById("max_results");
     var maxresults = $maxresults.value;
-    if(maxresults === ""){
-        $maxresults.classList.add("border-danger");
-        return false;
-    } else {
+    if(maxresults !== ""){
         maxresults = parseInt(maxresults, 10);
         if(maxresults < 0){
             maxresults = 0;

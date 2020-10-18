@@ -699,9 +699,10 @@ class Ajax(object):
 
         # Limit the number of results
         # We do this here instead of at the scan so we skip files we have already imported
-        maxresults = int(maxresults)
-        if maxresults and maxresults > 0:
-            files = files[0:maxresults]
+        if maxresults:
+            maxresults = int(maxresults)
+            if maxresults > 0:
+                files = files[0:maxresults]
 
         length = len(files)
 
