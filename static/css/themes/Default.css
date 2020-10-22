@@ -8052,3 +8052,35 @@ a.text-dark:hover, a.text-dark:focus {
     border: 1px solid #ddd
   }
 }
+
+/* Main toolbar alignment */
+#toolbar {
+  justify-content: space-between;
+}
+
+#toolbar > div.text-center {
+  flex: none;
+  max-width: 100%;
+}
+
+#toolbar > div {
+  flex: none;
+  max-width: 100%;
+  width: auto;
+}
+
+@media (max-width: 824px) {
+  #toolbar > div {
+    width: 100%;
+  }
+
+  body #toolbar .col-md-4.col-sm-6.order-md-3 {
+    text-align: left;
+  }
+}
+
+@media (max-width: 470px) {
+  body #toolbar .col-md-4.col-sm-6.order-md-3 .btn-group {
+    flex-wrap: wrap;
+  }
+}
