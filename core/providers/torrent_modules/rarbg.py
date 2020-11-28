@@ -64,7 +64,7 @@ def search(imdbid, term, ignore_if_imdbid_cap = False):
             now = datetime.datetime.now()
 
     try:
-        url = '{}/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=movies&format=json_extended&app_id=Watcher'.format(host, _token(), imdbid)
+        url = '{}/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=14;48;17;44;45;47;50;51;52;42;46;54&format=json_extended&app_id=Watcher'.format(host, _token(), imdbid)
 
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
