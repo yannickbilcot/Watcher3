@@ -4,7 +4,7 @@ ENV LANG="en_US.utf8" APP_NAME="watcher3" IMG_NAME="watcher3" PATH="/opt/watcher
 
 RUN apk add --no-cache bash curl git nano vim ca-certificates python3 su-exec
 
-RUN mkdir /opt/$APP_NAME && cd /opt/$APP_NAME && git clone https://github.com/barbequesauce/Watcher3 .
+RUN mkdir /opt/$APP_NAME && cd /opt/$APP_NAME && git clone https://github.com/mooneye14/Watcher3 .
 
 RUN rm -rf /tmp/* /var/tmp/* /opt/$APP_NAME/entrypoint.sh /opt/$APP_NAME/Docker
 
