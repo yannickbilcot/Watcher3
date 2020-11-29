@@ -27,6 +27,7 @@ Refer to the wiki for more information about post-processing, start scripts, and
 ## Latest
 
 Added ARM 32 and 64 bit docker images.
+Added docker timezone support.
  
 ## Installation
 
@@ -179,4 +180,22 @@ So for example:
   barbequesauce/watcher3:armhf
 ``` 
 
-You may also wish to checkout ellnic's repo: https://github.com/ellnic/Watcher3 [this is considered unstable at times please see warning in readme]
+### Docker Timezone
+
+By default, the Alpine docker images use UTC. You can set the timezone using the `TZ` env variable and your TZ code from the database [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+For example:
+
+
+```
+    docker run -d \
+  --name=watcher3 \
+  -v /path/to/config/:/config \
+  -v /path/to/downloads/:/downloads \
+  -v /path/to/movies/:/movies \
+  -e UMASK_SET=022 \
+  -e APP_UID=1000 -e APP_GID=1000 \
+  -e TZ="Europe/London" \
+  -p 9090:9090 \
+  barbequesauce/watcher3:armhf
+``` 
