@@ -4,6 +4,7 @@ from core.library import Manage
 import json
 import core
 import datetime
+import time
 from core import searcher
 import xml.etree.cElementTree as ET
 import re
@@ -134,10 +135,65 @@ def sync_rss():
 
     logging.info('Trakt RSS sync complete.')
 
+def api_get_token(refresh=False):
+    ''' Get Trakt API access token
+    refresh(bool): if True, use the refresh_token to get a new access_token without asking the user to re-authenticate.
+    '''
+    logging.info('Getting Trakt API access token')
+    url = 'https://api.trakt.tv/oauth/token'
+    ret = ''
+
+    headers = {'Content-Type': 'application/json'}
+
+    data = {'client_id': core.CONFIG['Search']['Watchlists']['traktclientid'],
+            'client_secret': core.CONFIG['Search']['Watchlists']['traktclientsecret'],
+            'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
+            'grant_type': 'authorization_code'
+            }
+
+    if refresh:
+        data['grant_type'] = 'refresh_token'
+        data['refresh_token'] = core.sql.system('trakt_refresh_token')
+    else:
+        data['code'] = core.CONFIG['Search']['Watchlists']['traktdevicecode']
+
+    try:
+        r = Url.open(url, headers=headers, post_data=json.dumps(data))
+        if r.status_code == 200:
+            m = json.loads(r.text)
+
+            if core.sql.row_exists('SYSTEM', name='trakt_access_token'):
+                core.sql.update('SYSTEM', 'data', m['access_token'], 'name', 'trakt_access_token')
+            else:
+                core.sql.write('SYSTEM', {'data': m['access_token'], 'name': 'trakt_access_token'})
+
+            if core.sql.row_exists('SYSTEM', name='trakt_refresh_token'):
+                core.sql.update('SYSTEM', 'data', m['refresh_token'], 'name', 'trakt_refresh_token')
+            else:
+                core.sql.write('SYSTEM', {'data': m['refresh_token'], 'name': 'trakt_refresh_token'})
+
+            ret = m['access_token']
+
+        elif r.status_code == 400:
+            logging.error('Error 400: Pending - waiting for the user to authorize your app')
+        elif r.status_code == 404:
+            logging.error('Error 404: Not Found - invalid device_code')
+        elif r.status_code == 409:
+            logging.error('Error 409: Already Used - user already approved this code')
+        elif r.status_code == 410:
+            logging.error('Error 410: Expired - the tokens have expired, restart the process')
+            time.sleep(1)
+            api_get_token(refresh=True)
+        elif r.status_code == 418:
+            logging.error('Error 418: Denied - user explicitly denied this code')
+    except Exception:
+        logging.error('Unable to get Trakt API token.', exc_info=True)
+
+    return ret
 
 def get_list(list_name, min_score=0, length=10):
     ''' Gets list of trending movies from Trakt
-    list_name (str): name of Trakt list. Must be one of ('trending', 'popular', 'watched', 'collected', 'anticipated', 'boxoffice')
+    list_name (str): name of Trakt list. Must be one of ('trending', 'popular', 'watched', 'collected', 'anticipated', 'boxoffice', 'watchlist')
     min_score (float): minimum score to accept (max 10)   <optional - default 0>
     length (int): how many results to get from Trakt      <optional - default 10>
 
@@ -151,23 +207,42 @@ def get_list(list_name, min_score=0, length=10):
 
     headers = {'Content-Type': 'application/json',
                'trakt-api-version': '2',
-               'trakt-api-key': Comparisons._k(b'trakt')
+               'trakt-api-key': core.CONFIG['Search']['Watchlists']['traktclientid']
                }
 
-    if list_name not in ('trending', 'popular', 'watched', 'collected', 'anticipated', 'boxoffice'):
+    if list_name not in ('trending', 'popular', 'watched', 'collected', 'anticipated', 'boxoffice', 'watchlist'):
         logging.error('Invalid list_name {}'.format(list_name))
         return []
 
     url = 'https://api.trakt.tv/movies/{}/?extended=full'.format(list_name)
 
+    if list_name == 'watchlist':
+        url = 'https://api.trakt.tv/sync/watchlist/movies'
+        try:
+            access_token = core.sql.system('trakt_access_token')
+        except Exception:
+            access_token = api_get_token()
+            if access_token == '':
+                return []
+        headers['Authorization'] = 'Bearer {}'.format(access_token)
+
     try:
         r = Url.open(url, headers=headers)
-        if r.status_code != 200:
+        if r.status_code == 200:
+            m = json.loads(r.text)
+            if list_name == 'popular':
+                return [i for i in m[:length] if i['rating'] >= min_score]
+            elif list_name == "watchlist":
+                return [i['movie'] for i in m]
+            return [i['movie'] for i in m[:length] if i['movie']['rating'] >= min_score]
+        elif r.status_code == 401:
+            logging.error('Error 401: Unauthorized')
+            time.sleep(1)
+            api_get_token(refresh=True)
+            time.sleep(1)
+            return get_list(list_name, min_score, length)
+        else:
             return []
-        m = json.loads(r.text)[:length]
-        if list_name == 'popular':
-            return [i for i in m if i['rating'] >= min_score]
-        return [i['movie'] for i in m if i['movie']['rating'] >= min_score]
 
     except Exception as e:
         logging.error('Unable to get Trakt list.', exc_info=True)

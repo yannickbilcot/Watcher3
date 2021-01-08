@@ -267,8 +267,23 @@
                     <input type="number" id="traktscore" class="form-control" min="0" placeholder="7" value="${config['Watchlists']['traktscore']}">
                 </div>
 
+                <div class="col-md-4">
+                    <label>${_('Trakt Watcher API Client ID')}</label>
+                    <input type="text" id="traktclientid" class="form-control" placeholder="" value="${config['Watchlists']['traktclientid']}">
+                </div>
+
+                <div class="col-md-4">
+                    <label>${_('Trakt Watcher API Client Secret')}</label>
+                    <input type="text" id="traktclientsecret" class="form-control" placeholder="" value="${config['Watchlists']['traktclientsecret']}">
+                </div>
+
+                <div class="col-md-2">
+                    <label>${_('Trakt API app code')}</label>
+                    <input type="text" id="traktappcode" class="form-control" placeholder="" value="${config['Watchlists']['traktappcode']}">
+                </div>
+
                 <div class="col-md-6">
-                    <label>${_('Trakt Watchlist URLs')}</label>
+                    <label>${_('Trakt Watchlist URLs (RSS)')}</label>
                     <input type="text" id="traktrss" class="form-control" placeholder="https://trakt.tv/users/user/lists/movielist.atom?..." value="${config['Watchlists']['traktrss']}" data-toggle="tooltip" title="${_('Separate lists with commas')}">
                 </div>
 
@@ -349,6 +364,19 @@
                         </div>
                         <span class="input-group-item form-control">
                             ${_('Watched')}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i id="watchlist" class="mdi mdi-checkbox-blank-outline c_box" data-sub-category="traktlist" value="${config['Watchlists']['Traktlists']['watchlist']}"></i>
+                            </span>
+                        </div>
+                        <span class="input-group-item form-control">
+                            ${_('Watchlist')}
                         </span>
                     </div>
                 </div>
