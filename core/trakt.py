@@ -155,7 +155,7 @@ def api_get_token(refresh=False):
         data['grant_type'] = 'refresh_token'
         data['refresh_token'] = core.sql.system('trakt_refresh_token')
     else:
-        data['code'] = core.CONFIG['Search']['Watchlists']['traktdevicecode']
+        data['code'] = core.CONFIG['Search']['Watchlists']['traktappcode']
 
     try:
         r = Url.open(url, headers=headers, post_data=json.dumps(data))
