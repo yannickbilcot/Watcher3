@@ -11,39 +11,6 @@ logging = logging.getLogger(__name__)
 
 
 class TheMovieDatabase(object):
-    tokens = 30             # int initial amount of tokens for TMDB rate limiting
-    last_token_fill = time()      # float epoch time of last token fill
-    token_capacity = 30     # int max number of tokens. TMDB allows more, but artificially restricting the hit rate doesn't hurt
-
-    @staticmethod
-    def _get_tokens():
-        ''' Refills TMDB tokens if possible
-
-        If tokens are needed, checks if they've been refilled in the
-            last 10 seconds and tops off the capacity.
-
-        Returns int # of tmdb tokens available
-        '''
-        if TheMovieDatabase.tokens < TheMovieDatabase.token_capacity:
-            now = time()
-            if (now - TheMovieDatabase.last_token_fill) > 10:
-                TheMovieDatabase.tokens = TheMovieDatabase.token_capacity
-                TheMovieDatabase.last_token_fill = time()
-        return TheMovieDatabase.tokens
-
-    @staticmethod
-    def _use_token():
-        ''' Uses tmdb api token
-
-        Used as a blocking method before url requests.
-        If remaining tokens are fewer than 3 waits for refill.
-
-        Does not return
-        '''
-        while TheMovieDatabase._get_tokens() < 3:
-            sleep(0.3)
-        TheMovieDatabase.tokens -= 1
-
     @staticmethod
     def search(search_term, single=False):
         ''' Search TMDB for all matches
@@ -103,7 +70,6 @@ class TheMovieDatabase(object):
         logging.info('Searching TMDB {}'.format(url))
         url = url + '&api_key={}'.format(_k(b'tmdb'))
 
-        TheMovieDatabase._use_token()
 
         try:
             results = json.loads(Url.open(url).text)
@@ -132,7 +98,6 @@ class TheMovieDatabase(object):
         logging.info('Searching TMDB {}'.format(url))
         url = url + '&api_key={}'.format(_k(b'tmdb'))
 
-        TheMovieDatabase._use_token()
 
         try:
             results = json.loads(Url.open(url).text)
@@ -165,7 +130,6 @@ class TheMovieDatabase(object):
         logging.info('Searching TMDB {}'.format(url))
         url += '&api_key={}'.format(_k(b'tmdb'))
 
-        TheMovieDatabase._use_token()
 
         try:
             response = Url.open(url)
@@ -254,7 +218,6 @@ class TheMovieDatabase(object):
 
             url = 'https://api.themoviedb.org/3/search/movie?api_key={}&language=en-US&query={}&year={}&page=1&include_adult={}'.format(_k(b'tmdb'), title, year, 'true' if core.CONFIG['Search']['allowadult'] else 'false')
 
-            TheMovieDatabase._use_token()
 
             try:
                 results = json.loads(Url.open(url).text)
@@ -271,7 +234,6 @@ class TheMovieDatabase(object):
 
         url = 'https://api.themoviedb.org/3/movie/{}?api_key={}'.format(tmdbid, _k(b'tmdb'))
 
-        TheMovieDatabase._use_token()
 
         try:
             results = json.loads(Url.open(url).text)
@@ -302,7 +264,6 @@ class TheMovieDatabase(object):
 
         url += '&api_key={}'.format(_k(b'tmdb'))
 
-        TheMovieDatabase._use_token()
 
         try:
             results = json.loads(Url.open(url).text)
