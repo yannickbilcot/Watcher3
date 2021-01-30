@@ -6,6 +6,7 @@ from core import plugins
 from core import downloaders
 from core.helpers import Torrent
 from core.library import Manage
+from core.providers import torrent_modules
 
 logging = logging.getLogger(__name__)
 
@@ -183,8 +184,8 @@ def download(data):
     if data['type'] in ('torrent', 'magnet'):
         if core.CONFIG['Downloader']['Sources']['torrentenabled']:
             response = snatch_torrent(data)
-            if not response['response']:
-                for result in core.sql.get_single_search_result('guid', data['guid'], all_indexers=True):
+            if not response['response'] and not response['guid'].startswith('redirect'):
+                for result in core.sql.get_single_search_result('guid', response['guid'], all_indexers=True):
                     if result['indexer'] != indexer:
                         response = snatch_torrent(result)
                         if response['response'] is True:
@@ -242,6 +243,21 @@ def snatch_torrent(data):
     imdbid = data['imdbid']
     title = data['title']
     kind = data['type']
+
+    if guid.startswith('redirect'):
+        indexer = getattr(torrent_modules, data['indexer'].lower())
+        if hasattr(indexer, 'get_hash_and_magnet'):
+            guid_, magnet = indexer.get_hash_and_magnet(data['info_link'])
+            if guid_ and magnet:
+                core.sql.update('SEARCHRESULTS', 'torrentfile', magnet, 'guid', guid)
+                core.sql.update('SEARCHRESULTS', 'guid', guid_, 'guid', guid)
+                guid = guid_
+                data['torrentfile'] = magnet
+                data['guid'] = guid
+            else:
+                return {'response': False, 'error': 'Unable to get torrent hash and magnet from indexer.'}
+        else:
+            logging.warning('Torrent indexer {} do not support get_hash_and_magnet().'.format(indexer))
 
     if urllib.parse.urlparse(guid).netloc:
         # if guid is not a url and not hash we'll have to get the hash now

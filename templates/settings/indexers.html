@@ -109,6 +109,23 @@
             <h1>${_('Torrent Indexers')}</h1>
             <form class="form-group row bg-light rounded mx-auto py-3" data-category="torrent">
                 <div class="col-md-6">
+                    <label>1337x</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="1337x-enabled" value="${config['Torrent']['1337x']['enabled']}"></i>
+                            </span>
+                        </div>
+                        <span class="input-group-item form-control">
+                            ${_('Enabled')}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label>${_('URL')}</label>
+                    <input type="text" id="1337x-url" class="form-control" value="${config['Torrent']['1337x']['url']}">
+                </div>
+                <div class="col-md-6">
                     <label>LimeTorrents</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -175,6 +192,23 @@
                 <div class="col-md-6">
                     <label>${_('URL')}</label>
                     <input type="text" id="torrentdownloads-url" class="form-control" value="${config['Torrent']['torrentdownloads']['url']}">
+                </div>
+                <div class="col-md-6">
+                    <label>TorrentGalaxy</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="mdi mdi-checkbox-blank-outline c_box" id="torrentgalaxy-enabled" value="${config['Torrent']['torrentgalaxy']['enabled']}"></i>
+                            </span>
+                        </div>
+                        <span class="input-group-item form-control">
+                            ${_('Enabled')}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label>${_('URL')}</label>
+                    <input type="text" id="torrentgalaxy-url" class="form-control" value="${config['Torrent']['torrentgalaxy']['url']}">
                 </div>
                 <div class="col-md-6">
                     <label>Torrentz2</label>
