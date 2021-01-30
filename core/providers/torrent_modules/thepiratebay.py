@@ -20,8 +20,8 @@ def search(imdbid, term, ignore_if_imdbid_cap = False):
 
     logging.info('Performing backlog search on ThePirateBay for {}.'.format(imdbid))
 
-    host = base_url()
-    url = '{}/q.php?q={}'.format(host, imdbid)
+    host = 'https://apibay.org'
+    url = '{}/q.php?q={}&cat=201'.format(host, imdbid)
     try:
         if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
@@ -44,8 +44,8 @@ def get_rss():
 
     logging.info('Fetching latest RSS from ThePirateBay.')
 
-    host = base_url()
-    url = '{}/q.php?q=category:201'.format(host)
+    host = 'https://apibay.org'
+    url = '{}/precompiled/data_top100_48h_201.json'.format(host)
     try:
         if proxy_enabled and core.proxy.whitelist(host) is True:
             response = Url.open(url, proxy_bypass=True).text
