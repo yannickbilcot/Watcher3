@@ -1001,7 +1001,11 @@ class Ajax(object):
             tmdb_data = tmdb_data[0]
 
             movie['id'] = tmdb_data['id']
-            movie['size'] = 0
+            try:
+                movie['size'] = os.path.getsize(movie.get('finished_file'))
+            except OSError as e:
+                movie['size'] = 0
+                logging.error('Unable to get the file size', exc_info=True)
             movie['status'] = 'Disabled'
             movie['predb'] = 'found'
             movie['finished_file'] = (movie.get('finished_file') or '').strip()
