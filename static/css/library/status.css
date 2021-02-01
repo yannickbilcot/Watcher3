@@ -259,8 +259,7 @@ div#settings_advanced span.input-group-text{
 
 /* Search Results table */
 ul#search_results_table{
-    overflow-y: scroll;
-    max-height: 18em;
+    max-height: 100%;
     transition: .6s;
     padding: 0;
     margin: 0;
