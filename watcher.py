@@ -19,7 +19,7 @@ else:
 import argparse     # noqa
 import locale       # noqa
 import logging      # noqa
-import webbrowser   # noqa
+#import webbrowser   # noqa
 import shutil       # noqa
 
 import cherrypy     # noqa
