@@ -7,6 +7,7 @@ import core
 from core.helpers import Url
 import json
 import re
+import unicodedata
 
 logging = logging.getLogger(__name__)
 
@@ -445,6 +446,10 @@ def fuzzy_title(releases, titles, english_title, lang_names):
     logging.info('Keeping {} releases.'.format(len(releases) - reject))
     return releases
 
+def _remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
 def _fuzzy_title(a, b):
     ''' Determines how much of a is in b
     a (str): String to match against b
@@ -468,8 +473,8 @@ def _fuzzy_title(a, b):
     a = a.replace(':', '')
     b = b.replace(':', '')
 
-    a_words = Url.normalize(a).split(' ')
-    b_words = Url.normalize(b).split(' ')
+    a_words = _remove_accents(Url.normalize(a)).split(' ')
+    b_words = _remove_accents(Url.normalize(b)).split(' ')
 
     m = 0
     a_len = len(a_words)

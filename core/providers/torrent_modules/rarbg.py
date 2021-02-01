@@ -64,7 +64,7 @@ def search(imdbid, term, ignore_if_imdbid_cap = False):
             now = datetime.datetime.now()
 
     try:
-        url = '{}/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=14;48;17;44;45;47;50;51;52;42;46;54&format=json_extended&app_id=Watcher'.format(host, _token(), imdbid)
+        url = '{}/pubapi_v2.php?token={}&mode=search&search_imdb={}&category=14;48;17;44;45;47;50;51;52;42;46;54&ranked=0&format=json_extended&app_id=myWatcherAPI'.format(host, _token(), imdbid)
 
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
@@ -107,7 +107,7 @@ def get_rss():
             now = datetime.datetime.now()
 
     try:
-        url = '{}/pubapi_v2.php?token={}&mode=list&category=movies&format=json_extended&app_id=Watcher'.format(host, _token())
+        url = '{}/pubapi_v2.php?token={}&mode=list&category=movies&ranked=0&format=json_extended&app_id=myWatcherAPI'.format(host, _token())
         timeout = datetime.datetime.now() + datetime.timedelta(seconds=2)
 
         if proxy_enabled and core.proxy.whitelist(host) is True:
@@ -138,7 +138,7 @@ def _get_token():
     '''
     logging.info('Getting RarBG access token.')
     host = base_url()
-    url = '{}/pubapi_v2.php?get_token=get_token&app_id=Watcher'.format(host)
+    url = '{}/pubapi_v2.php?get_token=get_token&app_id=myWatcherAPI'.format(host)
 
     try:
         result = json.loads(Url.open(url).text)
@@ -166,7 +166,7 @@ def _parse(results, imdbid=None):
     for result in results:
         result['indexer'] = 'Rarbg'
         if result['info_page']:
-            result['info_link'] = result['info_page'] + '&app_id=Watcher'
+            result['info_link'] = result['info_page'] + '&app_id=myWatcherAPI'
         result['torrentfile'] = result['download']
         result['guid'] = result['download'].split('&')[0].split(':')[-1]
         result['type'] = 'magnet'
